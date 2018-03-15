@@ -36,8 +36,8 @@ public class MjCardRule {
 			/**1-9万*/	0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,
 			/**1-9筒*/	9,9,9,9,10,10,10,10,11,11,11,11,12,12,12,12,13,13,13,13,14,14,14,14,15,15,15,15,16,16,16,16,17,17,17,17,
 			/**1-9条*/	18,18,18,18,19,19,19,19,20,20,20,20,21,21,21,21,22,22,22,22,23,23,23,23,24,24,24,24,25,25,25,25,26,26,26,26,
-		/**东南西北中发白*/	27,27,27,27,28,28,28,28,29,29,29,29,30,30,30,30,31,31,31,31,32,32,32,32,33,33,33,33,
-		/**春夏秋冬梅兰竹菊*/	34,35,36,37,38,39,40,41);
+		/**东南西北中发白*/	27,27,27,27,28,28,28,28,29,29,29,29,30,30,30,30,31,31,31,31,32,32,32,32,33,33,33,33);
+//		/**春夏秋冬梅兰竹菊*/	34,35,36,37,38,39,40,41);
 	private static List<Integer> list1 = Arrays.asList(0,0,0,1,1,1,2,2,2,3,3,6,4,5);
 	private static List<Integer> list2 = Arrays.asList(5,5,5,7,7,8,8,9,9,10,15,17,19);
 	private static List<Integer> list3 = Arrays.asList(3,4,6,7,8,9,10,11,12,13,14,17,17);
@@ -65,13 +65,28 @@ public class MjCardRule {
 		}
 		return list;
 	}
+
+	public static void removeCard(List<Integer> allCardList, List<Integer> cardList){
+	   for (Integer card: cardList){
+	       allCardList.remove(card);
+       }
+    }
+
 	public static List<Integer> getTableCardList(){
 		List<Integer> curTableCardList = new ArrayList<Integer>();
 		curTableCardList.addAll(tableList);
-		curTableCardList.removeAll(map.get(0));
-		curTableCardList.removeAll(map.get(1));
-		curTableCardList.removeAll(map.get(2));
-		curTableCardList.removeAll(map.get(3));
+		removeCard(curTableCardList,map.get(1));
+        removeCard(curTableCardList,map.get(2));
+        removeCard(curTableCardList,map.get(3));
+        removeCard(curTableCardList,map.get(4));
+        curTableCardList.addAll(0,map.get(4));
+        curTableCardList.addAll(0,map.get(3));
+        curTableCardList.addAll(0,map.get(2));
+        curTableCardList.addAll(0,map.get(1));
+//		curTableCardList.removeAll(map.get(1));
+//		curTableCardList.removeAll(map.get(2));
+//		curTableCardList.removeAll(map.get(3));
+//        curTableCardList.removeAll(map.get(4));
 		return curTableCardList;
 	}
 	
@@ -385,7 +400,7 @@ public class MjCardRule {
 				map.put(MjOperationEnum.hu.type, String.valueOf(MjHuTypeEnum.ziMo.type));
 			}
 			/**听牌校验*/
-			if (curPlayer.getIsTingHu() == 0) {
+			if ( curPlayer.getIsTingHu() == 0) {
 				Map<Integer, List<String>> chuCardIndexHuCardListMap = new HashMap<Integer, List<String>>();
 				if (checkTingHu1(roomInfo, curPlayer, cardIndex, chuCardIndexHuCardListMap)) {
 					/**4_4-2,7-1;7_4-2,7-1*/
@@ -553,7 +568,7 @@ public class MjCardRule {
 	/**
 	 * 校验手牌列表牌补花情况
 	 * @param player
-	 * @param tableRemainderCardList
+	 * @param
 	 * @return
 	 */
 	public static String checkHandCardsAddFlower(MjRoomInfo roomInfo, MjPlayerInfo player){
@@ -616,7 +631,7 @@ public class MjCardRule {
 	/**
 	 * 校验摸牌补花的情况
 	 * @param player
-	 * @param tableRemainderCardList
+	 * @param
 	 * @return
 	 */
 	public static String checkMoPaiAddFlower(MjRoomInfo roomInfo,  MjPlayerInfo player){
@@ -651,7 +666,7 @@ public class MjCardRule {
 	 * 补花操作
 	 * @param flowerCardStack
 	 * @param player
-	 * @param tableRemainderCardList
+	 * @param
 	 * @return 补花路径
 	 */
 	public static String addFlowerOperation(Stack<Integer> flowerCardStack, MjPlayerInfo player, MjRoomInfo roomInfo){
@@ -849,6 +864,8 @@ public class MjCardRule {
 		return map;
 	}
 	public static boolean checkTingHu1(MjRoomInfo roomInfo, MjPlayerInfo player, Integer cardIndex,Map<Integer, List<String>> chuCardIndexHuCardListMap){
+	    if (isJxNf(roomInfo))
+	        return false;
 		if (roomInfo.getBaiDaCardIndex() == null) {/**麻将没有百搭玩法*/
 			return checkTingHuWithOutBaiDa(roomInfo, player, cardIndex, chuCardIndexHuCardListMap);
 		}else{/**麻将有百搭玩法*/
@@ -1148,7 +1165,8 @@ public class MjCardRule {
 	 */
 	public static boolean checkHu(MjRoomInfo roomInfo, MjPlayerInfo player, Integer cardIndex){
 		boolean isHu = false;
-		if (player.getIsTingHu() == 0) {
+		if (!MjTypeEnum.jiangxiNanfeng.type.equals(roomInfo.getDetailType())
+                && player.getIsTingHu() == 0) {
 			return isHu;
 		}
 		
@@ -1157,15 +1175,20 @@ public class MjCardRule {
 		if (MjTypeEnum.shangHaiBaiDa.type.equals(roomInfo.getDetailType())) {
 			gui_index = roomInfo.getBaiDaCardIndex();
 		}
+		//todo
 		if (handCardList.size() == 14) {
 			isHu = Hulib.getInstance().get_hu_info(handCardList, Hulib.invalidCardInex, gui_index,roomInfo.getIndexLine());
-		}else{
+		}else if (cardIndex != null){
 			isHu = Hulib.getInstance().get_hu_info(handCardList, cardIndex, gui_index,roomInfo.getIndexLine());
 		}
 		return isHu;
 	}
-	
+
+    public static boolean isJxNf(MjRoomInfo mjRoomInfo){
+        return MjTypeEnum.jiangxiNanfeng.type.equals(mjRoomInfo.getDetailType());
+    }
+
 	public static void moveCardsFromHandCards(){
-		
+
 	}
 }

@@ -1,17 +1,17 @@
 package cn.worldwalker.game.wyqp.mj.cards;
 
+import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
-import cn.worldwalker.game.wyqp.mj.huvalidate.Hulib;
 
 public class MjCardResource {
 	
 	private static List<Integer> orderCardList = new ArrayList<Integer>();
 	static{
-		for(int i = 0; i < 42; i++){
+	    //先改成支持江西南丰
+		for(int i = 0; i < 34; i++){
 			if (i > 33) {
 				orderCardList.add(i);
 			}else{

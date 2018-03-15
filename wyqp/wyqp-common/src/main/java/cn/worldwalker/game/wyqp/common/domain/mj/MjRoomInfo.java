@@ -1,13 +1,12 @@
 package cn.worldwalker.game.wyqp.common.domain.mj;
 
+import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TreeMap;
-
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
-import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class MjRoomInfo extends BaseRoomInfo{
 	
@@ -54,8 +53,9 @@ public class MjRoomInfo extends BaseRoomInfo{
 	/**模式*/
 	private Integer model;
 	
-	private Integer indexLine;
-	
+	private Integer indexLine = 34;
+
+
 	public Integer getIndexLine() {
 		return indexLine;
 	}

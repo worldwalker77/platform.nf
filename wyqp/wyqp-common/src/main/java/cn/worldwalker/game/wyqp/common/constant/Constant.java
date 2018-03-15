@@ -43,7 +43,7 @@ public class Constant {
 	public final static String smsValidCodeMap = curCompany + "_sms_valide_code_map";
 
 	public static String noticeMsg = "游戏忠告:文明游戏，禁止赌博及其他违法行为  游戏代理及相关咨询加微信：" + CustomizedPropertyConfigurer.getContextProperty("proxy.cus.weixin");
-	
+
 	
 	/******************金花相关********************/
 	/**底注*/
@@ -103,8 +103,9 @@ public class Constant {
 	public static final String CODE_URL = "http://" + domain + clientFileUnrarFolder + "VERSION/game_code_VERSION.zip";//"D:/test/";
 	
 	public static final int isTest = Integer.valueOf(CustomizedPropertyConfigurer.getContextProperty("is.test"));
-	
-	public static final String mjTablePath = "C:/Users/worldwalker/Desktop/tables/";//(isTest == 1? "C:/Users/worldwalker/Desktop/tables/" : CustomizedPropertyConfigurer.getContextProperty("mj.table.path"));//
+
+	public static final String mjTablePath = (isTest == 1? "C:/Users/worldwalker/Desktop/tables/" : CustomizedPropertyConfigurer.getContextProperty("mj.table.path"));//
+//    public static final String mjTablePath = "/Users/zhangmin/tables/";//(isTest == 1? "C:/Users/worldwalker/Desktop/tables/" : CustomizedPropertyConfigurer.getContextProperty("mj.table.path"));//
 	public static final String sendSmsUrl = CustomizedPropertyConfigurer.getContextProperty("send.sms.url");
 	
 	public static final String smsAppId = CustomizedPropertyConfigurer.getContextProperty("sms.app.id");

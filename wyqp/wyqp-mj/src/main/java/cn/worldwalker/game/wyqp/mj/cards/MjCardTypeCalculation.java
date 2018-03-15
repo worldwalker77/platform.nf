@@ -1,10 +1,5 @@
 package cn.worldwalker.game.wyqp.mj.cards;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
@@ -12,7 +7,11 @@ import cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjTypeEnum;
 import cn.worldwalker.game.wyqp.mj.enums.QmCardTypeEnum;
 import cn.worldwalker.game.wyqp.mj.enums.ShbdCardTypeEnum;
-import cn.worldwalker.game.wyqp.mj.huvalidate.Hulib;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 public class MjCardTypeCalculation {
 	
@@ -87,7 +86,8 @@ public class MjCardTypeCalculation {
 		/**大吊车校验*/
 		checkDaDiaoChe(player, mjTypeEnum);
 		/**碰碰胡校验*/
-		checkPengPengHu(roomInfo, player, mjTypeEnum);
+		//todo 碰碰胡先屏了
+//		checkPengPengHu(roomInfo, player, mjTypeEnum);
 		List<Integer> mjCardTypeList = player.getMjCardTypeList();
 		/**特殊牌型都没有，则设置为平胡*/
 		if (mjCardTypeList.size() == 0) {

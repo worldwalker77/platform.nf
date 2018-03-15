@@ -1,18 +1,17 @@
 package cn.worldwalker.game.wyqp.common.utils.log;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import cn.worldwalker.game.wyqp.common.domain.base.PlayBackModel;
+import cn.worldwalker.game.wyqp.common.manager.CommonManager;
+import cn.worldwalker.game.wyqp.common.result.Result;
+import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cn.worldwalker.game.wyqp.common.domain.base.PlayBackModel;
-import cn.worldwalker.game.wyqp.common.manager.CommonManager;
-import cn.worldwalker.game.wyqp.common.result.Result;
-import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class LogDataService implements BatchTask<Result> {

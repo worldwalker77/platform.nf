@@ -1,32 +1,11 @@
 package cn.worldwalker.game.wyqp.mj.service;
 
-import io.netty.channel.ChannelHandlerContext;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Service;
-
 import cn.worldwalker.game.wyqp.common.constant.Constant;
-import cn.worldwalker.game.wyqp.common.domain.base.BaseMsg;
-import cn.worldwalker.game.wyqp.common.domain.base.BaseRequest;
-import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
-import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
-import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
+import cn.worldwalker.game.wyqp.common.domain.base.*;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjMsg;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
-import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
-import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
-import cn.worldwalker.game.wyqp.common.enums.OnlineStatusEnum;
-import cn.worldwalker.game.wyqp.common.enums.RoomCardOperationEnum;
-import cn.worldwalker.game.wyqp.common.enums.RoomStatusEnum;
+import cn.worldwalker.game.wyqp.common.enums.*;
 import cn.worldwalker.game.wyqp.common.exception.BusinessException;
 import cn.worldwalker.game.wyqp.common.exception.ExceptionEnum;
 import cn.worldwalker.game.wyqp.common.result.Result;
@@ -38,11 +17,12 @@ import cn.worldwalker.game.wyqp.common.utils.log.ThreadPoolMgr;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardResource;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardTypeCalculation;
-import cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjPlayerStatusEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjRoomStatusEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjTypeEnum;
+import cn.worldwalker.game.wyqp.mj.enums.*;
+import io.netty.channel.ChannelHandlerContext;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 @Service(value="mjGameService")
 public class MjGameService extends BaseGameService{
 
@@ -59,16 +39,21 @@ public class MjGameService extends BaseGameService{
 		roomInfo.setEachFlowerScore(msg.getEachFlowerScore());
 		roomInfo.setHuScoreLimit(msg.getHuScoreLimit());
 		roomInfo.setIsChiPai(msg.getIsChiPai());
-		if (MjTypeEnum.shangHaiBaiDa.type.equals(request.getDetailType())) {
+		//创建房间的时候记录麻将类型
+		roomInfo.setDetailType(request.getDetailType());
+		if (MjTypeEnum.shangHaiBaiDa.type.equals(roomInfo.getDetailType())) {
 			roomInfo.setModel(msg.getModel());
 			if (msg.getModel()  == 8) {
 				roomInfo.setIndexLine(31);
-			}else{
-				roomInfo.setIndexLine(34);
 			}
 			roomInfo.setNoBaiDaCanQiangGang(msg.getNoBaiDaCanQiangGang());
 			roomInfo.setNoBaiDaCanZhuaChong(msg.getNoBaiDaCanZhuaChong());
-		}
+        }
+
+        if (MjTypeEnum.jiangxiNanfeng.type.equals(roomInfo.getDetailType())){
+		    roomInfo.setIsChiPai(0);
+        }
+
 		List<MjPlayerInfo> playerList = roomInfo.getPlayerList();
 		MjPlayerInfo player = new MjPlayerInfo();
 		playerList.add(player);
@@ -84,7 +69,8 @@ public class MjGameService extends BaseGameService{
 		playerList.add(playerInfo);
 		return roomInfo;
 	}
-	
+
+
 	public void ready(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
 		Result result = new Result();
 		result.setGameType(GameTypeEnum.mj.gameType);
@@ -139,16 +125,19 @@ public class MjGameService extends BaseGameService{
 			boolean isKaiBao = MjCardRule.playDices(dices);
 			roomInfo.setDices(dices);
 			data.put("dices", dices);
-			if (isKaiBao) {
-				roomInfo.setIsCurGameKaiBao(1);
-			}
-			List<Integer> handCardListBeforeAddFlower = null;
-			String handCardAddFlower = null;
-			/**第54张牌是痞子，用于翻癞子*/
-			Integer piZiCardIndex = MjCardResource.genPiZiCardInex(tableRemainderCardList,roomInfo.getIndexLine());
-			Integer baiDaCardIndex = MjCardResource.genBaiDaCardIndex(piZiCardIndex);
-			roomInfo.setPiZiCardIndex(piZiCardIndex);
-			roomInfo.setBaiDaCardIndex(baiDaCardIndex);
+            if (!MjCardRule.isJxNf(roomInfo) && isKaiBao) {
+                    roomInfo.setIsCurGameKaiBao(1);
+            }
+            List<Integer> handCardListBeforeAddFlower = null;
+            String handCardAddFlower = null;
+            Integer piZiCardIndex = null, baiDaCardIndex = null;
+			if (!MjCardRule.isJxNf(roomInfo)){
+                /**第54张牌是痞子，用于翻癞子*/
+                piZiCardIndex = MjCardResource.genPiZiCardInex(tableRemainderCardList,roomInfo.getIndexLine());
+                baiDaCardIndex = MjCardResource.genBaiDaCardIndex(piZiCardIndex);
+                roomInfo.setPiZiCardIndex(piZiCardIndex);
+                roomInfo.setBaiDaCardIndex(baiDaCardIndex);
+            }
 			/**为每个玩家设置牌*/
 			for(int i = 0; i < size; i++ ){
 				MjPlayerInfo player = playerList.get(i);
@@ -157,16 +146,18 @@ public class MjGameService extends BaseGameService{
 				if (player.getPlayerId().equals(roomInfo.getRoomBankerId())) {
 					/**当前说话玩家的手牌缓存，由于没有补花之前的牌需要返回给客户端*/
 					handCardListBeforeAddFlower = new ArrayList<Integer>();
-					if (Constant.isTest == 1) {
+//					if (Constant.isTest == 1) {
 //						player.setHandCardList(MjCardRule.getHandCardListByIndex(i, true));//测试用
-					}else{
+//					}else{
 						player.setHandCardList(MjCardResource.genHandCardList(tableRemainderCardList, 14));
-					}
+//					}
 
 					/**补花之前的牌缓存*/
 					handCardListBeforeAddFlower.addAll(player.getHandCardList());
 					/**校验手牌补花*/
-					handCardAddFlower = MjCardRule.checkHandCardsAddFlower(roomInfo, player);
+                    if (!MjCardRule.isJxNf(roomInfo)) {
+                        handCardAddFlower = MjCardRule.checkHandCardsAddFlower(roomInfo, player);
+                    }
 					/**如果手牌中有补花牌，则将补花后的正常牌替换玩家手牌中的花牌*/
 					if (StringUtils.isNotBlank(handCardAddFlower)) {
 						handCardAddFlower = MjCardRule.replaceFlowerCards(player.getHandCardList(), handCardAddFlower);
@@ -180,28 +171,25 @@ public class MjGameService extends BaseGameService{
 					if (MjCardRule.getPlayerHighestPriority(roomInfo, player.getPlayerId()) != null) {
 						data.put("operations", MjCardRule.getPlayerHighestPriority(roomInfo, player.getPlayerId()));
 					}
-					data.put("piZiCardIndex", piZiCardIndex);
-					data.put("baiDaCardIndex", baiDaCardIndex);
-					channelContainer.sendTextMsgByPlayerIds(result, player.getPlayerId());
 				}else{/**闲家发13张牌*/
-					if (Constant.isTest == 1) {
+//					if (Constant.isTest == 1) {
 //						player.setHandCardList(MjCardRule.getHandCardListByIndex(i, false));//测试用
-					}else{
+//					}else{
 						player.setHandCardList(MjCardResource.genHandCardList(roomInfo.getTableRemainderCardList(), 13));
-					}
-					
-
+//					}
 					data.put("handCardList", player.getHandCardList());
 					data.remove("handCardAddFlower");
 					data.remove("operations");
-					data.put("piZiCardIndex", piZiCardIndex);
-					data.put("baiDaCardIndex", baiDaCardIndex);
-					channelContainer.sendTextMsgByPlayerIds(result, player.getPlayerId());
 				}
+				if (!MjCardRule.isJxNf(roomInfo)){
+                    data.put("piZiCardIndex", piZiCardIndex);
+                    data.put("baiDaCardIndex", baiDaCardIndex);
+                }
+                channelContainer.sendTextMsgByPlayerIds(result, player.getPlayerId());
 			}
 			MjPlayerInfo roomBankPlayer = MjCardRule.getPlayerInfoByPlayerId(playerList, roomInfo.getRoomBankerId());
 			/**给其他的玩家返回补花数*/
-			if (roomBankPlayer.getCurAddFlowerNum() > 0) {
+			if (!MjCardRule.isJxNf(roomInfo) && roomBankPlayer.getCurAddFlowerNum() > 0) {
 				data.clear();
 				data.put("curPlayerId", roomBankPlayer.getPlayerId());
 				data.put("addFlowerCount", roomBankPlayer.getCurAddFlowerNum());
@@ -1602,4 +1590,8 @@ public class MjGameService extends BaseGameService{
 			log.error("记录回放日志异常, msgType:" + msgType + ",msg:" + JsonUtil.toJson(msg) + ",oPlayer:" + JsonUtil.toJson(oPlayer) + ",roomInf:" + JsonUtil.toJson(roomInfo), e);
 		}
 	}
+
+
+
+
 }
