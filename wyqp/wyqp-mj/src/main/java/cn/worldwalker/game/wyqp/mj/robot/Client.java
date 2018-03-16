@@ -48,7 +48,7 @@ public class Client {
 
     public void init() throws Exception {
         generateToken();
-        socket = new Socket(new URI("ws://localhost:10008/webSocket"),this);
+        socket = new Socket(new URI("ws://localhost:10009/webSocket"),this);
         socket.connect();
         int i=0;
         while (!socket.getReadyState().equals(WebSocket.READYSTATE.OPEN)  && i++ < 10) {
