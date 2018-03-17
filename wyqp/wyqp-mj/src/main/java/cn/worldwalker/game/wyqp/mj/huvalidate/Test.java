@@ -34,20 +34,21 @@ public class Test //extends TestCase
 //		Program.print_cards(cards);
 //		System.out.println(Hulib.getInstance().get_hu_info(cards, 34, guiIndex));
 		List<Integer> list = new ArrayList<Integer>();
+//		list.addAll(Arrays.asList(0,1,2,3,4,5,6,7,8,10,11,12));
 		list.add(3);
 		list.add(4);
 		list.add(5);
-//		list.add(9);
-//		list.add(10);
-//		list.add(11);
-//		list.add(18);
-//		list.add(18);
-//		list.add(18);
-//		list.add(27);
-//		list.add(27);
-//		list.add(27);
-//		list.add(32);
-//		list.add(32);
+		list.add(9);
+		list.add(10);
+		list.add(11);
+		list.add(18);
+		list.add(18);
+		list.add(18);
+		list.add(27);
+		list.add(27);
+		list.add(27);
+		list.add(32);
+		list.add(32);
 		System.out.println(Hulib.getInstance().get_hu_info(list, 100, 100,34));
 	}
 }

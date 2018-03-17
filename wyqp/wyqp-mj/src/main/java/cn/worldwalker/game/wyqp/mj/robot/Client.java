@@ -29,14 +29,17 @@ public class Client {
     private Integer position;
     private Random random;
 
+    private static final String HTTP_URL = "http://game.nf.worldwalker.cn";
+    private static final String WS_URL = "ws://39.107.96.117:10009";
+//    private static final String HTTP_URL = "http://localhost:8080";
+//    private static final String WS_URL = "ws://localhost:10009";
+
     public Client(Integer position) {
         this.position = position;
         random = new Random();
         pengList = new ArrayList<>(16);
         gameOver = false;
     }
-
-
 
     public List<String> getPengList() {
         return pengList;
@@ -48,7 +51,7 @@ public class Client {
 
     public void init() throws Exception {
         generateToken();
-        socket = new Socket(new URI("ws://localhost:10009/webSocket"),this);
+        socket = new Socket(new URI(WS_URL),this);
         socket.connect();
         int i=0;
         while (!socket.getReadyState().equals(WebSocket.READYSTATE.OPEN)  && i++ < 10) {
@@ -160,14 +163,14 @@ public class Client {
     }
 
     private void generateToken() throws Exception {
-        String ret = HttpClientUtils.get("http://localhost:8080/game/login");
+        String ret = HttpClientUtils.get(HTTP_URL + "/game/login");
         JSONObject jsonObject = JSON.parseObject(ret);
         token = jsonObject.getJSONObject("data").getString("token");
         playerId = jsonObject.getJSONObject("data").getInteger("playerId");
     }
 
     public void addRobot() throws Exception {
-        String ret = HttpClientUtils.get("http://localhost:8080/addRobot?roomId=" + roomId);
+        String ret = HttpClientUtils.get(HTTP_URL + "/addRobot?roomId=" + roomId);
         System.out.println(ret);
     }
 

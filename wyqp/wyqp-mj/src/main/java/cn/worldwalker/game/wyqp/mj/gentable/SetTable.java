@@ -13,7 +13,7 @@ import java.util.Map.Entry;
 
 public class SetTable
 {
-	private HashMap<Integer, Boolean> m_tbl = new HashMap<Integer, Boolean>();
+	public HashMap<Integer, Boolean> m_tbl = new HashMap<Integer, Boolean>();
 
 	public boolean check(int number)
 	{

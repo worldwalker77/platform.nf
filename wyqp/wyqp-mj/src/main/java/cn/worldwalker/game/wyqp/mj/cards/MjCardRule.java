@@ -1,19 +1,5 @@
 package cn.worldwalker.game.wyqp.mj.cards;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
-
-import org.apache.commons.lang.StringUtils;
-
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.common.enums.DissolveStatusEnum;
@@ -28,6 +14,11 @@ import cn.worldwalker.game.wyqp.mj.enums.MjPlayerStatusEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjTypeEnum;
 import cn.worldwalker.game.wyqp.mj.huvalidate.Hulib;
 import cn.worldwalker.game.wyqp.mj.huvalidate.TableMgr;
+import cn.worldwalker.game.wyqp.mj.robot.HuService;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 
 public class MjCardRule {
@@ -38,7 +29,8 @@ public class MjCardRule {
 			/**1-9条*/	18,18,18,18,19,19,19,19,20,20,20,20,21,21,21,21,22,22,22,22,23,23,23,23,24,24,24,24,25,25,25,25,26,26,26,26,
 		/**东南西北中发白*/	27,27,27,27,28,28,28,28,29,29,29,29,30,30,30,30,31,31,31,31,32,32,32,32,33,33,33,33);
 //		/**春夏秋冬梅兰竹菊*/	34,35,36,37,38,39,40,41);
-	private static List<Integer> list1 = Arrays.asList(0,0,0,1,1,1,2,2,2,3,3,6,4,5);
+//	private static List<Integer> list1 = Arrays.asList(0,0,0,1,1,1,2,2,2,3,3,6,4,5);
+	private static List<Integer> list1 = Arrays.asList(0,3,6,9,12,15,18,21,24,29,30,31,32,33);
 	private static List<Integer> list2 = Arrays.asList(5,5,5,7,7,8,8,9,9,10,15,17,19);
 	private static List<Integer> list3 = Arrays.asList(3,4,6,7,8,9,10,11,12,13,14,17,17);
 	private static List<Integer> list4 = Arrays.asList(20,21,17,30,22,34,38,26,27,24,23,25,19);
@@ -1132,6 +1124,7 @@ public class MjCardRule {
 			int minIndex = cardList.get(0)%9 > 0 ? cardList.get(0) - 1: cardList.get(0);
 			int maxIndex = cardList.get(size - 1)%9 < 8 ? cardList.get(size - 1) + 1: cardList.get(size - 1);
 			for(int i = minIndex; i <= maxIndex; i++){
+			    //todo
 				boolean isHu = Hulib.getInstance().get_hu_info(handCardList, i, Hulib.invalidCardInex,roomInfo.getIndexLine());
 				if (isHu) {
 					huCardList.add(i);
@@ -1175,17 +1168,28 @@ public class MjCardRule {
 		if (MjTypeEnum.shangHaiBaiDa.type.equals(roomInfo.getDetailType())) {
 			gui_index = roomInfo.getBaiDaCardIndex();
 		}
-		//todo
-		if (handCardList.size() == 14) {
-			isHu = Hulib.getInstance().get_hu_info(handCardList, Hulib.invalidCardInex, gui_index,roomInfo.getIndexLine());
-		}else if (cardIndex != null){
-			isHu = Hulib.getInstance().get_hu_info(handCardList, cardIndex, gui_index,roomInfo.getIndexLine());
-		}
+
+		if (isJxNf(roomInfo)){
+		    if (cardIndex != null){
+		        List<Integer> allCardList = new ArrayList<>(16);
+		        allCardList.addAll(handCardList);
+		        allCardList.add(cardIndex);
+                isHu = HuService.getInstance().isHu(allCardList);
+            } else {
+		        isHu = HuService.getInstance().isHu(handCardList);
+            }
+        } else {
+            if (handCardList.size() == 14) {
+                isHu = Hulib.getInstance().get_hu_info(handCardList, Hulib.invalidCardInex, gui_index,roomInfo.getIndexLine());
+            }else if (cardIndex != null){
+                isHu = Hulib.getInstance().get_hu_info(handCardList, cardIndex, gui_index,roomInfo.getIndexLine());
+            }
+        }
 		return isHu;
 	}
 
-    public static boolean isJxNf(MjRoomInfo mjRoomInfo){
-        return MjTypeEnum.jiangxiNanfeng.type.equals(mjRoomInfo.getDetailType());
+    public static boolean isJxNf(MjRoomInfo mjRoomInfo) {
+        return mjRoomInfo != null && MjTypeEnum.jiangxiNanfeng.type.equals(mjRoomInfo.getDetailType());
     }
 
 	public static void moveCardsFromHandCards(){

@@ -30,7 +30,7 @@ public class Socket extends WebSocketClient implements Runnable {
         String type = MsgTypeEnum.getMsgTypeEnumByType(mjRequest.getMsgType()).desc;
 //        type = "";
         String msg = JSON.toJSONString(mjRequest);
-//        System.out.println(client.getPosition() + "--[>>>>" + type + "]: " + msg);
+        System.out.println(client.getPosition() + "--[>>>>" + type + "]: " + msg);
         send(msg);
     }
 
@@ -70,7 +70,7 @@ public class Socket extends WebSocketClient implements Runnable {
         }
 //        type = "";
         if (msgType!=220){
-//            System.out.println(client.getPosition() + "(" + client.getPlayerId() +  ")--[<<<<" + type + "]: " + arg0);
+            System.out.println(client.getPosition() + "(" + client.getPlayerId() +  ")--[<<<<" + type + "]: " + arg0);
         }
         if (jsonData != null) {
             Integer curPlayerId = jsonData.getInteger("curPlayerId");
