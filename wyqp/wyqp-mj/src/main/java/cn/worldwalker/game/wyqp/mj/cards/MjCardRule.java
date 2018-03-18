@@ -14,7 +14,7 @@ import cn.worldwalker.game.wyqp.mj.enums.MjPlayerStatusEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjTypeEnum;
 import cn.worldwalker.game.wyqp.mj.huvalidate.Hulib;
 import cn.worldwalker.game.wyqp.mj.huvalidate.TableMgr;
-import cn.worldwalker.game.wyqp.mj.robot.HuService;
+import cn.worldwalker.game.wyqp.mj.service.MjHuService;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
@@ -654,6 +654,15 @@ public class MjCardRule {
 		return null;
 	}
 
+	public static MjPlayerInfo getLastPlayer(MjRoomInfo mjRoomInfo){
+	   for (MjPlayerInfo mjPlayerInfo: mjRoomInfo.getPlayerList()){
+	       if (mjPlayerInfo.getPlayerId().equals(mjRoomInfo.getLastPlayerId())){
+	           return mjPlayerInfo;
+           }
+       }
+       return null;
+    }
+
 	/**
 	 * 补花操作
 	 * @param flowerCardStack
@@ -1174,9 +1183,9 @@ public class MjCardRule {
 		        List<Integer> allCardList = new ArrayList<>(16);
 		        allCardList.addAll(handCardList);
 		        allCardList.add(cardIndex);
-                isHu = HuService.getInstance().isHu(allCardList);
+                isHu = MjHuService.getInstance().isHu(allCardList);
             } else {
-		        isHu = HuService.getInstance().isHu(handCardList);
+		        isHu = MjHuService.getInstance().isHu(handCardList);
             }
         } else {
             if (handCardList.size() == 14) {

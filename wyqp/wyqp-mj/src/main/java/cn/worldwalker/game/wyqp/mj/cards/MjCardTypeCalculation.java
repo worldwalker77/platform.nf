@@ -81,13 +81,12 @@ public class MjCardTypeCalculation {
 		checkMenQing(player, mjTypeEnum);
 		/**清一色校验*/
 		checkQingYiSe(roomInfo, player, mjTypeEnum);
-		/**混一色校验*/
-		checkHunYiSe(roomInfo, player, mjTypeEnum);
-		/**大吊车校验*/
-		checkDaDiaoChe(player, mjTypeEnum);
+        /**混一色校验*/
+        checkHunYiSe(roomInfo, player, mjTypeEnum);
+        /**大吊车校验*/
+        checkDaDiaoChe(player, mjTypeEnum);
 		/**碰碰胡校验*/
-		//todo 碰碰胡先屏了
-//		checkPengPengHu(roomInfo, player, mjTypeEnum);
+		checkPengPengHu(roomInfo, player, mjTypeEnum);
 		List<Integer> mjCardTypeList = player.getMjCardTypeList();
 		/**特殊牌型都没有，则设置为平胡*/
 		if (mjCardTypeList.size() == 0) {
@@ -95,37 +94,40 @@ public class MjCardTypeCalculation {
 		}
 		/**如果是百搭类型，则要计算跑百搭和无百搭*/
 		if (mjTypeEnum.equals(MjTypeEnum.shangHaiBaiDa)) {
-			
-		}
+            /********************倍数计算*********************/
+            /**胡牌类型倍数*/
+            player.setMultiple(MjHuTypeEnum.getMjHuTypeEnum(player.getHuType()).multiple);
+            if (!MjCardRule.isJxNf(roomInfo)){
+
+            }
+            /**荒翻倍数*/
+            if (roomInfo.getHuangFanNum() > 0) {
+                player.setMultiple(player.getMultiple() * 2);
+                roomInfo.setHuangFanNum(roomInfo.getHuangFanNum() - 1);
+            }
+            /**开宝倍数*/
+            if (roomInfo.getIsCurGameKaiBao() > 0) {
+                player.setMultiple(player.getMultiple() * 2);
+            }
+            /**牌型组合倍数*/
+            switch (mjTypeEnum) {
+                case shangHaiQiaoMa:
+                    for(Integer cardType : mjCardTypeList){
+                        player.setMultiple(player.getMultiple() * QmCardTypeEnum.getCardType(cardType).multiple);
+                    }
+                    break;
+                case shangHaiBaiDa:
+                    for(Integer cardType : mjCardTypeList){
+                        player.setMultiple(player.getMultiple() * ShbdCardTypeEnum.getCardType(cardType).multiple);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+        }
 		
-		/********************倍数计算*********************/
-		/**胡牌类型倍数*/
-		player.setMultiple(MjHuTypeEnum.getMjHuTypeEnum(player.getHuType()).multiple);
-		/**荒翻倍数*/
-		if (roomInfo.getHuangFanNum() > 0) {
-			player.setMultiple(player.getMultiple() * 2);
-			roomInfo.setHuangFanNum(roomInfo.getHuangFanNum() - 1);
-		}
-		/**开宝倍数*/
-		if (roomInfo.getIsCurGameKaiBao() > 0) {
-			player.setMultiple(player.getMultiple() * 2);
-		}
-		/**牌型组合倍数*/
-		switch (mjTypeEnum) {
-		case shangHaiQiaoMa:
-			for(Integer cardType : mjCardTypeList){
-				player.setMultiple(player.getMultiple() * QmCardTypeEnum.getCardType(cardType).multiple);
-			}
-			break;
-		case shangHaiBaiDa:
-			for(Integer cardType : mjCardTypeList){
-				player.setMultiple(player.getMultiple() * ShbdCardTypeEnum.getCardType(cardType).multiple);
-			}
-			break;	
-		default:
-			break;
-		}
-		
+
 	}
 	public static void calButtomAndFlowerScore(MjPlayerInfo player, MjRoomInfo roomInfo){
 		/**补花数量*/

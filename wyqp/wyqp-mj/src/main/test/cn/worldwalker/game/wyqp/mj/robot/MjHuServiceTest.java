@@ -1,7 +1,7 @@
 package cn.worldwalker.game.wyqp.mj.robot;
 
-import cn.worldwalker.game.wyqp.mj.huvalidate.Hulib;
 import cn.worldwalker.game.wyqp.mj.huvalidate.TableMgr;
+import cn.worldwalker.game.wyqp.mj.service.MjHuService;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HuServiceTest {
+public class MjHuServiceTest {
     @Test
     public void testIsHu() throws Exception {
         TableMgr.getInstance().load();
@@ -40,21 +40,20 @@ public class HuServiceTest {
         caseMap.put(Arrays.asList(0,3,6,9,12,15,18,21,24,29,30,31,32,33), true);
         //七对
         caseMap.put(Arrays.asList(0,0,1,1,8,8,9,9,11,11,18,18,33,33), true);
+        //清一色
+        caseMap.put(Arrays.asList(0,0,1,1,2,3,4,5,7,7,8,8), true);
+
 
 
 
         for (Map.Entry<List<Integer>,Boolean> entry : caseMap.entrySet()){
             //无赖子
-            boolean isHuNew = HuService.getInstance().isHu(entry.getKey());
-            boolean isHuOld = Hulib.getInstance().get_hu_info(entry.getKey(), 100,100,34);
+            boolean isHuNew = MjHuService.getInstance().isHu(entry.getKey());
             if (!entry.getValue().equals(isHuNew)){
-                HuService.getInstance().isHu(entry.getKey());
+                MjHuService.getInstance().isHu(entry.getKey());
                 System.out.println(entry.getKey());
             }
             Assert.assertTrue(entry.getValue().equals(isHuNew));
-            if (isHuNew != isHuOld){
-                System.out.println(entry);
-            }
         }
     }
 

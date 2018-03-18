@@ -1,69 +1,29 @@
-package cn.worldwalker.game.wyqp.mj.robot;
+package cn.worldwalker.game.wyqp.mj.service;
 
+import cn.worldwalker.game.wyqp.mj.enums.MjValueEnum;
 import cn.worldwalker.game.wyqp.mj.seed.Seed;
 import cn.worldwalker.game.wyqp.mj.seed.SeedService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public class HuService {
-    private static HuService ourInstance = new HuService();
+public class MjHuService {
+    private static MjHuService ourInstance = new MjHuService();
 
-    public static HuService getInstance() {
+    private MjCardService mjCardService = MjCardService.getInstance();
+
+    public static MjHuService getInstance() {
         return ourInstance;
     }
 
-    private HuService() {
+    private MjHuService() {
     }
 
     /**
      * 万、筒、条、风边界等信息
      */
-    enum SubCardEnum {
-        wan(0, 8, false),
-        tong(9, 17, false),
-        tiao(18, 26, false),
-        feng(27, 33, true);
 
-        SubCardEnum(int min, int max, boolean isFeng) {
-            this.min = min;
-            this.max = max;
-            this.isFeng = isFeng;
-        }
-
-        int min;
-        int max;
-        boolean isFeng;
-    }
-
-    /**
-     * 拆分生成 万、筒、条、风的牌
-     *
-     * @param cardList 所有手牌
-     * @return 万->牌，筒->牌，条->牌
-     */
-    private Map<SubCardEnum, List<Integer>> split(List<Integer> cardList) {
-        Map<SubCardEnum, List<Integer>> typeMap = new HashMap<>(4);
-        for (SubCardEnum subCardEnum : SubCardEnum.values()) {
-            List<Integer> subCardList = new ArrayList<>(16);
-            for (Integer v : cardList) {
-                if (v >= subCardEnum.min && v <= subCardEnum.max) {
-                    subCardList.add(v % 9);
-                }
-            }
-            if (subCardList.size() > 0) {
-                typeMap.put(subCardEnum, subCardList);
-            }
-        }
-        return typeMap;
-    }
-
-    private int[] convertToSeed(List<Integer> valueList) {
-        int[] seed = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
-        for (Integer v : valueList) {
-            seed[v]++;
-        }
-        return seed;
-    }
 
     /**
      * @param valueList value的范围为0-8
@@ -75,11 +35,11 @@ public class HuService {
         boolean withGen = valueList.size() % 3 == 2;
         Set<Seed> seeds = isFeng ? SeedService.getInstanceFeng().getSeeds(withGen, 0) :
                 SeedService.getInstance().getSeeds(withGen, 0);
-        return seeds.contains(new Seed(convertToSeed(valueList)));
+        return seeds.contains(new Seed(mjCardService.convertToSeed(valueList)));
     }
 
     private boolean isSubLan(List<Integer> valueList, boolean isFeng) {
-        int[] seed = convertToSeed(valueList);
+        int[] seed = mjCardService.convertToSeed(valueList);
         for (int i = 0; i < 9; i++) {
             if (seed[i] > 1)
                 return false;
@@ -95,11 +55,13 @@ public class HuService {
     }
 
     public boolean isHu(List<Integer> cardList) {
-        if (isQiDui(cardList) || isShiSanLan(cardList)) {
-            return true;
-        }
-        Map<SubCardEnum, List<Integer>> map = split(cardList);
-        for (Map.Entry<SubCardEnum, List<Integer>> entry : map.entrySet()) {
+        return isQingYiSe(cardList) || isQiDui(cardList) || isShiSanLan(cardList) || isNormalHu(cardList);
+
+    }
+
+    public boolean isNormalHu(List<Integer> cardList){
+        Map<MjValueEnum, List<Integer>> map = mjCardService.split(cardList);
+        for (Map.Entry<MjValueEnum, List<Integer>> entry : map.entrySet()) {
             if (!isSubHu(entry.getValue(), entry.getKey().isFeng))
                 return false;
         }
@@ -127,8 +89,8 @@ public class HuService {
         if (cardList.size() != 14){
             return false;
         }
-        Map<SubCardEnum, List<Integer>> map = split(cardList);
-        for (Map.Entry<SubCardEnum, List<Integer>> entry : map.entrySet()) {
+        Map<MjValueEnum, List<Integer>> map = mjCardService.split(cardList);
+        for (Map.Entry<MjValueEnum, List<Integer>> entry : map.entrySet()) {
             if (!isSubLan(entry.getValue(), entry.getKey().isFeng))
                 return false;
         }
@@ -136,6 +98,10 @@ public class HuService {
 
     }
 
+    public boolean isQingYiSe(List<Integer> cardList){
+        Map<MjValueEnum, List<Integer>> map = mjCardService.split(cardList);
+        return map.size() == 1;
+    }
 }
 
 

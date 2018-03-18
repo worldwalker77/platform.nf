@@ -16,7 +16,6 @@ import cn.worldwalker.game.wyqp.common.utils.SnowflakeIdGenerator;
 import cn.worldwalker.game.wyqp.common.utils.log.ThreadPoolMgr;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardResource;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
-import cn.worldwalker.game.wyqp.mj.cards.MjCardTypeCalculation;
 import cn.worldwalker.game.wyqp.mj.enums.*;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang.StringUtils;
@@ -25,6 +24,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 @Service(value="mjGameService")
 public class MjGameService extends BaseGameService {
+
+    private MjScoreService mjScoreService = MjScoreService.getInstance();
 
     @Override
     public BaseRoomInfo doCreateRoom(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
@@ -741,7 +742,6 @@ public class MjGameService extends BaseGameService {
         addOperationLog(MsgTypeEnum.tingPai.msgType, (MjMsg) request.getMsg(), roomInfo, null, null, null, null);
     }
 
-
     public void pass(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
         Result result = new Result();
         MjMsg msg = (MjMsg) request.getMsg();
@@ -1000,7 +1000,9 @@ public class MjGameService extends BaseGameService {
                     newPlayer.put("isHu", temp.getIsHu());
                     newPlayer.put("mjCardTypeList", temp.getMjCardTypeList());
                     newPlayer.put("huType", temp.getHuType());
-                    newPlayer.put("buttomAndFlowerScore", temp.getButtomAndFlowerScore());
+                    if (!MjCardRule.isJxNf(roomInfo)){
+                        newPlayer.put("buttomAndFlowerScore", temp.getButtomAndFlowerScore());
+                    }
                     newPlayer.put("multiple", temp.getMultiple());
                     if (temp.getFeiCangYingCardIndex() != null) {
                         newPlayer.put("feiCangYingCardIndex", temp.getFeiCangYingCardIndex());
@@ -1152,68 +1154,10 @@ public class MjGameService extends BaseGameService {
      */
     private void calculateScore(MjRoomInfo roomInfo) {
 //		log.info("第" + roomInfo.getCurGame() + "局结算前roomInfo:" + JsonUtil.toJson(roomInfo));
-        /**如果当前局没有荒*/
+        //如果当前局没有荒
         if (roomInfo.getIsCurGameHuangZhuang() == 0) {
-            List<MjPlayerInfo> playerList = roomInfo.getPlayerList();
-            List<MjPlayerInfo> huPlayerList = new ArrayList<MjPlayerInfo>();
-            for (MjPlayerInfo player : playerList) {
-                if (player.getIsHu() == 1) {
-                    MjCardTypeCalculation.calButtomFlowerScoreAndCardTypeAndMultiple(player, roomInfo);
-                    huPlayerList.add(player);
-                }
-            }
-            MjPlayerInfo huPlayer = null;
-            MjPlayerInfo dianPaoPlayer = null;
-            /**如果只有一个人胡牌*/
-            if (huPlayerList.size() == 1) {
-                huPlayer = huPlayerList.get(0);
-                Integer tempScore = huPlayer.getButtomAndFlowerScore() * huPlayer.getMultiple();
-                if (tempScore > roomInfo.getHuScoreLimit()) {
-                    tempScore = roomInfo.getHuScoreLimit();
-                }
-                Integer huType = huPlayer.getHuType();
-                if (MjHuTypeEnum.zhuaChong.type.equals(huType) || MjHuTypeEnum.qiangGang.type.equals(huType)) {
-                    huPlayer.setCurScore(tempScore);
-                    huPlayer.setZhuaChongCount(huPlayer.getZhuaChongCount() + 1);
-                    dianPaoPlayer = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), roomInfo.getLastPlayerId());
-                    dianPaoPlayer.setCurScore(0 - tempScore);
-                    dianPaoPlayer.setDianPaoCount(dianPaoPlayer.getDianPaoCount() + 1);
-                } else if (MjHuTypeEnum.ziMo.type.equals(huType) || MjHuTypeEnum.gangKai.type.equals(huType)) {
-                    huPlayer.setCurScore(tempScore * 3);
-                    huPlayer.setZiMoCount(huPlayer.getZiMoCount() + 1);
-                    for (MjPlayerInfo player : playerList) {
-                        if (!player.getPlayerId().equals(huPlayer.getPlayerId())) {
-                            player.setCurScore(0 - tempScore);
-                        }
-                    }
-                }
-            } else if (huPlayerList.size() > 1 && huPlayerList.size() < 4) {/**如果是一炮多响*/
-                dianPaoPlayer = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), roomInfo.getLastPlayerId());
-                for (MjPlayerInfo player : huPlayerList) {
-                    Integer tempScore = player.getButtomAndFlowerScore() * player.getMultiple();
-                    if (tempScore > roomInfo.getHuScoreLimit()) {
-                        tempScore = roomInfo.getHuScoreLimit();
-                    }
-                    player.setCurScore(tempScore);
-                    player.setZhuaChongCount(player.getZhuaChongCount() + 1);
-                    dianPaoPlayer.setCurScore(dianPaoPlayer.getCurScore() - tempScore);
-                    dianPaoPlayer.setDianPaoCount(dianPaoPlayer.getDianPaoCount() + 1);
-                }
-            } else {
-                throw new BusinessException(ExceptionEnum.HU_PLAYER_NUM_ERROR);
-            }
-            /**计算每个玩家总得分及设置房间的总赢家*/
-            Integer totalWinnerId = playerList.get(0).getPlayerId();
-            Integer maxTotalScore = playerList.get(0).getTotalScore();
-            for (MjPlayerInfo player : playerList) {
-                player.setTotalScore(player.getTotalScore() + player.getCurScore());
-                Integer tempTotalScore = player.getTotalScore();
-                if (tempTotalScore > maxTotalScore) {
-                    maxTotalScore = tempTotalScore;
-                    totalWinnerId = player.getPlayerId();
-                }
-            }
-            roomInfo.setTotalWinnerId(totalWinnerId);
+            mjScoreService.calHuRoom(roomInfo);
+            mjScoreService.calScoreRoom(roomInfo);
         }
 
         /**如果当前局数小于总局数，则设置为当前局结束*/

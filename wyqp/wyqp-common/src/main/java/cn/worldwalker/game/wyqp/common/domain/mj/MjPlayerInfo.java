@@ -1,12 +1,11 @@
 package cn.worldwalker.game.wyqp.common.domain.mj;
 
+import cn.worldwalker.game.wyqp.common.domain.base.BasePlayerInfo;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
-
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
-import cn.worldwalker.game.wyqp.common.domain.base.BasePlayerInfo;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class MjPlayerInfo extends BasePlayerInfo{
 	/**玩家手上的牌*/
