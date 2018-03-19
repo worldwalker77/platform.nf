@@ -3,7 +3,7 @@ package cn.worldwalker.game.wyqp.mj.service;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
-import cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjValueEnum;
 
@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum.diHu;
+import static cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum.getMjHuTypeEnum;
 
 public class MjScoreService {
     private static MjScoreService ourInstance = new MjScoreService();
@@ -105,7 +108,10 @@ public class MjScoreService {
         }
     }
 
-    public void calHuPlayer(MjPlayerInfo mjPlayerInfo){
+    /*
+    计算单个玩家胡牌牌型
+     */
+    void calHuPlayer(MjPlayerInfo mjPlayerInfo){
         checkPengPeng(mjPlayerInfo);
         checkQingYiSe(mjPlayerInfo);
         checkQiDui(mjPlayerInfo);
@@ -116,7 +122,10 @@ public class MjScoreService {
         }
     }
 
-    public void calHuRoom(MjRoomInfo mjRoomInfo){
+    /*
+    计算整个房间胡牌牌型
+     */
+    void calHuRoom(MjRoomInfo mjRoomInfo){
         for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
             if (mjPlayerInfo.getIsHu().equals(1)){
                 calHuPlayer(mjPlayerInfo);
@@ -124,6 +133,10 @@ public class MjScoreService {
         }
 
     }
+
+    /*
+    为输和赢的玩家算分
+     */
     @SuppressWarnings("ConstantConditions")
     private void assignScore(List<MjPlayerInfo> winPlayList, List<MjPlayerInfo> losePlayList){
         for (MjPlayerInfo winPlayerInfo : winPlayList){
@@ -146,8 +159,11 @@ public class MjScoreService {
         }
     }
 
+    /*
+    计算整个房间玩家的牌面得分
+     */
     @SuppressWarnings("ConstantConditions")
-    public void calScoreRoom(MjRoomInfo roomInfo){
+    void calScoreRoom(MjRoomInfo roomInfo){
         //找到所有胡牌的人,判断天地胡
         List<MjPlayerInfo> huPlayerList = new ArrayList<>(4);
         for (MjPlayerInfo player : roomInfo.getPlayerList()) {
@@ -155,14 +171,14 @@ public class MjScoreService {
                 huPlayerList.add(player);
                 if (player.getDiscardCardList().isEmpty()) {
                     if (roomInfo.getRoomBankerId().equals(player.getPlayerId())) {
-                        player.setHuType(MjHuTypeEnum.diHu.type);
+                        player.setHuType(diHu.type);
                     }
                     //天胡在发牌的时候就判断了，这里就不判断了
                 }
             }
         }
         //计算各个玩家的加分和减分
-        switch (MjHuTypeEnum.getMjHuTypeEnum(huPlayerList.get(0).getHuType())){
+        switch (getMjHuTypeEnum(huPlayerList.get(0).getHuType())){
             case zhuaChong:
             case qiangGang:
             case diHu:
@@ -188,6 +204,9 @@ public class MjScoreService {
         Integer totalWinnerId = roomInfo.getPlayerList().get(0).getPlayerId();
         Integer maxTotalScore = roomInfo.getPlayerList().get(0).getTotalScore();
         for (MjPlayerInfo player : roomInfo.getPlayerList()) {
+            //算上杠分
+            player.setCurScore(player.getCurScore() + player.getGangScore());
+            //更新总分
             player.setTotalScore(player.getTotalScore() + player.getCurScore());
             if (player.getTotalScore() > maxTotalScore) {
                 maxTotalScore = player.getTotalScore();
@@ -195,5 +214,41 @@ public class MjScoreService {
             }
         }
         roomInfo.setTotalWinnerId(totalWinnerId);
+    }
+
+    /*
+    为杠牌玩家算分
+     */
+    private void assignGangScore(List<MjPlayerInfo> winPlayList, List<MjPlayerInfo> losePlayList, int score){
+        for (MjPlayerInfo winPlayerInfo : winPlayList){
+            for (MjPlayerInfo losePlayerInfo : losePlayList){
+                if (!winPlayerInfo.getPlayerId().equals(losePlayerInfo.getPlayerId())){
+                    winPlayerInfo.setCurScore(winPlayerInfo.getGangScore() + score);
+                    losePlayerInfo.setCurScore(losePlayerInfo.getGangScore() - score);
+                }
+            }
+        }
+    }
+
+    /*
+    计算杠的分数
+     */
+    public void calGangScore(MjRoomInfo roomInfo, MjPlayerInfo player, MjOperationEnum operationType){
+        switch (operationType) {
+            case mingGang:
+                //如果是摸牌后的明杠
+                if (MjCardRule.isHandCard3n2(player)) {
+                    assignGangScore(Collections.singletonList(player),roomInfo.getPlayerList(),1);
+                }else{//如果是别人打的牌的明杠
+                    MjPlayerInfo lastPlayer = MjCardRule.getLastPlayer(roomInfo);
+                    assignGangScore(Collections.singletonList(player),Collections.singletonList(lastPlayer),1);
+                }
+                break;
+            case anGang:
+                assignGangScore(Collections.singletonList(player),roomInfo.getPlayerList(),2);
+                break;
+            default:
+                break;
+        }
     }
 }

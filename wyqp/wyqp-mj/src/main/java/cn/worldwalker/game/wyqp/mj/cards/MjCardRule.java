@@ -392,6 +392,7 @@ public class MjCardRule {
 				map.put(MjOperationEnum.hu.type, String.valueOf(MjHuTypeEnum.ziMo.type));
 			}
 			/**听牌校验*/
+			//南丰在判听的时候，直接返回false
 			if ( curPlayer.getIsTingHu() == 0) {
 				Map<Integer, List<String>> chuCardIndexHuCardListMap = new HashMap<Integer, List<String>>();
 				if (checkTingHu1(roomInfo, curPlayer, cardIndex, chuCardIndexHuCardListMap)) {
@@ -423,6 +424,7 @@ public class MjCardRule {
 				}
 				/**吃牌校验（只对出牌玩家的下家计算,只有没听胡的玩家才可以吃牌）*/
 				if (i == 1) {
+				    //南丰会在创建房间的时候设置isChi＝false
 					if (roomInfo.getIsChiPai() > 0) {
 						String chiStr = checkChiPai(nextPlayer, cardIndex);
 						if (StringUtils.isNotBlank(chiStr)) {
@@ -456,6 +458,7 @@ public class MjCardRule {
 					}
 					
 				}else{
+				    //南丰在这里处理的
 					if (checkHu(roomInfo, nextPlayer, cardIndex)) {
 						map1.put(MjOperationEnum.hu.type, String.valueOf(MjHuTypeEnum.zhuaChong.type));
 					}

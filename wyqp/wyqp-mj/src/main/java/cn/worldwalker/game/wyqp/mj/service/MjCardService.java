@@ -19,9 +19,6 @@ public class MjCardService {
 
     /**
      * 拆分生成 万、筒、条、风的牌
-     *
-     * @param cardList 所有手牌
-     * @return 万->牌，筒->牌，条->牌
      */
     public Map<MjValueEnum, List<Integer>> split(List<Integer> cardList) {
         Map<MjValueEnum, List<Integer>> typeMap = new HashMap<>(4);
@@ -40,11 +37,9 @@ public class MjCardService {
     }
 
     /**
-     *
-     * @param valueList 牌
-     * @return 9位的seed
+     * 9位的seed
      */
-    public int[] convertToSeed(List<Integer> valueList) {
+    int[] convertToSeed(List<Integer> valueList) {
         int[] seed = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
         for (int v : valueList) {
             seed[v]++;
@@ -53,11 +48,9 @@ public class MjCardService {
     }
 
     /**
-     *
-     * @param cardList 牌
-     * @return 34位的seed
+     * 34位的seed
      */
-    public int[] convertToLongSeed(List<Integer> cardList){
+    int[] convertToLongSeed(List<Integer> cardList){
         int[] seed = new int[34];
         for (int v : cardList) {
             seed[v]++;

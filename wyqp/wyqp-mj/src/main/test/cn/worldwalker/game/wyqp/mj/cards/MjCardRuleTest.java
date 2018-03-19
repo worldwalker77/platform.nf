@@ -14,6 +14,7 @@ public class MjCardRuleTest {
     public void loadTable(){
         TableMgr.getInstance().load();
     }
+
     @Test
     public void testCheckPeng() throws Exception {
     }
@@ -49,4 +50,11 @@ public class MjCardRuleTest {
         System.out.println(isHu);
     }
 
+
+    @Test
+    public void testCalculateAllPlayerOperations() throws Exception{
+        MjRoomInfo mjRoomInfo = new MjRoomInfo();
+        mjRoomInfo.setLastPlayerId(1);
+        MjCardRule.calculateAllPlayerOperations(mjRoomInfo, 1, 1001,1);
+    }
 }

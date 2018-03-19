@@ -40,6 +40,8 @@ public class MjPlayerInfo extends BasePlayerInfo{
 	private List<Integer> mjCardTypeList = new ArrayList<Integer>();
 	/**底分和花分*/
 	private Integer buttomAndFlowerScore = 0;
+	/**杠分*/
+	private Integer gangScore = 0;
 	/**断线重连刷新的时候会通过这个接口返回当前玩家的操作权限*/
 	private TreeMap<Integer, String> operations;
 	/**自摸次数*/
@@ -177,5 +179,12 @@ public class MjPlayerInfo extends BasePlayerInfo{
 	public void setIsTingHu(Integer isTingHu) {
 		this.isTingHu = isTingHu;
 	}
-	
+
+    public Integer getGangScore() {
+        return gangScore;
+    }
+
+    public void setGangScore(Integer gangScore) {
+        this.gangScore = gangScore;
+    }
 }

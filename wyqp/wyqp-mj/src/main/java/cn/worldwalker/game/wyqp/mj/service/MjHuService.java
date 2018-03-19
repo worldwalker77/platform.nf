@@ -21,11 +21,6 @@ public class MjHuService {
     }
 
     /**
-     * 万、筒、条、风边界等信息
-     */
-
-
-    /**
      * @param valueList value的范围为0-8
      * @return 是否符合胡牌
      */
@@ -38,6 +33,9 @@ public class MjHuService {
         return seeds.contains(new Seed(mjCardService.convertToSeed(valueList)));
     }
 
+    /**
+    * 单花牌是否符合十三烂规则
+    */
     private boolean isSubLan(List<Integer> valueList, boolean isFeng) {
         int[] seed = mjCardService.convertToSeed(valueList);
         for (int i = 0; i < 9; i++) {
@@ -54,12 +52,18 @@ public class MjHuService {
         return true;
     }
 
+    /**
+     * 判胡,包括符合胡牌规则、十三烂、七对、清一色
+     */
     public boolean isHu(List<Integer> cardList) {
         return isQingYiSe(cardList) || isQiDui(cardList) || isShiSanLan(cardList) || isNormalHu(cardList);
 
     }
 
-    public boolean isNormalHu(List<Integer> cardList){
+    /**
+     * 判断是否符合胡牌规则
+     */
+    boolean isNormalHu(List<Integer> cardList){
         Map<MjValueEnum, List<Integer>> map = mjCardService.split(cardList);
         for (Map.Entry<MjValueEnum, List<Integer>> entry : map.entrySet()) {
             if (!isSubHu(entry.getValue(), entry.getKey().isFeng))
@@ -68,7 +72,10 @@ public class MjHuService {
         return true;
     }
 
-    public boolean isQiDui(List<Integer> cardList) {
+    /**
+     * 七对
+     */
+    boolean isQiDui(List<Integer> cardList) {
         //如果手牌数量小于13则说明吃过牌，不能胡七对
         if (cardList.size() != 14) {
             return false;
@@ -85,7 +92,10 @@ public class MjHuService {
         return true;
     }
 
-    public boolean isShiSanLan(List<Integer> cardList) {
+    /**
+     * 十三烂
+     */
+    boolean isShiSanLan(List<Integer> cardList) {
         if (cardList.size() != 14){
             return false;
         }
@@ -98,7 +108,10 @@ public class MjHuService {
 
     }
 
-    public boolean isQingYiSe(List<Integer> cardList){
+    /**
+     * 清一色
+     */
+    boolean isQingYiSe(List<Integer> cardList){
         Map<MjValueEnum, List<Integer>> map = mjCardService.split(cardList);
         return map.size() == 1;
     }

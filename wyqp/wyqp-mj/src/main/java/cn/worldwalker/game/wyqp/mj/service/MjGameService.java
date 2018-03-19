@@ -147,11 +147,7 @@ public class MjGameService extends BaseGameService {
                 if (player.getPlayerId().equals(roomInfo.getRoomBankerId())) {
                     /**当前说话玩家的手牌缓存，由于没有补花之前的牌需要返回给客户端*/
                     handCardListBeforeAddFlower = new ArrayList<Integer>();
-//					if (Constant.isTest == 1) {
-//						player.setHandCardList(MjCardRule.getHandCardListByIndex(i, true));//测试用
-//					}else{
                     player.setHandCardList(MjCardResource.genHandCardList(tableRemainderCardList, 14));
-//					}
 
                     /**补花之前的牌缓存*/
                     handCardListBeforeAddFlower.addAll(player.getHandCardList());
@@ -522,6 +518,10 @@ public class MjGameService extends BaseGameService {
         /**将杠的牌从手牌列表中移动到杠牌列表中*/
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
         List<Integer> mingGangCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.mingGang, msg.getGangCards());
+        //南丰,计算杠分
+        if (MjCardRule.isJxNf(roomInfo)) {
+            mjScoreService.calGangScore(roomInfo, player, MjOperationEnum.mingGang);
+        }
 
         /**计算其玩家是否可以抢杠*/
         MjCardRule.calculateAllPlayerOperations(roomInfo, Integer.valueOf(msg.getGangCards()), playerId, 3);
@@ -636,6 +636,12 @@ public class MjGameService extends BaseGameService {
         /**将杠的牌从手牌列表中移动到杠牌列表中*/
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
         List<Integer> anGangCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.anGang, msg.getGangCards());
+
+        //南丰麻将，算杠分
+        if (MjCardRule.isJxNf(roomInfo)) {
+            mjScoreService.calGangScore(roomInfo, player, MjOperationEnum.mingGang);
+        }
+
         /**将玩家当前轮补花数设置为0*/
         player.setCurAddFlowerNum(0);
         String moPaiAddFlower = null;
