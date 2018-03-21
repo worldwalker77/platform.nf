@@ -42,7 +42,8 @@ public class LoginController {
 
     @RequestMapping("addRobot")
     @ResponseBody
-    public String addRobot(Integer roomId) throws Exception {
+    public String addRobot(Integer roomId, Integer cnt) throws Exception {
+
         Client client1 = new Client(2);
         client1.init();
         Thread.sleep(waitTime);

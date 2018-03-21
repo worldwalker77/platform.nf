@@ -3,6 +3,7 @@ package cn.worldwalker.game.wyqp.mj.service;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
+import cn.worldwalker.game.wyqp.mj.enums.GangTypeEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjValueEnum;
@@ -223,6 +224,8 @@ public class MjScoreService {
         for (MjPlayerInfo winPlayerInfo : winPlayList){
             for (MjPlayerInfo losePlayerInfo : losePlayList){
                 if (!winPlayerInfo.getPlayerId().equals(losePlayerInfo.getPlayerId())){
+                    winPlayerInfo.setGangScore(winPlayerInfo.getGangScore() + score);
+                    losePlayerInfo.setGangScore(losePlayerInfo.getGangScore() + score);
                     winPlayerInfo.setCurScore(winPlayerInfo.getGangScore() + score);
                     losePlayerInfo.setCurScore(losePlayerInfo.getGangScore() - score);
                 }
@@ -238,13 +241,16 @@ public class MjScoreService {
             case mingGang:
                 //如果是摸牌后的明杠
                 if (MjCardRule.isHandCard3n2(player)) {
+                    player.getGangTypeList().add(GangTypeEnum.ZI_MO_MING_GANG.type);
                     assignGangScore(Collections.singletonList(player),roomInfo.getPlayerList(),1);
                 }else{//如果是别人打的牌的明杠
+                    player.getGangTypeList().add(GangTypeEnum.MING_GANG.type);
                     MjPlayerInfo lastPlayer = MjCardRule.getLastPlayer(roomInfo);
                     assignGangScore(Collections.singletonList(player),Collections.singletonList(lastPlayer),1);
                 }
                 break;
             case anGang:
+                player.getGangTypeList().add(GangTypeEnum.AN_GANG.type);
                 assignGangScore(Collections.singletonList(player),roomInfo.getPlayerList(),2);
                 break;
             default:

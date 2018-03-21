@@ -913,6 +913,7 @@ public class MjGameService extends BaseGameService {
             }
             data.put("curPlayerId", curPlayerId);
             data.put("huType", playerHuTypeInt);
+            data.put("roomBankerId", roomInfo.getRoomBankerId());
             if (MjHuTypeEnum.zhuaChong.type.equals(playerHuTypeInt) || MjHuTypeEnum.qiangGang.type.equals(playerHuTypeInt)) {
                 data.put("cardIndex", roomInfo.getLastCardIndex());
                 data.put("dianPaoPlayerId", roomInfo.getLastPlayerId());
@@ -941,6 +942,7 @@ public class MjGameService extends BaseGameService {
                 newPlayer.put("huType", temp.getHuType());
                 newPlayer.put("buttomAndFlowerScore", temp.getButtomAndFlowerScore());
                 newPlayer.put("multiple", temp.getMultiple());
+                newPlayer.put("gangTypeList",temp.getGangTypeList());
                 if (temp.getFeiCangYingCardIndex() != null) {
                     newPlayer.put("feiCangYingCardIndex", temp.getFeiCangYingCardIndex());
                 }
@@ -1113,6 +1115,7 @@ public class MjGameService extends BaseGameService {
             newPlayer.put("anGangCardList", temp.getAnGangCardList());
             newPlayer.put("curScore", temp.getCurScore());
             newPlayer.put("isHu", temp.getIsHu());
+            newPlayer.put("gangTypeList",temp.getGangTypeList());
             if (roomInfo.getStatus().equals(MjRoomStatusEnum.totalGameOver.status)) {
                 newPlayer.put("ziMoCount", temp.getZiMoCount());
                 newPlayer.put("zhuaChongCount", temp.getZhuaChongCount());

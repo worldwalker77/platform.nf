@@ -52,6 +52,8 @@ public class MjPlayerInfo extends BasePlayerInfo{
 	private Integer dianPaoCount = 0;
 	/**飞苍蝇牌索引*/
 	private Integer feiCangYingCardIndex;
+	//杠类型的列表,
+    private List<Integer> gangTypeList = new ArrayList<>(4);
 	
 	public Integer getFeiCangYingCardIndex() {
 		return feiCangYingCardIndex;
@@ -186,5 +188,14 @@ public class MjPlayerInfo extends BasePlayerInfo{
 
     public void setGangScore(Integer gangScore) {
         this.gangScore = gangScore;
+    }
+
+
+    public List<Integer> getGangTypeList() {
+        return gangTypeList;
+    }
+
+    public void setGangTypeList(List<Integer> gangTypeList) {
+        this.gangTypeList = gangTypeList;
     }
 }
