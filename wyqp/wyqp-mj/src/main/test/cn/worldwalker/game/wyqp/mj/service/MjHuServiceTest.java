@@ -1,7 +1,6 @@
-package cn.worldwalker.game.wyqp.mj.robot;
+package cn.worldwalker.game.wyqp.mj.service;
 
 import cn.worldwalker.game.wyqp.mj.huvalidate.TableMgr;
-import cn.worldwalker.game.wyqp.mj.service.MjHuService;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -11,22 +10,24 @@ import java.util.List;
 import java.util.Map;
 
 public class MjHuServiceTest {
+    private MjHuService mjHuService = MjHuService.getInstance();
+
     @Test
     public void testIsHu() throws Exception {
         TableMgr.getInstance().load();
         Map<List<Integer>,Boolean> caseMap = new HashMap<>(16);
-        caseMap.put(Arrays.asList(0,1,2,3,4,5,6,7,8), true);
+        caseMap.put(Arrays.asList(0,1,2,3,4,5,6,7,8,33,33), true);
         //常规牌型
-        caseMap.put(Arrays.asList(0,1,2,3,4,5,6,7,8,10,11,12), true);
+        caseMap.put(Arrays.asList(0,1,2,3,4,5,6,7,8,10,11,12,33,33), true);
         caseMap.put(Arrays.asList(0,1,2,3,4,5,6,7,8,10,11,12,13,13), true);
-        caseMap.put(Arrays.asList(1,1,1,3,4,5,6,7,8,10,11,12), true);
+        caseMap.put(Arrays.asList(1,1,1,3,4,5,6,7,8,10,11,12,33,33), true);
         caseMap.put(Arrays.asList(1,1,1,3,4,5,6,7,8,10,11,12,13,13), true);
         //万与筒交接处
-        caseMap.put(Arrays.asList(8,9,10), false);
+        caseMap.put(Arrays.asList(8,9,10,33,33), false);
         //筒与条交接处
-        caseMap.put(Arrays.asList(16,17,18), false);
+        caseMap.put(Arrays.asList(16,17,18,33,33), false);
         //条与风交接处
-        caseMap.put(Arrays.asList(25,26,27), false);
+        caseMap.put(Arrays.asList(25,26,27,33,33), false);
         //东南西北任意三个
         caseMap.put(Arrays.asList(1,1,27,28,29), true);
         caseMap.put(Arrays.asList(0,0,28,29,30), true);
@@ -48,9 +49,22 @@ public class MjHuServiceTest {
 
         for (Map.Entry<List<Integer>,Boolean> entry : caseMap.entrySet()){
             //无赖子
-            boolean isHuNew = MjHuService.getInstance().isHu(entry.getKey());
+            boolean isHuNew = mjHuService.isHu(entry.getKey());
+            boolean isNormalHu = mjHuService.isNormalHu(entry.getKey());
+
+            for (int i=0; i<4; i++){
+                List<Integer> cardList = entry.getKey();
+                if (cardList.size()-i-1 > 0){
+                    boolean isHuLaiZi = mjHuService.isHuLaizi(cardList.subList(0,cardList.size()-i-1),i+1);
+                    if (isHuLaiZi != isNormalHu &&  isNormalHu){
+                        System.out.println("laizi 失败 + [" + i + "]" + entry);
+                        isHuLaiZi = mjHuService.isHuLaizi(cardList.subList(0,cardList.size()-i-1),i+1);
+                    }
+                }
+
+            }
             if (!entry.getValue().equals(isHuNew)){
-                MjHuService.getInstance().isHu(entry.getKey());
+                mjHuService.isHu(entry.getKey());
                 System.out.println(entry.getKey());
             }
             Assert.assertTrue(entry.getValue().equals(isHuNew));

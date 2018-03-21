@@ -29,7 +29,7 @@ public class SeedService {
 
     private boolean isFeng;
 
-    private static final int MAX_GEN_CNT = 1;
+    private static final int MAX_GEN_CNT = 4;
 
     private Map<Integer, Set<Seed>> mapSeed = new HashMap<>(4);
     private Map<Integer, Set<Seed>> mapSeedGen = new HashMap<>(4);
