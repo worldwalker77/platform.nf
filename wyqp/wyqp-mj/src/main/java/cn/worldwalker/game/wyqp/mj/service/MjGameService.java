@@ -639,7 +639,7 @@ public class MjGameService extends BaseGameService {
 
         //南丰麻将，算杠分
         if (MjCardRule.isJxNf(roomInfo)) {
-            mjScoreService.calGangScore(roomInfo, player, MjOperationEnum.mingGang);
+            mjScoreService.calGangScore(roomInfo, player, MjOperationEnum.anGang);
         }
 
         /**将玩家当前轮补花数设置为0*/
@@ -943,6 +943,7 @@ public class MjGameService extends BaseGameService {
                 newPlayer.put("buttomAndFlowerScore", temp.getButtomAndFlowerScore());
                 newPlayer.put("multiple", temp.getMultiple());
                 newPlayer.put("gangTypeList",temp.getGangTypeList());
+                newPlayer.put("gangScore",temp.getGangScore());
                 if (temp.getFeiCangYingCardIndex() != null) {
                     newPlayer.put("feiCangYingCardIndex", temp.getFeiCangYingCardIndex());
                 }
@@ -981,6 +982,7 @@ public class MjGameService extends BaseGameService {
                 }
                 data.put("curPlayerId", curPlayerId);
                 data.put("huType", playerHuTypeInt);
+                data.put("roomBankerId", roomInfo.getRoomBankerId());
 
                 if (MjHuTypeEnum.zhuaChong.type.equals(playerHuTypeInt) || MjHuTypeEnum.qiangGang.type.equals(playerHuTypeInt)) {
                     data.put("cardIndex", roomInfo.getLastCardIndex());
@@ -1007,6 +1009,7 @@ public class MjGameService extends BaseGameService {
                     newPlayer.put("curScore", temp.getCurScore());
                     newPlayer.put("isHu", temp.getIsHu());
                     newPlayer.put("mjCardTypeList", temp.getMjCardTypeList());
+                    newPlayer.put("gangTypeList",temp.getGangTypeList());
                     newPlayer.put("huType", temp.getHuType());
                     if (!MjCardRule.isJxNf(roomInfo)){
                         newPlayer.put("buttomAndFlowerScore", temp.getButtomAndFlowerScore());
@@ -1086,6 +1089,11 @@ public class MjGameService extends BaseGameService {
      * 荒庄处理
      */
     public void huangZhuang(MjRoomInfo roomInfo, Integer roomId) {
+        //已经黄了，结算过了，免得重推消息，重复结算
+        //机器人走的时候，还是会跑到两次，除非上锁，貌似有一定概率重复结算,再观察下人工操作是否会重复结算
+        if (Integer.valueOf(1).equals(roomInfo.getIsCurGameHuangZhuang())){
+            return;
+        }
         roomInfo.setIsCurGameHuangZhuang(1);
         calculateScore(roomInfo);
         roomInfo.setUpdateTime(new Date());
@@ -1100,6 +1108,7 @@ public class MjGameService extends BaseGameService {
             result.setMsgType(MsgTypeEnum.curSettlement.msgType);
         }
         data.put("isCurGameHuangZhuang", 1);
+        data.put("roomBankerId",roomInfo.getRoomBankerId());
         data.put("totalWinnerId", roomInfo.getTotalWinnerId());
         List<MjPlayerInfo> playerList = roomInfo.getPlayerList();
         List<Map<String, Object>> newPlayerList = new ArrayList<Map<String, Object>>();
@@ -1116,6 +1125,7 @@ public class MjGameService extends BaseGameService {
             newPlayer.put("curScore", temp.getCurScore());
             newPlayer.put("isHu", temp.getIsHu());
             newPlayer.put("gangTypeList",temp.getGangTypeList());
+            newPlayer.put("gangScore", temp.getGangScore());
             if (roomInfo.getStatus().equals(MjRoomStatusEnum.totalGameOver.status)) {
                 newPlayer.put("ziMoCount", temp.getZiMoCount());
                 newPlayer.put("zhuaChongCount", temp.getZhuaChongCount());
@@ -1168,6 +1178,9 @@ public class MjGameService extends BaseGameService {
             mjScoreService.calHuRoom(roomInfo);
             mjScoreService.calScoreRoom(roomInfo);
         }
+        //南丰，黄了，杠分也要去算总赢家
+        mjScoreService.calTotalWin(roomInfo);
+
 
         /**如果当前局数小于总局数，则设置为当前局结束*/
         if (roomInfo.getCurGame() < roomInfo.getTotalGames()) {

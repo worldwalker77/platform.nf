@@ -201,6 +201,10 @@ public class MjScoreService {
                 break;
         }
 
+
+    }
+
+    public void calTotalWin(MjRoomInfo roomInfo){
         //计算每个玩家总得分及设置房间的总赢家
         Integer totalWinnerId = roomInfo.getPlayerList().get(0).getPlayerId();
         Integer maxTotalScore = roomInfo.getPlayerList().get(0).getTotalScore();
@@ -216,7 +220,6 @@ public class MjScoreService {
         }
         roomInfo.setTotalWinnerId(totalWinnerId);
     }
-
     /*
     为杠牌玩家算分
      */
@@ -225,9 +228,7 @@ public class MjScoreService {
             for (MjPlayerInfo losePlayerInfo : losePlayList){
                 if (!winPlayerInfo.getPlayerId().equals(losePlayerInfo.getPlayerId())){
                     winPlayerInfo.setGangScore(winPlayerInfo.getGangScore() + score);
-                    losePlayerInfo.setGangScore(losePlayerInfo.getGangScore() + score);
-                    winPlayerInfo.setCurScore(winPlayerInfo.getGangScore() + score);
-                    losePlayerInfo.setCurScore(losePlayerInfo.getGangScore() - score);
+                    losePlayerInfo.setGangScore(losePlayerInfo.getGangScore() - score);
                 }
             }
         }

@@ -30,7 +30,7 @@ public class Socket extends WebSocketClient implements Runnable {
         String type = MsgTypeEnum.getMsgTypeEnumByType(mjRequest.getMsgType()).desc;
 //        type = "";
         String msg = JSON.toJSONString(mjRequest);
-        System.out.println(client.getPosition() + "--[>>>>" + type + "]: " + msg);
+//        System.out.println(client.getPosition() + "--[>>>>" + type + "]: " + msg);
         send(msg);
     }
 
@@ -55,8 +55,8 @@ public class Socket extends WebSocketClient implements Runnable {
                 cardList.add((Integer) o);
             }
             client.setCardList(cardList);
-            System.out.println(client.getPosition() + "--" + client.getCardList() +
-                    " -- with:" + client.getPengList());
+//            System.out.println(client.getPosition() + "--" + client.getCardList() +
+//                    " -- with:" + client.getPengList());
         }
     }
     @Override
@@ -69,7 +69,7 @@ public class Socket extends WebSocketClient implements Runnable {
             System.out.println(client.getPosition() + "(" + client.getPlayerId() +  ")--[<<<<" + type + "]: " + arg0);
         }
 //        type = "";
-        if (msgType!=220){
+        if (msgType!=220 && msgType != 211 && msgType != 210){
             System.out.println(client.getPosition() + "(" + client.getPlayerId() +  ")--[<<<<" + type + "]: " + arg0);
         }
         if (jsonData != null) {
@@ -113,6 +113,17 @@ public class Socket extends WebSocketClient implements Runnable {
                     if (operationMap.size() > 1){
                         System.out.println(operationMap);
                     }
+
+                    /*
+                    for (int i=5; i>1; i--){
+                        String openrationValue = (String) operationMap.get(String.valueOf(i));
+                        if (openrationValue != null){
+
+                        }
+
+                    }
+                   */
+
                     for (MjOperationEnum mjOperationEnum: MjOperationEnum.values()) {
                         String operationValue = (String) operationMap.get(String.valueOf(mjOperationEnum.type));
                         if ( operationValue != null){
@@ -120,16 +131,17 @@ public class Socket extends WebSocketClient implements Runnable {
                                 case hu:
                                     client.hu();
                                     break;
-                                case peng:
-                                    client.peng(operationValue);
-                                    break;
                                 case mingGang:
                                     client.mingGang(operationValue);
                                     break;
                                 case anGang:
                                     client.anGang(operationValue);
                                     break;
+                                case peng:
+                                    client.peng(operationValue);
+                                    break;
                             }
+                            break;
 
                         }
                     }

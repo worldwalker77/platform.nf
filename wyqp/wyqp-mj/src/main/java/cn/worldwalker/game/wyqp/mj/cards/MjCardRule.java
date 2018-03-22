@@ -155,6 +155,7 @@ public class MjCardRule {
 	
 	public static void initMjPlayer(MjPlayerInfo playerInfo){
 		playerInfo.setCurScore(0);
+		playerInfo.setGangScore(0);
 		playerInfo.setIsTingHu(0);
 		playerInfo.setCurMoPaiCardIndex(null);
 		playerInfo.setCurAddFlowerNum(0);
@@ -165,6 +166,7 @@ public class MjCardRule {
 		playerInfo.setButtomAndFlowerScore(0);
 		playerInfo.setFeiCangYingCardIndex(null);
 		playerInfo.getMjCardTypeList().clear();
+		playerInfo.getGangTypeList().clear();
 		playerInfo.setHandCardList(null);
 		playerInfo.getChiCardList().clear();
 		playerInfo.getPengCardList().clear();

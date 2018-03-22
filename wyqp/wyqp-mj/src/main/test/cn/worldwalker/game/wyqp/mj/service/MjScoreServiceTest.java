@@ -3,6 +3,7 @@ package cn.worldwalker.game.wyqp.mj.service;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -152,4 +153,28 @@ public class MjScoreServiceTest {
     }
 
 
+    @Test
+    public void testCalGangScore() throws Exception {
+        MjRoomInfo mjRoomInfo = new MjRoomInfo();
+        for (int i=0; i<4; i++){
+            MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
+            mjPlayerInfo.setPlayerId(1000 + i);
+            mjRoomInfo.getPlayerList().add(mjPlayerInfo);
+        }
+
+        mjRoomInfo.setLastPlayerId(mjRoomInfo.getPlayerList().get(3).getPlayerId());
+
+        MjPlayerInfo gangPlayer = mjRoomInfo.getPlayerList().get(0);
+        gangPlayer.setHandCardList(Arrays.asList(1,2,3,4));
+
+        mjScoreService.calGangScore(mjRoomInfo, gangPlayer,  MjOperationEnum.anGang);
+
+        for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
+            System.out.println(mjPlayerInfo.getCurScore());
+            System.out.println(mjPlayerInfo.getGangTypeList());
+            System.out.println(mjPlayerInfo.getGangScore());
+
+        }
+
+    }
 }
