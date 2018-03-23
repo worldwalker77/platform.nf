@@ -19,7 +19,7 @@ public class ClientSimulator {
 
 //        clientOwner.addRobot();
 
-        addRobot(clientOwner.getRoomId());
+//        addRobot(clientOwner.getRoomId());
 
 //        clientOwner.close();
 //        client1.close();

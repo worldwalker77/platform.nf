@@ -104,9 +104,8 @@ public class Constant {
 	
 	public static final int isTest = Integer.valueOf(CustomizedPropertyConfigurer.getContextProperty("is.test"));
 
-//	public static final String mjTablePath =CustomizedPropertyConfigurer.getContextProperty("mj.table.path");
-
-    public static final String mjTablePath = "/Users/zhangmin/tables/";
+	public static final String mjTablePath =CustomizedPropertyConfigurer.getContextProperty("mj.table.path");
+//    public static final String mjTablePath = "/Users/zhangmin/tables/";
 
 	public static final String sendSmsUrl = CustomizedPropertyConfigurer.getContextProperty("send.sms.url");
 	
