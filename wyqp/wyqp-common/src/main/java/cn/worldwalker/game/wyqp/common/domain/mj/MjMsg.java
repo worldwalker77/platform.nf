@@ -33,6 +33,8 @@ public class MjMsg extends BaseMsg{
 	private String chiCards;
 	private String pengCards;
 	private String gangCards;
+
+	private Integer maiMaCount = 0;
 	
 	public Integer getModel() {
 		return model;
@@ -124,5 +126,12 @@ public class MjMsg extends BaseMsg{
 	public void setHuScoreLimit(Integer huScoreLimit) {
 		this.huScoreLimit = huScoreLimit;
 	}
-	
+
+    public Integer getMaiMaCount() {
+        return maiMaCount;
+    }
+
+    public void setMaiMaCount(Integer maiMaCount) {
+        this.maiMaCount = maiMaCount;
+    }
 }

@@ -2,6 +2,7 @@ package cn.worldwalker.game.wyqp.mj.service;
 
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
+import cn.worldwalker.game.wyqp.mj.cards.MjCardResource;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
 import cn.worldwalker.game.wyqp.mj.enums.GangTypeEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
@@ -151,6 +152,7 @@ public class MjScoreService {
                     score = score + MjScoreEnum.getByType(type).score;
                 }
             }
+
             for (MjPlayerInfo losePlayerInfo : losePlayList){
                 if (!winPlayerInfo.getPlayerId().equals(losePlayerInfo.getPlayerId())){
                     winPlayerInfo.setCurScore(winPlayerInfo.getCurScore() + score);
@@ -211,6 +213,8 @@ public class MjScoreService {
         for (MjPlayerInfo player : roomInfo.getPlayerList()) {
             //算上杠分
             player.setCurScore(player.getCurScore() + player.getGangScore());
+            //算上马分
+            player.setCurScore(player.getCurScore() + player.getMaScore());
             //更新总分
             player.setTotalScore(player.getTotalScore() + player.getCurScore());
             if (player.getTotalScore() > maxTotalScore) {
@@ -220,6 +224,7 @@ public class MjScoreService {
         }
         roomInfo.setTotalWinnerId(totalWinnerId);
     }
+
     /*
     为杠牌玩家算分
      */
@@ -249,13 +254,43 @@ public class MjScoreService {
                     MjPlayerInfo lastPlayer = MjCardRule.getLastPlayer(roomInfo);
                     assignGangScore(Collections.singletonList(player),Collections.singletonList(lastPlayer),1);
                 }
+                player.setMinGangCount(player.getMinGangCount() + 1);
                 break;
             case anGang:
                 player.getGangTypeList().add(GangTypeEnum.AN_GANG.type);
                 assignGangScore(Collections.singletonList(player),roomInfo.getPlayerList(),2);
+                player.setAnGangCount(player.getAnGangCount() + 1);
                 break;
             default:
                 break;
         }
     }
+
+
+    public void assignMaiMaScore(MjPlayerInfo winPlayer, MjPlayerInfo losePlayer){
+        winPlayer.setMaScore(winPlayer.getMaScore() + losePlayer.getCurScore());
+        losePlayer.setMaScore( losePlayer.getMaScore() - losePlayer.getCurScore());
+    }
+
+    public void calMaScore(MjRoomInfo roomInfo){
+        for (int maiMaCnt=0; maiMaCnt < roomInfo.getMaiMaCount(); maiMaCnt++){
+            Integer card = MjCardResource.mopai(roomInfo.getTableRemainderCardList());
+            roomInfo.getMaiMaCardList().add(card);
+            int maiMaIndex = (card % 9) % 4 ;
+            MjPlayerInfo bankerPlayer, maiMaPlayer;
+            List<MjPlayerInfo> playerInfoList = roomInfo.getPlayerList();
+            for (int playerCnt  = 0; playerCnt<roomInfo.getPlayerList().size(); playerCnt++){
+                MjPlayerInfo mjPlayerInfo = playerInfoList.get(playerCnt);
+                if (mjPlayerInfo.getPlayerId().equals(roomInfo.getRoomBankerId())){
+                    bankerPlayer = mjPlayerInfo;
+                    maiMaPlayer = playerInfoList.get( (playerCnt+maiMaIndex) % 4);
+                    if (!maiMaPlayer.getPlayerId().equals(bankerPlayer.getPlayerId()) ){
+                        assignMaiMaScore(bankerPlayer, maiMaPlayer);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
 }

@@ -54,7 +54,13 @@ public class MjPlayerInfo extends BasePlayerInfo{
 	private Integer feiCangYingCardIndex;
 	//杠类型的列表,
     private List<Integer> gangTypeList = new ArrayList<>(4);
-	
+    //明杠次数
+    private Integer minGangCount = 0;
+    //暗杠次数
+    private Integer anGangCount = 0;
+    //买马分
+    private Integer maScore = 0;
+
 	public Integer getFeiCangYingCardIndex() {
 		return feiCangYingCardIndex;
 	}
@@ -198,4 +204,30 @@ public class MjPlayerInfo extends BasePlayerInfo{
     public void setGangTypeList(List<Integer> gangTypeList) {
         this.gangTypeList = gangTypeList;
     }
+
+    public Integer getMinGangCount() {
+        return minGangCount;
+    }
+
+    public void setMinGangCount(Integer minGangCount) {
+        this.minGangCount = minGangCount;
+    }
+
+    public Integer getAnGangCount() {
+        return anGangCount;
+    }
+
+    public void setAnGangCount(Integer anGangCount) {
+        this.anGangCount = anGangCount;
+    }
+
+
+    public Integer getMaScore() {
+        return maScore;
+    }
+
+    public void setMaScore(Integer maScore) {
+        this.maScore = maScore;
+    }
 }
+

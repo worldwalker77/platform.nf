@@ -54,7 +54,7 @@ public class MjHuService {
      * 判胡,包括符合胡牌规则、十三烂、七对、清一色
      */
     public boolean isHu(List<Integer> cardList) {
-        return isQingYiSe(cardList) || isQiDui(cardList) || isShiSanLan(cardList) || isNormalHu(cardList);
+        return isQiDui(cardList) || isShiSanLan(cardList) || isNormalHu(cardList);
 
     }
 
@@ -112,9 +112,10 @@ public class MjHuService {
     /**
      * 清一色
      */
-    boolean isQingYiSe(List<Integer> cardList) {
+    public boolean isQingYiSe(List<Integer> cardList) {
         Map<MjValueEnum, List<Integer>> map = mjCardService.split(cardList);
-        return map.size() == 1;
+        //杠了的有可能大于14张牌吧
+        return cardList.size() > 13 && map.size() == 1;
     }
 
     /**

@@ -22,6 +22,8 @@ import java.util.Map.Entry;
 
 
 public class MjCardRule {
+
+
 	private static Map<Integer, List<Integer>> map = new HashMap<Integer, List<Integer>>();
 	private static List<Integer> tableList = Arrays.asList(
 			/**1-9万*/	0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,
@@ -306,11 +308,6 @@ public class MjCardRule {
 	
 	/**
 	 * 摸牌或者出牌的时候，依次计算每个玩家的可操作权限
-	 * @param list
-	 * @param cardIndex
-	 * @param playerId
-	 * @param isMoPai
-	 * @return
 	 */
 	public static LinkedHashMap<Integer, TreeMap<Integer, String>> calculateAllPlayerOperations(MjRoomInfo roomInfo, Integer cardIndex, Integer playerId, Integer type){
 		List<MjPlayerInfo> list = roomInfo.getPlayerList();
@@ -634,7 +631,7 @@ public class MjCardRule {
 	public static String checkMoPaiAddFlower(MjRoomInfo roomInfo,  MjPlayerInfo player){
 		List<Integer> tableRemainderCardList = roomInfo.getTableRemainderCardList();
 		/**如果桌牌数为0，则结束*/
-		if (tableRemainderCardList.size() == 0) {
+		if (tableRemainderCardList.size() <= roomInfo.getMaiMaCount()) {
 			throw new BusinessException(ExceptionEnum.NO_MORE_CARD_ERROR);
 		}
 		Integer tempCard = MjCardResource.mopai(tableRemainderCardList);
@@ -1184,13 +1181,19 @@ public class MjCardRule {
 		}
 
 		if (isJxNf(roomInfo)){
+            List<Integer> allCardList = new ArrayList<>(16);
+            allCardList.addAll(handCardList);
 		    if (cardIndex != null){
-		        List<Integer> allCardList = new ArrayList<>(16);
-		        allCardList.addAll(handCardList);
 		        allCardList.add(cardIndex);
-                isHu = MjHuService.getInstance().isHu(allCardList);
-            } else {
-		        isHu = MjHuService.getInstance().isHu(handCardList);
+            }
+            isHu = MjHuService.getInstance().isHu(allCardList);
+            //清一色单独判断，手上牌和底下牌都要判断
+            if (!isHu){
+                allCardList.addAll(player.getChiCardList());
+                allCardList.addAll(player.getPengCardList());
+                allCardList.addAll(player.getMingGangCardList());
+		        allCardList.addAll(player.getAnGangCardList());
+		        isHu = MjHuService.getInstance().isQingYiSe(allCardList);
             }
         } else {
             if (handCardList.size() == 14) {

@@ -40,6 +40,7 @@ public class MjGameService extends BaseGameService {
         roomInfo.setEachFlowerScore(msg.getEachFlowerScore());
         roomInfo.setHuScoreLimit(msg.getHuScoreLimit());
         roomInfo.setIsChiPai(msg.getIsChiPai());
+        roomInfo.setMaiMaCount(msg.getMaiMaCount());
         //创建房间的时候记录麻将类型
         roomInfo.setDetailType(request.getDetailType());
         if (MjTypeEnum.shangHaiBaiDa.type.equals(roomInfo.getDetailType())) {
@@ -913,6 +914,7 @@ public class MjGameService extends BaseGameService {
             }
             data.put("curPlayerId", curPlayerId);
             data.put("huType", playerHuTypeInt);
+            data.put("roomOwnerId",roomInfo.getRoomOwnerId());
             data.put("roomBankerId", roomInfo.getRoomBankerId());
             if (MjHuTypeEnum.zhuaChong.type.equals(playerHuTypeInt) || MjHuTypeEnum.qiangGang.type.equals(playerHuTypeInt)) {
                 data.put("cardIndex", roomInfo.getLastCardIndex());
@@ -951,6 +953,8 @@ public class MjGameService extends BaseGameService {
                     newPlayer.put("ziMoCount", temp.getZiMoCount());
                     newPlayer.put("zhuaChongCount", temp.getZhuaChongCount());
                     newPlayer.put("dianPaoCount", temp.getDianPaoCount());
+                    newPlayer.put("minGangCount",temp.getMinGangCount());
+                    newPlayer.put("anGangCount",temp.getAnGangCount());
                     newPlayer.put("totalScore", temp.getTotalScore());
                 }
                 newPlayerList.add(newPlayer);
@@ -982,6 +986,7 @@ public class MjGameService extends BaseGameService {
                 }
                 data.put("curPlayerId", curPlayerId);
                 data.put("huType", playerHuTypeInt);
+                data.put("roomOwnerId",roomInfo.getRoomOwnerId());
                 data.put("roomBankerId", roomInfo.getRoomBankerId());
 
                 if (MjHuTypeEnum.zhuaChong.type.equals(playerHuTypeInt) || MjHuTypeEnum.qiangGang.type.equals(playerHuTypeInt)) {
@@ -1022,6 +1027,8 @@ public class MjGameService extends BaseGameService {
                         newPlayer.put("ziMoCount", temp.getZiMoCount());
                         newPlayer.put("zhuaChongCount", temp.getZhuaChongCount());
                         newPlayer.put("dianPaoCount", temp.getDianPaoCount());
+                        newPlayer.put("minGangCount",temp.getMinGangCount());
+                        newPlayer.put("anGangCount",temp.getAnGangCount());
                         newPlayer.put("totalScore", temp.getTotalScore());
                     }
                     newPlayerList.add(newPlayer);
@@ -1108,6 +1115,7 @@ public class MjGameService extends BaseGameService {
             result.setMsgType(MsgTypeEnum.curSettlement.msgType);
         }
         data.put("isCurGameHuangZhuang", 1);
+        data.put("roomOwnerId",roomInfo.getRoomOwnerId());
         data.put("roomBankerId",roomInfo.getRoomBankerId());
         data.put("totalWinnerId", roomInfo.getTotalWinnerId());
         List<MjPlayerInfo> playerList = roomInfo.getPlayerList();
@@ -1130,6 +1138,9 @@ public class MjGameService extends BaseGameService {
                 newPlayer.put("ziMoCount", temp.getZiMoCount());
                 newPlayer.put("zhuaChongCount", temp.getZhuaChongCount());
                 newPlayer.put("dianPaoCount", temp.getDianPaoCount());
+                newPlayer.put("minGangCount",temp.getMinGangCount());
+                newPlayer.put("anGangCount",temp.getAnGangCount());
+                newPlayer.put("totalScore", temp.getTotalScore());
             }
             newPlayerList.add(newPlayer);
         }
@@ -1178,6 +1189,7 @@ public class MjGameService extends BaseGameService {
             mjScoreService.calHuRoom(roomInfo);
             mjScoreService.calScoreRoom(roomInfo);
         }
+
         //南丰，黄了，杠分也要去算总赢家
         mjScoreService.calTotalWin(roomInfo);
 

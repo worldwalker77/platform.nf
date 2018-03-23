@@ -54,6 +54,10 @@ public class MjRoomInfo extends BaseRoomInfo{
 	private Integer model;
 	
 	private Integer indexLine = 34;
+	//南丰 买马
+    private Integer maiMaCount = 0;
+
+    private List<Integer> maiMaCardList = new ArrayList<>(4);
 
 
 	public Integer getIndexLine() {
@@ -183,5 +187,20 @@ public class MjRoomInfo extends BaseRoomInfo{
 	public void setIsCurGameHuangZhuang(Integer isCurGameHuangZhuang) {
 		this.isCurGameHuangZhuang = isCurGameHuangZhuang;
 	}
-	
+
+    public Integer getMaiMaCount() {
+        return maiMaCount;
+    }
+
+    public void setMaiMaCount(Integer maiMaCount) {
+        this.maiMaCount = maiMaCount;
+    }
+
+    public List<Integer> getMaiMaCardList() {
+        return maiMaCardList;
+    }
+
+    public void setMaiMaCardList(List<Integer> maiMaCardList) {
+        this.maiMaCardList = maiMaCardList;
+    }
 }
