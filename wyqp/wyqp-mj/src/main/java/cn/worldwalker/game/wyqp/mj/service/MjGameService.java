@@ -946,6 +946,7 @@ public class MjGameService extends BaseGameService {
                 newPlayer.put("multiple", temp.getMultiple());
                 newPlayer.put("gangTypeList",temp.getGangTypeList());
                 newPlayer.put("gangScore",temp.getGangScore());
+                newPlayer.put("maScore",temp.getMaScore());
                 if (temp.getFeiCangYingCardIndex() != null) {
                     newPlayer.put("feiCangYingCardIndex", temp.getFeiCangYingCardIndex());
                 }
@@ -1015,6 +1016,7 @@ public class MjGameService extends BaseGameService {
                     newPlayer.put("isHu", temp.getIsHu());
                     newPlayer.put("mjCardTypeList", temp.getMjCardTypeList());
                     newPlayer.put("gangTypeList",temp.getGangTypeList());
+                    newPlayer.put("gangScore",temp.getGangScore());
                     newPlayer.put("huType", temp.getHuType());
                     if (!MjCardRule.isJxNf(roomInfo)){
                         newPlayer.put("buttomAndFlowerScore", temp.getButtomAndFlowerScore());
@@ -1134,6 +1136,7 @@ public class MjGameService extends BaseGameService {
             newPlayer.put("isHu", temp.getIsHu());
             newPlayer.put("gangTypeList",temp.getGangTypeList());
             newPlayer.put("gangScore", temp.getGangScore());
+            newPlayer.put("maScore",temp.getMaScore());
             if (roomInfo.getStatus().equals(MjRoomStatusEnum.totalGameOver.status)) {
                 newPlayer.put("ziMoCount", temp.getZiMoCount());
                 newPlayer.put("zhuaChongCount", temp.getZhuaChongCount());
