@@ -66,7 +66,14 @@ public class MjHuService {
             return false;
         }
         Map<MjValueEnum, List<Integer>> map = mjCardService.split(cardList);
+        boolean hasGen = false;
         for (Map.Entry<MjValueEnum, List<Integer>> entry : map.entrySet()) {
+            if (entry.getValue().size() %3 == 2){
+                if (hasGen){
+                    return false;
+                }
+                hasGen = true;
+            }
             if (!isSubHu(entry.getValue(), entry.getKey().isFeng, 0))
                 return false;
         }

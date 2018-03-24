@@ -1,6 +1,6 @@
 package cn.worldwalker.game.wyqp.mj.service;
 
-import cn.worldwalker.game.wyqp.mj.huvalidate.TableMgr;
+import cn.worldwalker.game.wyqp.mj.seed.SeedService;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -14,7 +14,7 @@ public class MjHuServiceTest {
 
     @Test
     public void testIsHu() throws Exception {
-        TableMgr.getInstance().load();
+//        TableMgr.getInstance().load();
         Map<List<Integer>,Boolean> caseMap = new HashMap<>(16);
         caseMap.put(Arrays.asList(0,1,2,3,4,5,6,7,8,33,33), true);
         //常规牌型
@@ -42,7 +42,7 @@ public class MjHuServiceTest {
         //七对
         caseMap.put(Arrays.asList(0,0,1,1,8,8,9,9,11,11,18,18,33,33), true);
         //清一色
-        caseMap.put(Arrays.asList(0,0,1,1,2,3,4,5,7,7,8,8), true);
+//        caseMap.put(Arrays.asList(0,0,1,1,2,3,4,5,7,7,8,8), true);
 
 
 
@@ -69,6 +69,17 @@ public class MjHuServiceTest {
             }
             Assert.assertTrue(entry.getValue().equals(isHuNew));
         }
+    }
+
+
+    @Test
+    public void  testHu() throws Exception{
+        SeedService.getInstanceFeng();
+        SeedService.getInstance();
+        boolean isHu = mjHuService.isHu(Arrays.asList(7,7,12,12,24,24,32,32));
+        System.out.println(isHu);
+        isHu = mjHuService.isHuLaizi(Arrays.asList(7,7,12,12,24,24,32,32),0);
+        System.out.println(isHu);
     }
 
 
