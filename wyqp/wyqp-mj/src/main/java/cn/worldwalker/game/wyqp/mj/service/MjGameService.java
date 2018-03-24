@@ -915,6 +915,7 @@ public class MjGameService extends BaseGameService {
             } else {
                 result.setMsgType(MsgTypeEnum.curSettlement.msgType);
             }
+            data.put("curGame", roomInfo.getCurGame());
             data.put("curPlayerId", curPlayerId);
             data.put("huType", playerHuTypeInt);
             data.put("roomOwnerId",roomInfo.getRoomOwnerId());
@@ -989,6 +990,7 @@ public class MjGameService extends BaseGameService {
                 } else {
                     result.setMsgType(MsgTypeEnum.curSettlement.msgType);
                 }
+                data.put("curGame", roomInfo.getCurGame());
                 data.put("curPlayerId", curPlayerId);
                 data.put("huType", playerHuTypeInt);
                 data.put("roomOwnerId",roomInfo.getRoomOwnerId());
