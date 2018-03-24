@@ -637,7 +637,10 @@ public class MjGameService extends BaseGameService {
         /**将杠的牌从手牌列表中移动到杠牌列表中*/
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
         List<Integer> anGangCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.anGang, msg.getGangCards());
-
+        if (player.getCurMoPaiCardIndex() != null) {
+            player.getHandCardList().add(player.getCurMoPaiCardIndex());
+            player.setCurMoPaiCardIndex(null);
+        }
         //南丰麻将，算杠分
         if (MjCardRule.isJxNf(roomInfo)) {
             mjScoreService.calGangScore(roomInfo, player, MjOperationEnum.anGang);
