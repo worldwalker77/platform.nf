@@ -2,7 +2,10 @@ package cn.worldwalker.game.wyqp.web.backend;
 
 import cn.worldwalker.game.wyqp.common.backend.BackendService;
 import cn.worldwalker.game.wyqp.common.backend.GameQuery;
+import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
+import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.common.result.Result;
+import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
 import cn.worldwalker.game.wyqp.mj.robot.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @Controller
 public class LoginController {
@@ -75,4 +79,28 @@ public class LoginController {
 
         return "OK";
     }
+
+
+    @RequestMapping("refreshRoom")
+    @ResponseBody
+    public String refreshRoom(Integer roomId, Integer sceneId){
+        RedisOperationService redisOperationService = new RedisOperationService();
+        MjRoomInfo mjRoomInfo = redisOperationService.getRoomInfoByRoomId(roomId, MjRoomInfo.class);
+        List<MjPlayerInfo> playerList = mjRoomInfo.getPlayerList();
+
+        MjRoomInfo mjRoomInfoNew = new MjRoomInfo();
+        List<MjPlayerInfo> newPlayerList = mjRoomInfoNew.getPlayerList();
+
+        //开始替换
+        mjRoomInfoNew.setRoomId(mjRoomInfo.getRoomId());
+        for (int i=0; i<4; i++){
+            newPlayerList.get(i).setPlayerId(playerList.get(i).getPlayerId());
+        }
+
+        redisOperationService.setRoomIdRoomInfo(roomId,mjRoomInfoNew);
+
+	    return "OK";
+    }
+
+
 }

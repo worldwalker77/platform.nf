@@ -57,7 +57,7 @@ public class MjRoomInfo extends BaseRoomInfo{
 	//南丰 买马
     private Integer maiMaCount = 0;
 
-    private List<Integer> maiMaCardList = new ArrayList<>(4);
+    private List<Integer> maCardList = new ArrayList<>(4);
 
 
 	public Integer getIndexLine() {
@@ -196,11 +196,11 @@ public class MjRoomInfo extends BaseRoomInfo{
         this.maiMaCount = maiMaCount;
     }
 
-    public List<Integer> getMaiMaCardList() {
-        return maiMaCardList;
+    public List<Integer> getMaCardList() {
+        return maCardList;
     }
 
-    public void setMaiMaCardList(List<Integer> maiMaCardList) {
-        this.maiMaCardList = maiMaCardList;
+    public void setMaCardList(List<Integer> maCardList) {
+        this.maCardList = maCardList;
     }
 }

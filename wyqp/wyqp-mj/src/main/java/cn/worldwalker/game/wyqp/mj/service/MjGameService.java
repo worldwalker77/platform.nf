@@ -916,6 +916,7 @@ public class MjGameService extends BaseGameService {
             data.put("huType", playerHuTypeInt);
             data.put("roomOwnerId",roomInfo.getRoomOwnerId());
             data.put("roomBankerId", roomInfo.getRoomBankerId());
+            data.put("maCardList",roomInfo.getMaCardList());
             if (MjHuTypeEnum.zhuaChong.type.equals(playerHuTypeInt) || MjHuTypeEnum.qiangGang.type.equals(playerHuTypeInt)) {
                 data.put("cardIndex", roomInfo.getLastCardIndex());
                 data.put("dianPaoPlayerId", roomInfo.getLastPlayerId());
@@ -989,6 +990,7 @@ public class MjGameService extends BaseGameService {
                 data.put("huType", playerHuTypeInt);
                 data.put("roomOwnerId",roomInfo.getRoomOwnerId());
                 data.put("roomBankerId", roomInfo.getRoomBankerId());
+                data.put("maCardList",roomInfo.getMaCardList());
 
                 if (MjHuTypeEnum.zhuaChong.type.equals(playerHuTypeInt) || MjHuTypeEnum.qiangGang.type.equals(playerHuTypeInt)) {
                     data.put("cardIndex", roomInfo.getLastCardIndex());
@@ -1017,6 +1019,7 @@ public class MjGameService extends BaseGameService {
                     newPlayer.put("mjCardTypeList", temp.getMjCardTypeList());
                     newPlayer.put("gangTypeList",temp.getGangTypeList());
                     newPlayer.put("gangScore",temp.getGangScore());
+                    newPlayer.put("maScore", temp.getMaScore());
                     newPlayer.put("huType", temp.getHuType());
                     if (!MjCardRule.isJxNf(roomInfo)){
                         newPlayer.put("buttomAndFlowerScore", temp.getButtomAndFlowerScore());
@@ -1120,6 +1123,7 @@ public class MjGameService extends BaseGameService {
         data.put("roomOwnerId",roomInfo.getRoomOwnerId());
         data.put("roomBankerId",roomInfo.getRoomBankerId());
         data.put("totalWinnerId", roomInfo.getTotalWinnerId());
+        data.put("maCardList",roomInfo.getMaCardList());
         List<MjPlayerInfo> playerList = roomInfo.getPlayerList();
         List<Map<String, Object>> newPlayerList = new ArrayList<Map<String, Object>>();
         for (MjPlayerInfo temp : playerList) {

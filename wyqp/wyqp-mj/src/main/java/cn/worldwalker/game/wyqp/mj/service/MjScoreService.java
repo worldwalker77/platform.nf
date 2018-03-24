@@ -152,11 +152,30 @@ public class MjScoreService {
                     score = score + MjScoreEnum.getByType(type).score;
                 }
             }
+            /*
+            if (isMa){
 
-            for (MjPlayerInfo losePlayerInfo : losePlayList){
-                if (!winPlayerInfo.getPlayerId().equals(losePlayerInfo.getPlayerId())){
-                    winPlayerInfo.setCurScore(winPlayerInfo.getCurScore() + score);
-                    losePlayerInfo.setCurScore(losePlayerInfo.getCurScore() - score);
+            }
+            */
+            List<MjPlayerInfo> winPlayerWithMaList = new ArrayList<>(4);
+            winPlayerWithMaList.add(winPlayerInfo);
+//            winPlayerWithMaList.add(Zhuang);
+
+            for (MjPlayerInfo player: winPlayerWithMaList) {
+                for (MjPlayerInfo losePlayerInfo : losePlayList) {
+                    /*
+                    if (isMa){
+                        List<MjPlayerInfo> losePlayer = new ArrayList<>(4);
+                        losePlayer.add(winPlayerInfo);
+                        losePlayer.add(Zhuang);
+                    }
+                  */
+//                    for (MjPlayerInfo )
+                    if (!player.getPlayerId().equals(losePlayerInfo.getPlayerId())) {
+                        player.setCurScore(player.getCurScore() + score);
+                        losePlayerInfo.setCurScore(losePlayerInfo.getCurScore() - score);
+                    }
+//                }
                 }
             }
         }
@@ -275,7 +294,7 @@ public class MjScoreService {
     public void calMaScore(MjRoomInfo roomInfo){
         for (int maiMaCnt=0; maiMaCnt < roomInfo.getMaiMaCount(); maiMaCnt++){
             Integer card = MjCardResource.mopai(roomInfo.getTableRemainderCardList());
-            roomInfo.getMaiMaCardList().add(card);
+            roomInfo.getMaCardList().add(card);
             int maiMaIndex = (card % 9) % 4 ;
             MjPlayerInfo bankerPlayer, maiMaPlayer;
             List<MjPlayerInfo> playerInfoList = roomInfo.getPlayerList();
