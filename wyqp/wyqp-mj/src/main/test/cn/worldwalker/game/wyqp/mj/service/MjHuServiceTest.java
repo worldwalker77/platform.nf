@@ -76,10 +76,11 @@ public class MjHuServiceTest {
     public void  testHu() throws Exception{
         SeedService.getInstanceFeng();
         SeedService.getInstance();
-        boolean isHu = mjHuService.isHu(Arrays.asList(7,7,12,12,24,24,32,32));
+//        boolean isHu = mjHuService.isHu(Arrays.asList(7,7,12,12,24,24,32,32));
+        boolean isHu = mjHuService.isHu(Arrays.asList(10,10,10,8,8,8,5,6,7,23,23,23,24,26));
         System.out.println(isHu);
-        isHu = mjHuService.isHuLaizi(Arrays.asList(7,7,12,12,24,24,32,32),0);
-        System.out.println(isHu);
+//        isHu = mjHuService.isHuLaizi(Arrays.asList(7,7,12,12,24,24,32,32),0);
+//        System.out.println(isHu);
     }
 
 

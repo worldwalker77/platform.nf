@@ -111,6 +111,7 @@ public abstract class BaseGameService {
 		userInfo.setPlayerId(userModel.getPlayerId());
 		userInfo.setRoomId(roomId);
 		userInfo.setNickName(weixinUserInfo.getName());
+		userInfo.setSex(weixinUserInfo.getSex());
 		userInfo.setLevel(userModel.getUserLevel() == null ? 1 : userModel.getUserLevel());
 		userInfo.setServerIp(Constant.localIp);
 		userInfo.setPort(String.valueOf(Constant.websocketPort));
@@ -137,6 +138,7 @@ public abstract class BaseGameService {
 		userInfo.setPlayerId(playerId);
 		userInfo.setRoomId(roomId);
 		userInfo.setNickName(String.valueOf(playerId));
+		userInfo.setSex(0);
 		userInfo.setLevel(1);
 		userInfo.setServerIp(Constant.localIp);
 		userInfo.setPort(String.valueOf(Constant.websocketPort));

@@ -128,6 +128,8 @@ public class Client {
     void peng(String card){
         MjRequest mjRequest = createRequest(MsgTypeEnum.peng);
         mjRequest.getMsg().setPengCards(card);
+        cardList.remove(Integer.valueOf(card));
+        cardList.remove(Integer.valueOf(card));
         pengList.add(card+","+card+","+card);
         socket.sendMsg(mjRequest);
     }

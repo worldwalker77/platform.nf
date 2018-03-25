@@ -40,6 +40,8 @@ public class UserInfo {
 	private Integer isBindPhone;
 	
 	private Integer isRealNameCert;
+
+	private Integer sex = 0;
 	
 	public Integer getHasClub() {
 		return hasClub;
@@ -184,5 +186,12 @@ public class UserInfo {
 	public void setY(String y) {
 		this.y = y;
 	}
-	
+
+    public Integer getSex() {
+        return sex;
+    }
+
+    public void setSex(Integer sex) {
+        this.sex = sex;
+    }
 }
