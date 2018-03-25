@@ -22,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import cn.worldwalker.game.wyqp.common.backend.VersionModel;
 import cn.worldwalker.game.wyqp.common.backend.VersionService;
+import cn.worldwalker.game.wyqp.common.constant.Constant;
 import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.exception.ExceptionEnum;
 import cn.worldwalker.game.wyqp.common.result.Result;
@@ -123,14 +124,14 @@ public class VersionController {
         	return result;
 		}
 		try {
-			File dir=new File(request.getSession().getServletContext().getRealPath("/voicefiles/" + roomId));
+			File dir=new File(Constant.voiceFileUploadPath +  + roomId);
 			if(!dir.exists()){
 			    dir.mkdirs();
 			}
 			String fileName = file.getOriginalFilename();
 			String path = dir.getAbsolutePath() + "/" + fileName;
 			file.transferTo(new File(path));
-			result.setData("http://" + CustomizedPropertyConfigurer.getContextProperty("cur.domain") + "/voicefiles/" + roomId + "/" + fileName);
+			result.setData("http://" + Constant.domain + "/voicefiles/" + roomId + "/" + fileName);
 		} catch (Exception e) {
 			result.setCode(1);
 			result.setDesc("系统异常");

@@ -98,6 +98,8 @@ public class Constant {
 	
 	public final static String clientFileUnrarPath = staticNginxRoot + clientFileUnrarFolder;
 	
+	public final static String voiceFileUploadPath = staticNginxRoot + CustomizedPropertyConfigurer.getContextProperty("voice.folder");
+	
 	public static final String UPDATE_RUL = "http://" + domain + clientFileUnrarFolder  + "VERSION";//"D:/test/";
 	
 	public static final String CODE_URL = "http://" + domain + clientFileUnrarFolder + "VERSION/game_code_VERSION.zip";//"D:/test/";
