@@ -88,6 +88,7 @@ public class Client {
         MjRequest mjRequest = createRequest(MsgTypeEnum.createRoom);
         mjRequest.getMsg().setPayType(1);
         mjRequest.getMsg().setTotalGames(10);
+        mjRequest.getMsg().setMaiMaCount(4);
         mjRequest.getMsg().setIsChiPai(null);
         socket.sendMsg(mjRequest);
     }

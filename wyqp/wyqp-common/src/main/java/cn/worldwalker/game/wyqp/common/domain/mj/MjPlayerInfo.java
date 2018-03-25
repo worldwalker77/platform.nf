@@ -229,5 +229,15 @@ public class MjPlayerInfo extends BasePlayerInfo{
     public void setMaScore(Integer maScore) {
         this.maScore = maScore;
     }
+
+
+    @Override
+    public String toString() {
+        return "MjPlayerInfo{" +
+                "playerId=" + getPlayerId()+
+                "maScore=" + maScore +
+                '}';
+    }
 }
+
 

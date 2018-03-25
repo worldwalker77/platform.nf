@@ -1,14 +1,5 @@
 package cn.worldwalker.game.wyqp.mj.seed;
 
-import cn.worldwalker.game.wyqp.mj.gentable.SetTable;
-import cn.worldwalker.game.wyqp.mj.gentable.TableMgr;
-import cn.worldwalker.game.wyqp.mj.huvalidate.Hulib;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 public class SeedTest {
 
 
@@ -17,7 +8,7 @@ public class SeedTest {
     static SeedService seedServiceFeng = SeedService.getInstanceFeng();
 
     public static void main(String[] arsgs){
-        TableMgr.getInstance().load();
+//        TableMgr.getInstance().load();
 
         seedService.printInfo();
         seedServiceFeng.printInfo();
@@ -26,13 +17,13 @@ public class SeedTest {
            System.out.println();
            System.out.println("laiziCnt:" + i);
            System.out.println("noGen-----");
-           compare(seedService.getSeeds(false,i), TableMgr.getInstance().m_check_table[i]);
+//           compare(seedService.getSeeds(false,i), TableMgr.getInstance().m_check_table[i]);
            System.out.println("gen-----");
-           compare(seedService.getSeeds(true,i), TableMgr.getInstance().m_check_eye_table[i]);
+//           compare(seedService.getSeeds(true,i), TableMgr.getInstance().m_check_eye_table[i]);
            System.out.println("noGenFeng-----");
-           compare(seedServiceFeng.getSeeds(false,i), TableMgr.getInstance().m_check_feng_table[i]);
+//           compare(seedServiceFeng.getSeeds(false,i), TableMgr.getInstance().m_check_feng_table[i]);
            System.out.println("genFeng-----");
-           compare(seedServiceFeng.getSeeds(true,i), TableMgr.getInstance().m_check_feng_eye_table[i]);
+//           compare(seedServiceFeng.getSeeds(true,i), TableMgr.getInstance().m_check_feng_eye_table[i]);
        }
 
     }
@@ -58,18 +49,8 @@ public class SeedTest {
         return val;
     }
 
-    private static boolean isSeedIllegal(Seed seed){
-        List<Integer> list = new ArrayList<>(16);
-        for (int i=0; i<seed.getSeed().length; i++){
-            int val = seed.getSeed()[i];
-            while (val > 0){
-                list.add(i);
-                val = val -1;
-            }
-        }
-        return Hulib.getInstance().get_hu_info(list,100,100,34);
-    }
 
+    /*
     private static void compare(Set<Seed> seeds, SetTable setTable){
 
         for (Seed seed : seeds){
@@ -89,4 +70,5 @@ public class SeedTest {
         System.out.println(  set.size()
                 + " ," + setTable.m_tbl.size() + " ," + set.size() /(double)setTable.m_tbl.size());
     }
+    */
 }

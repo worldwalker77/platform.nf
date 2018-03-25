@@ -655,6 +655,9 @@ public class MjCardRule {
 		}
 		return null;
 	}
+	public static MjPlayerInfo getBankerPlayer(MjRoomInfo mjRoomInfo){
+	    return getPlayerInfoByPlayerId(mjRoomInfo.getPlayerList(), mjRoomInfo.getRoomBankerId());
+    }
 
 	public static MjPlayerInfo getLastPlayer(MjRoomInfo mjRoomInfo){
 	   for (MjPlayerInfo mjPlayerInfo: mjRoomInfo.getPlayerList()){

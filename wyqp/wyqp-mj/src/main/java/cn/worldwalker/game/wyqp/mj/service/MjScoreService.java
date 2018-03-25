@@ -2,7 +2,6 @@ package cn.worldwalker.game.wyqp.mj.service;
 
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
-import cn.worldwalker.game.wyqp.mj.cards.MjCardResource;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
 import cn.worldwalker.game.wyqp.mj.enums.GangTypeEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
@@ -136,11 +135,28 @@ public class MjScoreService {
 
     }
 
+    /**
+     * 列表中有个几个，主要用来计算马中了几次
+     */
+    private int getCntInList(List<MjPlayerInfo> playerInfoList, MjPlayerInfo playerInfo){
+        int cnt = 0;
+        for (MjPlayerInfo mjPlayerInfo : playerInfoList){
+            if (mjPlayerInfo.getPlayerId().equals(playerInfo.getPlayerId())){
+                cnt = cnt + 1;
+            }
+        }
+        return cnt;
+
+    }
+
     /*
     为输和赢的玩家算分
      */
     @SuppressWarnings("ConstantConditions")
-    private void assignScore(List<MjPlayerInfo> winPlayList, List<MjPlayerInfo> losePlayList){
+    private void assignScore(List<MjPlayerInfo> winPlayList, List<MjPlayerInfo> losePlayList, MjRoomInfo roomInfo){
+        //庄家和中了马的
+        MjPlayerInfo bankerPlayer = MjCardRule.getBankerPlayer(roomInfo);
+        List<MjPlayerInfo> maPlayerList = getMaPlayerList(roomInfo);
         for (MjPlayerInfo winPlayerInfo : winPlayList){
             int score = 0;
             //天胡地胡放一起了
@@ -152,32 +168,26 @@ public class MjScoreService {
                     score = score + MjScoreEnum.getByType(type).score;
                 }
             }
-            /*
-            if (isMa){
 
-            }
-            */
-            List<MjPlayerInfo> winPlayerWithMaList = new ArrayList<>(4);
-            winPlayerWithMaList.add(winPlayerInfo);
-//            winPlayerWithMaList.add(Zhuang);
-
-            for (MjPlayerInfo player: winPlayerWithMaList) {
-                for (MjPlayerInfo losePlayerInfo : losePlayList) {
-                    /*
-                    if (isMa){
-                        List<MjPlayerInfo> losePlayer = new ArrayList<>(4);
-                        losePlayer.add(winPlayerInfo);
-                        losePlayer.add(Zhuang);
+            for (MjPlayerInfo losePlayerInfo : losePlayList) {
+                if (!winPlayerInfo.getPlayerId().equals(losePlayerInfo.getPlayerId())) {
+                    winPlayerInfo.setCurScore(winPlayerInfo.getCurScore() + score);
+                    losePlayerInfo.setCurScore(losePlayerInfo.getCurScore() - score);
+                    //输了马了哦
+                    int loseMaCnt = getCntInList(maPlayerList, losePlayerInfo);
+                    if (loseMaCnt > 0){
+                        assignMaiMaScore(Collections.singletonList(winPlayerInfo),
+                                Collections.singletonList(bankerPlayer),score * loseMaCnt);
                     }
-                  */
-//                    for (MjPlayerInfo )
-                    if (!player.getPlayerId().equals(losePlayerInfo.getPlayerId())) {
-                        player.setCurScore(player.getCurScore() + score);
-                        losePlayerInfo.setCurScore(losePlayerInfo.getCurScore() - score);
-                    }
-//                }
                 }
             }
+            //赢了马
+            int winMaCnt = getCntInList(maPlayerList, winPlayerInfo);
+            if (winMaCnt > 0){
+                assignMaiMaScore(Collections.singletonList(bankerPlayer),losePlayList,score * winMaCnt );
+            }
+
+
         }
     }
 
@@ -205,7 +215,7 @@ public class MjScoreService {
             case qiangGang:
             case diHu:
                 MjPlayerInfo dianPaoPlayer = MjCardRule.getLastPlayer(roomInfo);
-                assignScore(huPlayerList, Collections.singletonList(dianPaoPlayer));
+                assignScore(huPlayerList, Collections.singletonList(dianPaoPlayer), roomInfo);
                 for (MjPlayerInfo mjPlayerInfo: huPlayerList){
                     mjPlayerInfo.setZhuaChongCount( mjPlayerInfo.getZhuaChongCount() + 1);
                 }
@@ -214,7 +224,7 @@ public class MjScoreService {
             case ziMo:
             case gangKai:
             case tianHu:
-                assignScore(huPlayerList, roomInfo.getPlayerList());
+                assignScore(huPlayerList, roomInfo.getPlayerList(), roomInfo);
                 //实际上也只会有一个自摸
                 for (MjPlayerInfo mjPlayerInfo : huPlayerList){
                     mjPlayerInfo.setZiMoCount(mjPlayerInfo.getZiMoCount() + 1);
@@ -225,6 +235,9 @@ public class MjScoreService {
 
     }
 
+    /**
+     * 计算总赢家，马分、杠分，算到总分中
+     */
     public void calTotalWin(MjRoomInfo roomInfo){
         //计算每个玩家总得分及设置房间的总赢家
         Integer totalWinnerId = roomInfo.getPlayerList().get(0).getPlayerId();
@@ -247,13 +260,27 @@ public class MjScoreService {
     /*
     为杠牌玩家算分
      */
-    private void assignGangScore(List<MjPlayerInfo> winPlayList, List<MjPlayerInfo> losePlayList, int score){
+    private void assignGangScore(MjRoomInfo roomInfo, List<MjPlayerInfo> winPlayList, List<MjPlayerInfo> losePlayList, int score ){
+        //庄家和中了马的
+        MjPlayerInfo bankerPlayer = MjCardRule.getBankerPlayer(roomInfo);
+        List<MjPlayerInfo> maPlayerList = getMaPlayerList(roomInfo);
         for (MjPlayerInfo winPlayerInfo : winPlayList){
             for (MjPlayerInfo losePlayerInfo : losePlayList){
                 if (!winPlayerInfo.getPlayerId().equals(losePlayerInfo.getPlayerId())){
                     winPlayerInfo.setGangScore(winPlayerInfo.getGangScore() + score);
                     losePlayerInfo.setGangScore(losePlayerInfo.getGangScore() - score);
+                    //输了马
+                    int loseCnt = getCntInList(maPlayerList, losePlayerInfo);
+                    if (loseCnt > 0){
+                        assignMaiMaScore(Collections.singletonList(winPlayerInfo),
+                                Collections.singletonList(bankerPlayer), loseCnt * score);
+                    }
                 }
+            }
+            //赢了马
+            int winCnt = getCntInList(maPlayerList, winPlayerInfo);
+            if (winCnt > 0) {
+                assignMaiMaScore(Collections.singletonList(bankerPlayer), losePlayList, winCnt * score);
             }
         }
     }
@@ -267,17 +294,17 @@ public class MjScoreService {
                 //如果是摸牌后的明杠
                 if (MjCardRule.isHandCard3n2(player)) {
                     player.getGangTypeList().add(GangTypeEnum.ZI_MO_MING_GANG.type);
-                    assignGangScore(Collections.singletonList(player),roomInfo.getPlayerList(),1);
+                    assignGangScore(roomInfo,Collections.singletonList(player),roomInfo.getPlayerList(),1);
                 }else{//如果是别人打的牌的明杠
                     player.getGangTypeList().add(GangTypeEnum.MING_GANG.type);
                     MjPlayerInfo lastPlayer = MjCardRule.getLastPlayer(roomInfo);
-                    assignGangScore(Collections.singletonList(player),Collections.singletonList(lastPlayer),1);
+                    assignGangScore(roomInfo,Collections.singletonList(player),Collections.singletonList(lastPlayer),1);
                 }
                 player.setMinGangCount(player.getMinGangCount() + 1);
                 break;
             case anGang:
                 player.getGangTypeList().add(GangTypeEnum.AN_GANG.type);
-                assignGangScore(Collections.singletonList(player),roomInfo.getPlayerList(),2);
+                assignGangScore(roomInfo,Collections.singletonList(player),roomInfo.getPlayerList(),2);
                 player.setAnGangCount(player.getAnGangCount() + 1);
                 break;
             default:
@@ -286,30 +313,35 @@ public class MjScoreService {
     }
 
 
-    public void assignMaiMaScore(MjPlayerInfo winPlayer, MjPlayerInfo losePlayer){
-        winPlayer.setMaScore(winPlayer.getMaScore() + losePlayer.getCurScore());
-        losePlayer.setMaScore( losePlayer.getMaScore() - losePlayer.getCurScore());
-    }
-
-    public void calMaScore(MjRoomInfo roomInfo){
-        for (int maiMaCnt=0; maiMaCnt < roomInfo.getMaiMaCount(); maiMaCnt++){
-            Integer card = MjCardResource.mopai(roomInfo.getTableRemainderCardList());
-            roomInfo.getMaCardList().add(card);
-            int maiMaIndex = (card % 9) % 4 ;
-            MjPlayerInfo bankerPlayer, maiMaPlayer;
-            List<MjPlayerInfo> playerInfoList = roomInfo.getPlayerList();
-            for (int playerCnt  = 0; playerCnt<roomInfo.getPlayerList().size(); playerCnt++){
-                MjPlayerInfo mjPlayerInfo = playerInfoList.get(playerCnt);
-                if (mjPlayerInfo.getPlayerId().equals(roomInfo.getRoomBankerId())){
-                    bankerPlayer = mjPlayerInfo;
-                    maiMaPlayer = playerInfoList.get( (playerCnt+maiMaIndex) % 4);
-                    if (!maiMaPlayer.getPlayerId().equals(bankerPlayer.getPlayerId()) ){
-                        assignMaiMaScore(bankerPlayer, maiMaPlayer);
-                    }
-                    break;
-                }
+    /**
+     ** 计算马分
+     */
+    private void assignMaiMaScore(List<MjPlayerInfo> winPlayerList, List<MjPlayerInfo> losePlayerList, int score){
+        for (MjPlayerInfo winPlayer: winPlayerList){
+            for (MjPlayerInfo losePlayer: losePlayerList){
+                winPlayer.setMaScore( winPlayer.getMaScore() + score);
+                losePlayer.setMaScore( losePlayer.getMaScore() - score);
             }
         }
     }
+
+
+    /**
+     * 获取中马的玩家
+     */
+    List<MjPlayerInfo> getMaPlayerList(MjRoomInfo roomInfo){
+        List<MjPlayerInfo> maPlayerList = new ArrayList<>(4);
+        for (int i=0; i<roomInfo.getPlayerList().size(); i++){
+            MjPlayerInfo mjPlayerInfo = roomInfo.getPlayerList().get(i);
+            if (mjPlayerInfo.getPlayerId().equals(roomInfo.getRoomBankerId())){
+                for (Integer maCard : roomInfo.getMaCardList()){
+                    maPlayerList.add(roomInfo.getPlayerList().get( (i - 1 + maCard %9 ) % 4));
+                }
+                break;
+            }
+        }
+        return maPlayerList;
+    }
+
 
 }

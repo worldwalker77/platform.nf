@@ -152,7 +152,6 @@ public class MjScoreServiceTest {
                 || (list1 != null && list1.size() == list2.size() && list1.containsAll(list2));
     }
 
-
     @Test
     public void testCalGangScore() throws Exception {
         MjRoomInfo mjRoomInfo = new MjRoomInfo();
@@ -166,15 +165,61 @@ public class MjScoreServiceTest {
 
         MjPlayerInfo gangPlayer = mjRoomInfo.getPlayerList().get(0);
         gangPlayer.setHandCardList(Arrays.asList(1,2,3,4));
+        mjRoomInfo.setRoomBankerId(1001);
+        mjRoomInfo.setMaCardList(Arrays.asList(1,1,1,1));
 
         mjScoreService.calGangScore(mjRoomInfo, gangPlayer,  MjOperationEnum.anGang);
 
         for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
-            System.out.println(mjPlayerInfo.getCurScore());
-            System.out.println(mjPlayerInfo.getGangTypeList());
-            System.out.println(mjPlayerInfo.getGangScore());
-
+            System.out.println("id:" + mjPlayerInfo.getPlayerId() +
+                    " ,GangTypeList:"+ mjPlayerInfo.getGangTypeList() +
+                    ", GangScore:" + mjPlayerInfo.getGangScore() +
+                    ", MaScore:" + mjPlayerInfo.getMaScore());
         }
 
+    }
+
+
+    @Test
+    public void testGetMaPlayerList() throws Exception{
+        MjRoomInfo mjRoomInfo = new MjRoomInfo();
+        for (int i=0; i<4; i++){
+            MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
+            mjPlayerInfo.setPlayerId(1000 + i);
+            mjRoomInfo.getPlayerList().add(mjPlayerInfo);
+        }
+        mjRoomInfo.setRoomBankerId(1001);
+        mjRoomInfo.setMaCardList(Arrays.asList(3,3,3));
+
+
+        List<MjPlayerInfo> maPlayerList = mjScoreService.getMaPlayerList(mjRoomInfo);
+        for (MjPlayerInfo player : maPlayerList){
+            System.out.println(player.getPlayerId());
+        }
+    }
+
+    @Test
+    public void testCalHuPlayer() throws Exception {
+        MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
+        mjPlayerInfo.setHandCardList(Arrays.asList(23,23,23,17,17,17,18,18,18,19,19));
+        mjPlayerInfo.setChiCardList(Collections.<Integer>emptyList());
+        mjPlayerInfo.setPengCardList(Arrays.asList(13,13,13));
+        mjPlayerInfo.setAnGangCardList(Collections.<Integer>emptyList());
+        mjPlayerInfo.setMingGangCardList(Collections.<Integer>emptyList());
+        mjScoreService.calHuPlayer(mjPlayerInfo);
+        System.out.println(mjPlayerInfo.getMjCardTypeList());
+    }
+
+    @Test
+    public void testCalGangScore1() throws Exception {
+
+        MjRoomInfo mjRoomInfo = new MjRoomInfo();
+        for (int i=0; i<4; i++){
+            MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
+            mjPlayerInfo.setPlayerId(1000 + i);
+            mjRoomInfo.getPlayerList().add(mjPlayerInfo);
+        }
+        mjRoomInfo.setRoomBankerId(1001);
+        mjRoomInfo.setMaCardList(Arrays.asList(3,3,3));
     }
 }

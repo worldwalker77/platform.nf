@@ -41,6 +41,7 @@ public class MjGameService extends BaseGameService {
         roomInfo.setHuScoreLimit(msg.getHuScoreLimit());
         roomInfo.setIsChiPai(msg.getIsChiPai());
         roomInfo.setMaiMaCount(msg.getMaiMaCount());
+
         //创建房间的时候记录麻将类型
         roomInfo.setDetailType(request.getDetailType());
         if (MjTypeEnum.shangHaiBaiDa.type.equals(roomInfo.getDetailType())) {
@@ -112,6 +113,11 @@ public class MjGameService extends BaseGameService {
 
             /**初始化桌牌*/
             roomInfo.setTableRemainderCardList(tableRemainderCardList);
+            //分配马牌
+            roomInfo.getMaCardList().clear();
+            for (int i=0; i<roomInfo.getMaiMaCount(); i++){
+                roomInfo.getMaCardList().add(tableRemainderCardList.get(tableRemainderCardList.size()-i-1));
+            }
             /**开始发牌时将房间内当前局数+1*/
             roomInfo.setCurGame(roomInfo.getCurGame() + 1);
             /**发牌返回信息*/
@@ -1124,6 +1130,7 @@ public class MjGameService extends BaseGameService {
         data.put("roomBankerId",roomInfo.getRoomBankerId());
         data.put("totalWinnerId", roomInfo.getTotalWinnerId());
         data.put("maCardList",roomInfo.getMaCardList());
+        data.put("maPlayerList", mjScoreService.getMaPlayerList(roomInfo));
         List<MjPlayerInfo> playerList = roomInfo.getPlayerList();
         List<Map<String, Object>> newPlayerList = new ArrayList<Map<String, Object>>();
         for (MjPlayerInfo temp : playerList) {

@@ -59,7 +59,6 @@ public class MjRoomInfo extends BaseRoomInfo{
 
     private List<Integer> maCardList = new ArrayList<>(4);
 
-
 	public Integer getIndexLine() {
 		return indexLine;
 	}
