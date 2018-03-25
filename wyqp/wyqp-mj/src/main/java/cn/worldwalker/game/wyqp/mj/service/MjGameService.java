@@ -1130,6 +1130,7 @@ public class MjGameService extends BaseGameService {
         } else {
             result.setMsgType(MsgTypeEnum.curSettlement.msgType);
         }
+        data.put("curGame", roomInfo.getCurGame());
         data.put("isCurGameHuangZhuang", 1);
         data.put("roomOwnerId",roomInfo.getRoomOwnerId());
         data.put("roomBankerId",roomInfo.getRoomBankerId());
