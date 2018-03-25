@@ -205,6 +205,8 @@ public class MjGameService extends BaseGameService {
             roomInfo.setStatus(MjRoomStatusEnum.inGame.status);
             roomInfo.setUpdateTime(new Date());
             redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+            /**给所有玩家返回桌面剩余牌张数*/
+            noticeAllPlayerRemaindCardNum(roomInfo);
             /**记录回放操作日志*/
             addOperationLog(MsgTypeEnum.initRoom.msgType, null, roomInfo, null, null, null, null);
             addOperationLog(MsgTypeEnum.initHandCards.msgType, null, roomInfo, null, handCardAddFlower, null, handCardListBeforeAddFlower);
