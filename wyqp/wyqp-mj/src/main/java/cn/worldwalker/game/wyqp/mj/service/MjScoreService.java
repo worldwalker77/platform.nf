@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum.diHu;
 import static cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum.getMjHuTypeEnum;
 
 public class MjScoreService {
@@ -37,9 +36,10 @@ public class MjScoreService {
                 mjPlayerInfo.getAnGangCardList().size() == 0;
     }
 
-    private void checkPengPeng(MjPlayerInfo mjPlayerInfo){
+    private void checkPengPeng(MjPlayerInfo mjPlayerInfo, Integer huCard){
         List<Integer> cardList = new ArrayList<>(16);
         cardList.addAll(mjPlayerInfo.getHandCardList());
+        if (huCard != null) cardList.add(huCard);
         cardList.addAll(mjPlayerInfo.getChiCardList());
         cardList.addAll(mjPlayerInfo.getPengCardList());
         cardList.addAll(mjPlayerInfo.getMingGangCardList());
@@ -64,9 +64,10 @@ public class MjScoreService {
         }
     }
 
-    private void checkQingYiSe(MjPlayerInfo mjPlayerInfo){
+    private void checkQingYiSe(MjPlayerInfo mjPlayerInfo, Integer huCard){
         List<Integer> cardList = new ArrayList<>(16);
         cardList.addAll(mjPlayerInfo.getHandCardList());
+        if (huCard != null) cardList.add(huCard);
         cardList.addAll(mjPlayerInfo.getChiCardList());
         cardList.addAll(mjPlayerInfo.getPengCardList());
         cardList.addAll(mjPlayerInfo.getMingGangCardList());
@@ -86,14 +87,20 @@ public class MjScoreService {
 
     }
 
-    private void checkQiDui(MjPlayerInfo mjPlayerInfo){
-        if (mjHuService.isQiDui(mjPlayerInfo.getHandCardList())){
+    private void checkQiDui(MjPlayerInfo mjPlayerInfo, Integer huCard){
+        List<Integer> cardList = new ArrayList<>(16);
+        cardList.addAll(mjPlayerInfo.getHandCardList());
+        if (huCard != null) cardList.add(huCard);
+        if (mjHuService.isQiDui(cardList)){
             mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.QI_DUI.type);
         }
     }
 
-    private void checkShiSanLan(MjPlayerInfo mjPlayerInfo){
-        if (mjHuService.isShiSanLan(mjPlayerInfo.getHandCardList())){
+    private void checkShiSanLan(MjPlayerInfo mjPlayerInfo, Integer huCard){
+        List<Integer> cardList = new ArrayList<>(16);
+        cardList.addAll(mjPlayerInfo.getHandCardList());
+        if (huCard != null) cardList.add(huCard);
+        if (mjHuService.isShiSanLan(cardList)){
             Map<MjValueEnum, List<Integer>> map = mjCardService.split(mjPlayerInfo.getHandCardList());
             if (map.get(MjValueEnum.feng).size() == 7){
                 mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.QI_XING.type);
@@ -104,7 +111,7 @@ public class MjScoreService {
     }
 
     private void checkDanDiao(MjPlayerInfo mjPlayerInfo){
-        if (mjPlayerInfo.getHandCardList().size() == 2){
+        if (mjPlayerInfo.getHandCardList().size() == 1){
             mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.DAN_DIAO.type);
         }
     }
@@ -112,24 +119,43 @@ public class MjScoreService {
     /*
     计算单个玩家胡牌牌型
      */
-    void calHuPlayer(MjPlayerInfo mjPlayerInfo){
-        checkPengPeng(mjPlayerInfo);
-        checkQingYiSe(mjPlayerInfo);
-        checkQiDui(mjPlayerInfo);
-        checkShiSanLan(mjPlayerInfo);
+    void calHuPlayer(MjPlayerInfo mjPlayerInfo, Integer huCard){
+        checkPengPeng(mjPlayerInfo,huCard);
+        checkQingYiSe(mjPlayerInfo, huCard);
+        checkQiDui(mjPlayerInfo, huCard);
+        checkShiSanLan(mjPlayerInfo, huCard);
         checkDanDiao(mjPlayerInfo);
         if (mjPlayerInfo.getMjCardTypeList().isEmpty()){
             mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.PING_HU.type);
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
+    private Integer getHuCard(MjRoomInfo mjRoomInfo, MjPlayerInfo mjPlayerInfo){
+        Integer huCard = null; //计算各个玩家的加分和减分
+        switch (getMjHuTypeEnum(mjPlayerInfo.getHuType())){
+            case zhuaChong:
+            case qiangGang:
+            case diHu:
+                huCard = mjRoomInfo.getLastCardIndex();
+                break;
+            case ziMo:
+            case gangKai:
+            case tianHu:
+                huCard = mjPlayerInfo.getCurMoPaiCardIndex();
+                break;
+        }
+        return huCard;
+    }
     /*
     计算整个房间胡牌牌型
      */
+    @SuppressWarnings("ConstantConditions")
     void calHuRoom(MjRoomInfo mjRoomInfo){
         for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
             if (mjPlayerInfo.getIsHu().equals(1)){
-                calHuPlayer(mjPlayerInfo);
+                Integer huCard = getHuCard(mjRoomInfo, mjPlayerInfo);
+                calHuPlayer(mjPlayerInfo, huCard);
             }
         }
 
@@ -167,12 +193,13 @@ public class MjScoreService {
                 for (Integer type : winPlayerInfo.getMjCardTypeList()){
                     score = score + MjScoreEnum.getByType(type).score;
                 }
+                score = score > 8 ? 8 : score;
             }
 
             for (MjPlayerInfo losePlayerInfo : losePlayList) {
                 if (!winPlayerInfo.getPlayerId().equals(losePlayerInfo.getPlayerId())) {
-                    winPlayerInfo.setCurScore(winPlayerInfo.getCurScore() + score);
-                    losePlayerInfo.setCurScore(losePlayerInfo.getCurScore() - score);
+                    winPlayerInfo.setHuScore(winPlayerInfo.getHuScore() + score);
+                    losePlayerInfo.setHuScore(losePlayerInfo.getHuScore() - score);
                     //输了马了哦
                     int loseMaCnt = getCntInList(maPlayerList, losePlayerInfo);
                     if (loseMaCnt > 0){
@@ -201,12 +228,14 @@ public class MjScoreService {
         for (MjPlayerInfo player : roomInfo.getPlayerList()) {
             if (player.getIsHu().equals(1)) {
                 huPlayerList.add(player);
+                /*
                 if (player.getDiscardCardList().isEmpty()) {
                     if (roomInfo.getRoomBankerId().equals(player.getPlayerId())) {
                         player.setHuType(diHu.type);
                     }
                     //天胡在发牌的时候就判断了，这里就不判断了
                 }
+               */
             }
         }
         //计算各个玩家的加分和减分
@@ -243,6 +272,8 @@ public class MjScoreService {
         Integer totalWinnerId = roomInfo.getPlayerList().get(0).getPlayerId();
         Integer maxTotalScore = roomInfo.getPlayerList().get(0).getTotalScore();
         for (MjPlayerInfo player : roomInfo.getPlayerList()) {
+            //算上胡分
+            player.setCurScore(player.getCurScore() + player.getHuScore());
             //算上杠分
             player.setCurScore(player.getCurScore() + player.getGangScore());
             //算上马分
@@ -335,7 +366,7 @@ public class MjScoreService {
             MjPlayerInfo mjPlayerInfo = roomInfo.getPlayerList().get(i);
             if (mjPlayerInfo.getPlayerId().equals(roomInfo.getRoomBankerId())){
                 for (Integer maCard : roomInfo.getMaCardList()){
-                    maPlayerList.add(roomInfo.getPlayerList().get( (i - 1 + maCard %9 ) % 4));
+                    maPlayerList.add(roomInfo.getPlayerList().get( (i - 1 + (maCard +1) %9 ) % 4));
                 }
                 break;
             }

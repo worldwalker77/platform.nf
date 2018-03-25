@@ -84,7 +84,7 @@ public class MjScoreServiceTest {
             mjPlayerInfo.setPengCardList(entry.getKey().get(1));
             mjPlayerInfo.setAnGangCardList(entry.getKey().get(2));
             mjPlayerInfo.setMingGangCardList(entry.getKey().get(3));
-            mjScoreService.calHuPlayer(mjPlayerInfo);
+            mjScoreService.calHuPlayer(mjPlayerInfo, null);
             List<MjScoreEnum> mjScoreEnumList = new ArrayList<>(16);
             for (Integer type : mjPlayerInfo.getMjCardTypeList()) {
                 mjScoreEnumList.add(MjScoreEnum.getByType(type));
@@ -201,12 +201,12 @@ public class MjScoreServiceTest {
     @Test
     public void testCalHuPlayer() throws Exception {
         MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
-        mjPlayerInfo.setHandCardList(Arrays.asList(23,23,23,17,17,17,18,18,18,19,19));
+        mjPlayerInfo.setHandCardList(Arrays.asList(23,23,23,17,17,17,18,18,18,19));
         mjPlayerInfo.setChiCardList(Collections.<Integer>emptyList());
         mjPlayerInfo.setPengCardList(Arrays.asList(13,13,13));
         mjPlayerInfo.setAnGangCardList(Collections.<Integer>emptyList());
         mjPlayerInfo.setMingGangCardList(Collections.<Integer>emptyList());
-        mjScoreService.calHuPlayer(mjPlayerInfo);
+        mjScoreService.calHuPlayer(mjPlayerInfo,19);
         System.out.println(mjPlayerInfo.getMjCardTypeList());
     }
 

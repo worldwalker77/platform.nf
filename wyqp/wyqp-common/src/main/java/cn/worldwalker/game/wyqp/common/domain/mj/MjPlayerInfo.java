@@ -60,6 +60,8 @@ public class MjPlayerInfo extends BasePlayerInfo{
     private Integer anGangCount = 0;
     //买马分
     private Integer maScore = 0;
+    //胡分
+    private Integer huScore = 0;
 
 	public Integer getFeiCangYingCardIndex() {
 		return feiCangYingCardIndex;
@@ -230,6 +232,13 @@ public class MjPlayerInfo extends BasePlayerInfo{
         this.maScore = maScore;
     }
 
+    public Integer getHuScore() {
+        return huScore;
+    }
+
+    public void setHuScore(Integer huScore) {
+        this.huScore = huScore;
+    }
 
     @Override
     public String toString() {
