@@ -77,7 +77,11 @@ public class MjHuServiceTest {
         SeedService.getInstanceFeng();
         SeedService.getInstance();
 //        boolean isHu = mjHuService.isHu(Arrays.asList(7,7,12,12,24,24,32,32));
-        boolean isHu = mjHuService.isHu(Arrays.asList(10,10,10,8,8,8,5,6,7,23,23,23,24,26));
+//        boolean isHu = mjHuService.isHu(Arrays.asList(10,10,10,8,8,8,5,6,7,23,23,23,24,26));
+
+        boolean isHu = mjHuService.isShiSanLan(Arrays.asList(0,3,6,9,12,15,18,21,24,29,30,31,27,33));
+        System.out.println(isHu);
+        isHu = mjHuService.isHu(Arrays.asList(5,6,7,14,16,22,23,24,26,27,29,31,32,33));
         System.out.println(isHu);
 //        isHu = mjHuService.isHuLaizi(Arrays.asList(7,7,12,12,24,24,32,32),0);
 //        System.out.println(isHu);

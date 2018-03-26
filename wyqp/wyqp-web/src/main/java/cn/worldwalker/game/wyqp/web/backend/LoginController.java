@@ -2,11 +2,13 @@ package cn.worldwalker.game.wyqp.web.backend;
 
 import cn.worldwalker.game.wyqp.common.backend.BackendService;
 import cn.worldwalker.game.wyqp.common.backend.GameQuery;
-import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.common.result.Result;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
+import cn.worldwalker.game.wyqp.mj.mock.MockRoom;
+import cn.worldwalker.game.wyqp.mj.mock.MockService;
 import cn.worldwalker.game.wyqp.mj.robot.Client;
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,15 +17,19 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 @Controller
 public class LoginController {
 
     private static final int waitTime = 100;
 
+    private MockService mockService = MockService.getInstance();
+
+
 	@Autowired
 	private BackendService gameService;
+	@Autowired
+    private RedisOperationService redisOperationService;
 	
 	@RequestMapping("login/index")
 	public ModelAndView index(String redirectUrl,HttpServletResponse response, HttpServletRequest request){
@@ -48,59 +54,56 @@ public class LoginController {
     @ResponseBody
     public String addRobot(Integer roomId, Integer cnt) throws Exception {
 
-        Client client1 = new Client(2);
-        client1.init();
-        Thread.sleep(waitTime);
-        client1.entryHall();
-        Thread.sleep(waitTime);
-        client1.entryRoom(roomId);
-        Thread.sleep(waitTime);
-        client1.playerReady();
-
-        Client client2 = new Client(3);
-        client2.init();
-        Thread.sleep(waitTime);
-        client2.entryHall();
-        Thread.sleep(waitTime);
-        client2.entryRoom(roomId);
-        Thread.sleep(waitTime);
-        client2.playerReady();
-
-
-        Client client3 = new Client(4);
-        client3.init();
-        Thread.sleep(waitTime);
-        client3.entryHall();
-        Thread.sleep(waitTime);
-        client3.entryRoom(roomId);
-        Thread.sleep(waitTime);
-        client3.playerReady();
-        Thread.sleep(waitTime);
-
-        return "OK";
+	    int clientCnt = cnt == null ? 3 : cnt;
+	    for (int i=0; i<clientCnt; i++){
+            Client client = new Client(i);
+            client.init();
+            Thread.sleep(waitTime);
+            client.entryHall();
+            Thread.sleep(waitTime);
+            client.entryRoom(roomId);
+            Thread.sleep(waitTime);
+            client.playerReady();
+            Thread.sleep(waitTime);
+        }
+        return "addRobot OK";
     }
 
 
     @RequestMapping("refreshRoom")
     @ResponseBody
-    public String refreshRoom(Integer roomId, Integer sceneId){
-        RedisOperationService redisOperationService = new RedisOperationService();
-        MjRoomInfo mjRoomInfo = redisOperationService.getRoomInfoByRoomId(roomId, MjRoomInfo.class);
-        List<MjPlayerInfo> playerList = mjRoomInfo.getPlayerList();
-
-        MjRoomInfo mjRoomInfoNew = new MjRoomInfo();
-        List<MjPlayerInfo> newPlayerList = mjRoomInfoNew.getPlayerList();
-
-        //开始替换
-        mjRoomInfoNew.setRoomId(mjRoomInfo.getRoomId());
-        for (int i=0; i<4; i++){
-            newPlayerList.get(i).setPlayerId(playerList.get(i).getPlayerId());
+    public String refreshRoom(String data, Integer roomId){
+        MjRoomInfo mjRoomInfoOld = redisOperationService.getRoomInfoByRoomId(roomId, MjRoomInfo.class);
+        if (mjRoomInfoOld == null){
+            return "此房间不存在";
         }
-
+        MjRoomInfo mjRoomInfoNew = mockService.refreshRoom(mjRoomInfoOld, JSON.parseObject(data, MjRoomInfo.class) );
+        //开始替换
         redisOperationService.setRoomIdRoomInfo(roomId,mjRoomInfoNew);
+	    return JSON.toJSONString(mjRoomInfoNew);
+    }
 
-	    return "OK";
+    @RequestMapping("getRoomInfo")
+    @ResponseBody
+    public MjRoomInfo getRoomInfo(Integer roomId){
+        return redisOperationService.getRoomInfoByRoomId(roomId, MjRoomInfo.class);
     }
 
 
+    @RequestMapping("replaceRoom")
+    @ResponseBody
+    public String replaceRoom(Integer roomId, String data){
+        MockRoom mockRoom = JSON.parseObject(data, MockRoom.class);
+        MjRoomInfo mjRoomInfo = mockService.convertToRoom(mockRoom);
+
+        MjRoomInfo mjRoomInfoOld = redisOperationService.getRoomInfoByRoomId(roomId, MjRoomInfo.class);
+        if (mjRoomInfoOld == null){
+           return "此房间不存在";
+        }
+        MjRoomInfo mjRoomInfoNew = mockService.refreshRoom(mjRoomInfoOld, mjRoomInfo);
+        //开始替换
+        redisOperationService.setRoomIdRoomInfo(roomId,mjRoomInfoNew);
+
+        return JSON.toJSONString(mjRoomInfo);
+    }
 }

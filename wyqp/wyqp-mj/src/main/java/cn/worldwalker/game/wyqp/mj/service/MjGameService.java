@@ -929,6 +929,7 @@ public class MjGameService extends BaseGameService {
             data.put("roomOwnerId",roomInfo.getRoomOwnerId());
             data.put("roomBankerId", roomInfo.getRoomBankerId());
             data.put("maCardList",roomInfo.getMaCardList());
+            data.put("maPlayerList", mjScoreService.getMaPlayerList(roomInfo));
             if (MjHuTypeEnum.zhuaChong.type.equals(playerHuTypeInt) || MjHuTypeEnum.qiangGang.type.equals(playerHuTypeInt)) {
                 data.put("cardIndex", roomInfo.getLastCardIndex());
                 data.put("dianPaoPlayerId", roomInfo.getLastPlayerId());
@@ -1005,6 +1006,7 @@ public class MjGameService extends BaseGameService {
                 data.put("roomOwnerId",roomInfo.getRoomOwnerId());
                 data.put("roomBankerId", roomInfo.getRoomBankerId());
                 data.put("maCardList",roomInfo.getMaCardList());
+                data.put("maPlayerList", mjScoreService.getMaPlayerList(roomInfo));
 
                 if (MjHuTypeEnum.zhuaChong.type.equals(playerHuTypeInt) || MjHuTypeEnum.qiangGang.type.equals(playerHuTypeInt)) {
                     data.put("cardIndex", roomInfo.getLastCardIndex());

@@ -41,7 +41,7 @@ public class MjHuService {
                 return false;
             if (!isFeng && seed[i] == 1) {
                 for (int j = 1; j < 3 && i + j < 9; j++) {
-                    if (seed[j] > 0) {
+                    if (seed[i+j] > 0) {
                         return false;
                     }
                 }

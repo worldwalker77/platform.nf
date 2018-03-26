@@ -130,6 +130,7 @@ public class Client {
         mjRequest.getMsg().setPengCards(card);
         cardList.remove(Integer.valueOf(card));
         cardList.remove(Integer.valueOf(card));
+        cardList.remove(card);
         pengList.add(card+","+card+","+card);
         socket.sendMsg(mjRequest);
     }
