@@ -123,5 +123,6 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.exitClub.msgType, MsgTypeEnum.exitClub);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.getClubMembers.msgType, MsgTypeEnum.getClubMembers);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.getClubRooms.msgType, MsgTypeEnum.getClubRooms);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.getAllPlayerDistance.msgType, MsgTypeEnum.getAllPlayerDistance);
 	}
 }

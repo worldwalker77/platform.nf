@@ -346,7 +346,18 @@ public abstract class BaseGameService {
 		/**概率控制*/
 		playerInfo.setWinProbability(userInfo.getWinProbability());
 		roomInfo.setUpdateTime(new Date());
-		
+		/**计算当前进入的玩家和其他玩家间的距离*/
+		for(int i = size - 2; i >= 0; i-- ){
+			BasePlayerInfo tempPlayerInfo = (BasePlayerInfo)playerList.get(i);
+			String distance = GameUtil.getLatLngDistance(playerInfo, tempPlayerInfo);
+			if (StringUtils.isNotBlank(distance)) {
+				String key = null;
+				if (playerInfo.getPlayerId() < tempPlayerInfo.getPlayerId()) {
+					key = playerInfo.getPlayerId() + "_" + tempPlayerInfo.getPlayerId();
+					roomInfo.getDistanceMap().put(key, distance);
+				}
+			}
+		}
 		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, request.getGameType(), new Date());
 		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 		redisOperationService.setPlayerIdRoomIdGameType(userInfo.getPlayerId(), roomId, request.getGameType());
@@ -691,6 +702,18 @@ public abstract class BaseGameService {
 			data.put("address", curPlayer.getAddress());
 		}
 		result.setMsgType(MsgTypeEnum.queryPlayerInfo.msgType);
+		channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
+	}
+	
+	public void getAllPlayerDistance(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
+		Result result = new Result();
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		BaseMsg msg = request.getMsg();
+		result.setMsgType(MsgTypeEnum.getAllPlayerDistance.msgType);
+		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
+		result.setData(roomInfo.getDistanceMap());
 		channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
 	}
 	

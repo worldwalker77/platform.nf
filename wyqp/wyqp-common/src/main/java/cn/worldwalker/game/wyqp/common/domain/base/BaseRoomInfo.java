@@ -1,7 +1,9 @@
 package cn.worldwalker.game.wyqp.common.domain.base;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
@@ -48,7 +50,17 @@ public class BaseRoomInfo {
 	private Long curGameUuid;
 	
 	private Integer clubId;
+	/**玩家相互之间的距离*/
+	private Map<String, String> distanceMap = new HashMap<String, String>();
 	
+	public Map<String, String> getDistanceMap() {
+		return distanceMap;
+	}
+
+	public void setDistanceMap(Map<String, String> distanceMap) {
+		this.distanceMap = distanceMap;
+	}
+
 	public Integer getClubId() {
 		return clubId;
 	}

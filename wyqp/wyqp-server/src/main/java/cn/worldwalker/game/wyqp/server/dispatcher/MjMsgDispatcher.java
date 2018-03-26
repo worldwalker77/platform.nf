@@ -75,6 +75,9 @@ public class MjMsgDispatcher extends BaseMsgDisPatcher {
 		case pass:
 			mjGameService.pass(ctx, request, userInfo);
 			break;
+		case getAllPlayerDistance:
+			mjGameService.getAllPlayerDistance(ctx, request, userInfo);
+			break;
 		default:
 			break;
 		}

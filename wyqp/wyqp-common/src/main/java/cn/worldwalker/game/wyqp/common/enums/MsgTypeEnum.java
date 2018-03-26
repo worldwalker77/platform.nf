@@ -40,6 +40,7 @@ public enum MsgTypeEnum {
 	exitClub(35, "退出进入的俱乐部"),
 	getClubMembers(36, "查询俱乐部玩家列表"),
 	getClubRooms(37, "查询俱乐部房间列表"),
+	getAllPlayerDistance(38, "获取所有玩家相互之间的距离"),
 	
 	
 	/**斗牛特有100-199*/
