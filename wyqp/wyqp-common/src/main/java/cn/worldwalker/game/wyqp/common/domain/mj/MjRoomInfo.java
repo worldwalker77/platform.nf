@@ -58,7 +58,15 @@ public class MjRoomInfo extends BaseRoomInfo{
     private Integer maiMaCount = 0;
 
     private List<Integer> maCardList = new ArrayList<>(4);
-
+    
+    private Integer remaindCardCnt;
+    
+	public Integer getRemaindCardCnt() {
+		return remaindCardCnt;
+	}
+	public void setRemaindCardCnt(Integer remaindCardCnt) {
+		this.remaindCardCnt = remaindCardCnt;
+	}
 	public Integer getIndexLine() {
 		return indexLine;
 	}

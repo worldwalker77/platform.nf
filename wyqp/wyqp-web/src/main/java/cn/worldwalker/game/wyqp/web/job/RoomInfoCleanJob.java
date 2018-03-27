@@ -50,7 +50,9 @@ public class RoomInfoCleanJob /**extends SingleServerJobByRedis*/ {
 					redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomInfo.getRoomId());
 				}
 				try {
-					commonManager.addUserRecord(roomInfo);
+					if (roomInfo.getCurGame() > 1) {
+						commonManager.addUserRecord(roomInfo);
+					}
 				} catch (Exception e) {
 					log.error("解散房间时添加记录失败", e);
 				}

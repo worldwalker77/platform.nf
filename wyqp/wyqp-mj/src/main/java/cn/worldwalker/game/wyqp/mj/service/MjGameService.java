@@ -1371,6 +1371,8 @@ public class MjGameService extends BaseGameService {
         newRoomInfo.setIsCurGameKaiBao(roomInfo.getIsCurGameKaiBao());
         newRoomInfo.setDices(roomInfo.getDices());
         newRoomInfo.setTotalWinnerId(roomInfo.getTotalWinnerId());
+        newRoomInfo.setDetailType(roomInfo.getDetailType());
+        newRoomInfo.setRemaindCardCnt(roomInfo.getTableRemainderCardList().size());
         for (MjPlayerInfo player : playerList) {
             MjPlayerInfo newPlayer = new MjPlayerInfo();
             newRoomInfo.getPlayerList().add(newPlayer);
