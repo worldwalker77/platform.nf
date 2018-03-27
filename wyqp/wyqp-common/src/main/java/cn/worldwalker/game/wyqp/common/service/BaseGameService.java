@@ -351,10 +351,18 @@ public abstract class BaseGameService {
 			BasePlayerInfo tempPlayerInfo = (BasePlayerInfo)playerList.get(i);
 			String distance = GameUtil.getLatLngDistance(playerInfo, tempPlayerInfo);
 			if (StringUtils.isNotBlank(distance)) {
+				String flag = "0";
+				Integer realDistance = 0;
+				if (!distance.contains("km")) {
+					realDistance = Integer.valueOf(distance.substring(0, distance.length() - 1));
+					if (realDistance < 20) {
+						flag = "1";
+					}
+				}
 				String key = null;
 				if (playerInfo.getPlayerId() < tempPlayerInfo.getPlayerId()) {
 					key = playerInfo.getPlayerId() + "_" + tempPlayerInfo.getPlayerId();
-					roomInfo.getDistanceMap().put(key, distance);
+					roomInfo.getDistanceMap().put(key, distance + "_" + flag);
 				}
 			}
 		}
