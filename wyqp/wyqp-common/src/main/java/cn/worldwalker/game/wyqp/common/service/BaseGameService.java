@@ -53,6 +53,7 @@ import cn.worldwalker.game.wyqp.common.roomlocks.RoomLockContainer;
 import cn.worldwalker.game.wyqp.common.rpc.WeiXinRpc;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.IPUtil;
+import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
 import cn.worldwalker.game.wyqp.common.utils.SnowflakeIdGenerator;
 import cn.worldwalker.game.wyqp.common.utils.UrlImgDownLoadUtil;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.DateUtils;
@@ -369,8 +370,10 @@ public abstract class BaseGameService {
 			String key = null;
 			if (playerInfo.getPlayerId() < tempPlayerInfo.getPlayerId()) {
 				key = playerInfo.getPlayerId() + "_" + tempPlayerInfo.getPlayerId();
-				roomInfo.getDistanceMap().put(key, "10m_1");
+			}else{
+				key = tempPlayerInfo.getPlayerId() + "_" + playerInfo.getPlayerId();
 			}
+			roomInfo.getDistanceMap().put(key, "10m_1");
 		}
 		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, request.getGameType(), new Date());
 		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
@@ -721,8 +724,6 @@ public abstract class BaseGameService {
 	
 	public void getAllPlayerDistance(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
 		Result result = new Result();
-		Map<String, Object> data = new HashMap<String, Object>();
-		result.setData(data);
 		result.setGameType(request.getGameType());
 		BaseMsg msg = request.getMsg();
 		result.setMsgType(MsgTypeEnum.getAllPlayerDistance.msgType);
