@@ -33,14 +33,21 @@ public class MjHuServiceTest {
         caseMap.put(Arrays.asList(0,0,28,29,30), true);
         caseMap.put(Arrays.asList(2,2,27,29,30), true);
         caseMap.put(Arrays.asList(3,3,27,28,30), true);
+        caseMap.put(Arrays.asList(3,3,29,30,31), false);
         //中发白
         caseMap.put(Arrays.asList(3,3,31,32,33), true);
         //风 碰子
         caseMap.put(Arrays.asList(0,0,27,27,27), true);
         //十三烂
         caseMap.put(Arrays.asList(0,3,6,9,12,15,18,21,24,29,30,31,32,33), true);
+        caseMap.put(Arrays.asList(0,2,6,9,12,15,18,21,24,29,30,31,32,33), false);
+        caseMap.put(Arrays.asList(0,3,8,9,12,15,18,21,24,29,30,31,32,33), true);
+        caseMap.put(Arrays.asList(0,3,8,9,12,15,18,21,24,29,30,30,32,33), false);
         //七对
         caseMap.put(Arrays.asList(0,0,1,1,8,8,9,9,11,11,18,18,33,33), true);
+        caseMap.put(Arrays.asList(0,1,1,1,8,8,9,9,11,11,18,18,33,33), false);
+        caseMap.put(Arrays.asList(0,0,1,3,8,8,9,9,11,11,18,18,33,33), false);
+        caseMap.put(Arrays.asList(0,0,1,3,8,8,9,9,11,11,18,18,33), false);
         //清一色
 //        caseMap.put(Arrays.asList(0,0,1,1,2,3,4,5,7,7,8,8), true);
 
@@ -50,8 +57,9 @@ public class MjHuServiceTest {
         for (Map.Entry<List<Integer>,Boolean> entry : caseMap.entrySet()){
             //无赖子
             boolean isHuNew = mjHuService.isHu(entry.getKey());
-            boolean isNormalHu = mjHuService.isNormalHu(entry.getKey());
 
+            /*有赖子的判胡测试
+            boolean isNormalHu = mjHuService.isNormalHu(entry.getKey());
             for (int i=0; i<4; i++){
                 List<Integer> cardList = entry.getKey();
                 if (cardList.size()-i-1 > 0){
@@ -61,13 +69,31 @@ public class MjHuServiceTest {
                         isHuLaiZi = mjHuService.isHuLaizi(cardList.subList(0,cardList.size()-i-1),i+1);
                     }
                 }
-
             }
+            */
             if (!entry.getValue().equals(isHuNew)){
                 mjHuService.isHu(entry.getKey());
                 System.out.println(entry.getKey());
             }
             Assert.assertTrue(entry.getValue().equals(isHuNew));
+        }
+
+
+        //清一色单调判断，必须14张
+        Map<List<Integer>,Boolean> caseMapQingYiSe = new HashMap<>(16);
+        caseMapQingYiSe.put(Arrays.asList(0,0,0,0,1,2,3,4,5,7,7,7,8,8), true);
+        caseMapQingYiSe.put(Arrays.asList(0,0,0,0,1,2,3,4,5,7,7,7,8), false);
+        caseMapQingYiSe.put(Arrays.asList(0,0,0,0,1,2,3,4,5,7,7,7,8,9), false);
+        caseMapQingYiSe.put(Arrays.asList(10,10,11,11,11,12,13,13,14,15,16,16,17,17), true);
+
+        for (Map.Entry<List<Integer>, Boolean> entry : caseMapQingYiSe.entrySet()){
+           Boolean isQingYiSe = mjHuService.isQingYiSe(entry.getKey());
+            if (!entry.getValue().equals(isQingYiSe)){
+                mjHuService.isHu(entry.getKey());
+                System.out.println(entry.getKey());
+            }
+            Assert.assertTrue(entry.getValue().equals(isQingYiSe));
+
         }
     }
 

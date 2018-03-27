@@ -12,8 +12,26 @@ import java.util.Collections;
 import java.util.List;
 
 public class MockServiceTest {
+
     private MockService mockService = MockService.getInstance();
     private static final String HTTP_URL = "http://game.nf.worldwalker.cn";
+
+
+    @Test
+    public void testSetNextCard() throws Exception {
+
+        List<Integer> cardList = new ArrayList<>(16);
+        cardList.add(1);
+        cardList.add(2);
+        cardList.add(3);
+        cardList.add(3);
+        cardList.add(4);
+        cardList.add(5);
+        cardList.add(6);
+        mockService.setNextCard(cardList, 5);
+        System.out.println(cardList);
+    }
+
 
     @Test
     public void testConvertToRoom() throws Exception {

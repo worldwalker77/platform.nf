@@ -110,8 +110,11 @@ public class MjScoreService {
         }
     }
 
-    private void checkDanDiao(MjPlayerInfo mjPlayerInfo){
-        if (mjPlayerInfo.getHandCardList().size() == 1){
+    private void checkDanDiao(MjPlayerInfo mjPlayerInfo, Integer huCard){
+        List<Integer> cardList = new ArrayList<>(16);
+        cardList.addAll(mjPlayerInfo.getHandCardList());
+        if (huCard != null) cardList.add(huCard);
+        if (cardList.size() == 2){
             mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.DAN_DIAO.type);
         }
     }
@@ -124,7 +127,7 @@ public class MjScoreService {
         checkQingYiSe(mjPlayerInfo, huCard);
         checkQiDui(mjPlayerInfo, huCard);
         checkShiSanLan(mjPlayerInfo, huCard);
-        checkDanDiao(mjPlayerInfo);
+        checkDanDiao(mjPlayerInfo,huCard);
         if (mjPlayerInfo.getMjCardTypeList().isEmpty()){
             mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.PING_HU.type);
         }

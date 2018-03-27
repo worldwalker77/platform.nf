@@ -7,6 +7,7 @@ import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 public class MockService {
@@ -103,7 +104,18 @@ public class MockService {
     }
 
 
-    public void replaceRoom(){
 
+    public boolean setNextCard(List<Integer> cardList, Integer newCard){
+        Iterator<Integer> it = cardList.iterator();
+        while(it.hasNext()){
+            Integer value = it.next();
+            if (value.equals(newCard)){
+                it.remove();
+                cardList.add(0, newCard);
+                return true;
+            }
+        }
+        return false;
     }
+
 }

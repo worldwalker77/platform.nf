@@ -39,7 +39,7 @@ public class MjScoreServiceTest {
 
         //门清清一色
         caseMap.put(Arrays.asList(
-                Arrays.asList(0,0,1,2,2,3,4,5,6,7,7,8,8), Collections.<Integer>emptyList(),
+                Arrays.asList(0,0,1,2,2,3,4,5,6,7,7,8,8,8), Collections.<Integer>emptyList(),
                 Collections.<Integer>emptyList(), Collections.<Integer>emptyList()),
                 Arrays.asList(MENG_QING_QING_YI_SE));
 

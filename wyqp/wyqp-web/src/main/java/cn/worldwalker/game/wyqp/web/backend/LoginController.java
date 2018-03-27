@@ -17,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @Controller
 public class LoginController {
@@ -106,4 +107,24 @@ public class LoginController {
 
         return JSON.toJSONString(mjRoomInfo);
     }
+
+
+    @RequestMapping("setNextCard")
+    @ResponseBody
+    public String setNextCard(Integer roomId, Integer card){
+        MjRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, MjRoomInfo.class);
+        if (roomInfo == null){
+            return "room not exist";
+        }
+
+        List<Integer> cardList = roomInfo.getTableRemainderCardList();
+
+        boolean isOK = mockService.setNextCard(cardList,card);
+
+        redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+
+        return isOK ? "OK" : "No Card";
+
+    }
 }
+

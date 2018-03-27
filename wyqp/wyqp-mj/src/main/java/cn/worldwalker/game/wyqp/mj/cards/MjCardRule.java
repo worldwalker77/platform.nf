@@ -8,10 +8,7 @@ import cn.worldwalker.game.wyqp.common.exception.ExceptionEnum;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
 import cn.worldwalker.game.wyqp.common.utils.SnowflakeIdGenerator;
-import cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjPlayerStatusEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjTypeEnum;
+import cn.worldwalker.game.wyqp.mj.enums.*;
 import cn.worldwalker.game.wyqp.mj.huvalidate.Hulib;
 import cn.worldwalker.game.wyqp.mj.huvalidate.TableMgr;
 import cn.worldwalker.game.wyqp.mj.service.MjHuService;
@@ -638,6 +635,8 @@ public class MjCardRule {
 			throw new BusinessException(ExceptionEnum.NO_MORE_CARD_ERROR);
 		}
 		Integer tempCard = MjCardResource.mopai(tableRemainderCardList);
+
+
 		/**如果摸的是非花牌，则直接返回这张牌*/
 		if (tempCard  < roomInfo.getIndexLine()) {
 			return String.valueOf(tempCard);
