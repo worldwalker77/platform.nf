@@ -349,21 +349,27 @@ public abstract class BaseGameService {
 		/**计算当前进入的玩家和其他玩家间的距离*/
 		for(int i = size - 2; i >= 0; i-- ){
 			BasePlayerInfo tempPlayerInfo = (BasePlayerInfo)playerList.get(i);
-			String distance = GameUtil.getLatLngDistance(playerInfo, tempPlayerInfo);
-			if (StringUtils.isNotBlank(distance)) {
-				String flag = "0";
-				Integer realDistance = 0;
-				if (!distance.contains("km")) {
-					realDistance = Integer.valueOf(distance.substring(0, distance.length() - 1));
-					if (realDistance < 20) {
-						flag = "1";
-					}
-				}
-				String key = null;
-				if (playerInfo.getPlayerId() < tempPlayerInfo.getPlayerId()) {
-					key = playerInfo.getPlayerId() + "_" + tempPlayerInfo.getPlayerId();
-					roomInfo.getDistanceMap().put(key, distance + "_" + flag);
-				}
+//			String distance = GameUtil.getLatLngDistance(playerInfo, tempPlayerInfo);
+//			if (StringUtils.isNotBlank(distance)) {
+//				String flag = "0";
+//				Integer realDistance = 0;
+//				if (!distance.contains("km")) {
+//					realDistance = Integer.valueOf(distance.substring(0, distance.length() - 1));
+//					if (realDistance < 20) {
+//						flag = "1";
+//					}
+//				}
+//				String key = null;
+//				if (playerInfo.getPlayerId() < tempPlayerInfo.getPlayerId()) {
+//					key = playerInfo.getPlayerId() + "_" + tempPlayerInfo.getPlayerId();
+//					roomInfo.getDistanceMap().put(key, distance + "_" + flag);
+//				}
+//			}
+			
+			String key = null;
+			if (playerInfo.getPlayerId() < tempPlayerInfo.getPlayerId()) {
+				key = playerInfo.getPlayerId() + "_" + tempPlayerInfo.getPlayerId();
+				roomInfo.getDistanceMap().put(key, "10m_1");
 			}
 		}
 		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, request.getGameType(), new Date());
