@@ -113,6 +113,13 @@ public class MjGameService extends BaseGameService {
 
             /**初始化桌牌*/
             roomInfo.setTableRemainderCardList(tableRemainderCardList);
+
+
+            playerList.get(0).setWinProbability(50);
+            //输赢控制数据初始化
+            if (roomInfo.getCurGame().equals(0)){
+                calculateControl(roomInfo);
+            }
             //分配马牌
             roomInfo.getMaCardList().clear();
             for (int i=0; i<roomInfo.getMaiMaCount(); i++){
@@ -1272,6 +1279,41 @@ public class MjGameService extends BaseGameService {
 //		log.info("第" + roomInfo.getCurGame() + "局结算后roomInfo:" + JsonUtil.toJson(roomInfo));
     }
 
+
+    private Set<Integer> randomIndex(int allCnt, int rate) {
+        Set<Integer> set = new HashSet<>(allCnt);
+        Random random = new Random();
+        for (int i=0; i<allCnt; i++){
+            int rd = random.nextInt(100);
+            if (rd < rate ){
+                set.add(i + 1);
+            }
+        }
+        return set;
+    }
+
+
+    private void calculateControl(MjRoomInfo roomInfo){
+        List<MjPlayerInfo> playerInfoList = roomInfo.getPlayerList();
+        int winCnt = 0, winRate = 0;
+
+        roomInfo.getControlGame().clear();
+        roomInfo.getControlPlayer().clear();
+        for (MjPlayerInfo mjPlayerInfo : playerInfoList){
+            if (mjPlayerInfo.getWinProbability() > 0){
+                winCnt = winCnt + 1;
+                winRate = mjPlayerInfo.getWinProbability();
+            } else {
+                roomInfo.getControlPlayer().add(mjPlayerInfo.getPlayerId());
+            }
+        }
+        if (winCnt == 1 && winRate > 0){
+            roomInfo.getControlGame().addAll(randomIndex(roomInfo.getTotalGames(), winRate));
+        } else {
+            roomInfo.getControlPlayer().clear();
+        }
+
+    }
 
     public static void main(String[] args) {
         MjRoomInfo roomInfo = new MjRoomInfo();

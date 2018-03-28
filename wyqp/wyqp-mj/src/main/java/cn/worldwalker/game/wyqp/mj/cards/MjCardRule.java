@@ -11,8 +11,11 @@ import cn.worldwalker.game.wyqp.common.utils.SnowflakeIdGenerator;
 import cn.worldwalker.game.wyqp.mj.enums.*;
 import cn.worldwalker.game.wyqp.mj.huvalidate.Hulib;
 import cn.worldwalker.game.wyqp.mj.huvalidate.TableMgr;
+import cn.worldwalker.game.wyqp.mj.service.MjCardService;
 import cn.worldwalker.game.wyqp.mj.service.MjHuService;
+import cn.worldwalker.game.wyqp.mj.service.MjScoreService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -20,6 +23,7 @@ import java.util.Map.Entry;
 
 public class MjCardRule {
 
+    private static final Logger log = Logger.getLogger(MjCardRule.class);
 
 	private static Map<Integer, List<Integer>> map = new HashMap<Integer, List<Integer>>();
 	private static List<Integer> tableList = Arrays.asList(
@@ -629,13 +633,46 @@ public class MjCardRule {
 	 * @return
 	 */
 	public static String checkMoPaiAddFlower(MjRoomInfo roomInfo,  MjPlayerInfo player){
+        MjCardService mjCardService = MjCardService.getInstance();
 		List<Integer> tableRemainderCardList = roomInfo.getTableRemainderCardList();
 		/**如果桌牌数为0，则结束*/
 		if (tableRemainderCardList.size() <= roomInfo.getMaiMaCount()) {
 			throw new BusinessException(ExceptionEnum.NO_MORE_CARD_ERROR);
 		}
-		Integer tempCard = MjCardResource.mopai(tableRemainderCardList);
 
+
+		Integer tempCard = null;
+		if (roomInfo.getControlGame().contains(roomInfo.getCurGame())
+				&& roomInfo.getControlPlayer().contains(player.getPlayerId())){
+			Iterator<Integer> it = tableRemainderCardList.iterator();
+
+			//摸牌控制
+			List<Integer> controlCard = new ArrayList<>(16);
+			while (it.hasNext()){
+				Integer val = it.next();
+				//todo: 听牌的先不加吧，略微复杂
+				if (!MjCardService.getInstance().isGang(player.getHandCardList(), val) &&
+                        ! MjCardService.getInstance().isGang(player.getPengCardList(), val)) {
+					tempCard = val;
+					it.remove();
+					break;
+				} else {
+				    controlCard.add(val);
+                }
+			}
+
+            if (tempCard != null && controlCard.size() > 0){
+                log.info( "controlGame:" + roomInfo.getControlGame() + " ,curGame:" + roomInfo.getCurGame()
+                        + ":controlPlayer:" + roomInfo.getControlPlayer() + " ,player:" + player.getPlayerId()
+                        + " handCard:" + player.getHandCardList() + ", peng:" + player.getPengCardList()
+                        + " replace " + controlCard + " to " + tempCard);
+            }
+		}
+
+
+		if (tempCard == null){
+			tempCard = MjCardResource.mopai(tableRemainderCardList);
+		}
 
 		/**如果摸的是非花牌，则直接返回这张牌*/
 		if (tempCard  < roomInfo.getIndexLine()) {
@@ -647,13 +684,13 @@ public class MjCardRule {
 		String addFlowerPath = addFlowerOperation(moPaiflowerCardStack, player, roomInfo);
 		return addFlowerPath;
 	}
-	
+
 	public static MjPlayerInfo getPlayerInfoByPlayerId(List<MjPlayerInfo> list, Integer playerId){
 		for(MjPlayerInfo player : list){
 			if (player.getPlayerId().equals(playerId)) {
 				return player;
 			}
-			
+
 		}
 		return null;
 	}

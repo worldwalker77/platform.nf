@@ -188,14 +188,21 @@ public class MjScoreServiceTest {
             mjPlayerInfo.setPlayerId(1000 + i);
             mjRoomInfo.getPlayerList().add(mjPlayerInfo);
         }
-        mjRoomInfo.setRoomBankerId(1001);
-        mjRoomInfo.setMaCardList(Arrays.asList(3,3,3));
+        for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
+            mjRoomInfo.setRoomBankerId(mjPlayerInfo.getPlayerId());
+            List<Integer> allCard = new ArrayList<>(64);
+            for (int i=0; i<34; i++){
+                allCard.add(i);
+            }
+            mjRoomInfo.setMaCardList(allCard);
 
 
-        List<MjPlayerInfo> maPlayerList = mjScoreService.getMaPlayerList(mjRoomInfo);
-        for (MjPlayerInfo player : maPlayerList){
-            System.out.println(player.getPlayerId());
+            List<MjPlayerInfo> maPlayerList = mjScoreService.getMaPlayerList(mjRoomInfo);
+            for (MjPlayerInfo player : maPlayerList){
+                System.out.println(player.getPlayerId());
+            }
         }
+
     }
 
     @Test

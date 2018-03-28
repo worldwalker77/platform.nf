@@ -3,10 +3,8 @@ package cn.worldwalker.game.wyqp.common.domain.mj;
 import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
+
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class MjRoomInfo extends BaseRoomInfo{
 	
@@ -60,7 +58,10 @@ public class MjRoomInfo extends BaseRoomInfo{
     private List<Integer> maCardList = new ArrayList<>(4);
     
     private Integer remaindCardCnt;
-    
+
+    private Set<Integer> controlGame = new HashSet<>(16);
+    private Set<Integer> controlPlayer = new HashSet<>(4);
+
 	public Integer getRemaindCardCnt() {
 		return remaindCardCnt;
 	}
@@ -209,6 +210,23 @@ public class MjRoomInfo extends BaseRoomInfo{
 
     public void setMaCardList(List<Integer> maCardList) {
         this.maCardList = maCardList;
+    }
+
+
+    public Set<Integer> getControlGame() {
+        return controlGame;
+    }
+
+    public void setControlGame(Set<Integer> controlGame) {
+        this.controlGame = controlGame;
+    }
+
+    public Set<Integer> getControlPlayer() {
+        return controlPlayer;
+    }
+
+    public void setControlPlayer(Set<Integer> controlPlayer) {
+        this.controlPlayer = controlPlayer;
     }
 }
 

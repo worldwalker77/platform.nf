@@ -7,6 +7,7 @@ import cn.worldwalker.game.wyqp.mj.enums.GangTypeEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjValueEnum;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,8 +26,11 @@ public class MjScoreService {
         return ourInstance;
     }
 
+    private static final Logger log = Logger.getLogger(MjScoreService.class);
+
     private MjScoreService() {
     }
+
 
 
     private boolean isMengQing(MjPlayerInfo mjPlayerInfo){
@@ -369,7 +373,7 @@ public class MjScoreService {
             MjPlayerInfo mjPlayerInfo = roomInfo.getPlayerList().get(i);
             if (mjPlayerInfo.getPlayerId().equals(roomInfo.getRoomBankerId())){
                 for (Integer maCard : roomInfo.getMaCardList()){
-                    maPlayerList.add(roomInfo.getPlayerList().get( (i - 1 + (maCard +1) %9 ) % 4));
+                    maPlayerList.add(roomInfo.getPlayerList().get( (i + 3 + (maCard +1) %9 ) % 4));
                 }
                 break;
             }

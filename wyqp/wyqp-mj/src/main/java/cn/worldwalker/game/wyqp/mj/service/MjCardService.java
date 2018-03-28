@@ -50,11 +50,16 @@ public class MjCardService {
     /**
      * 34位的seed
      */
-    int[] convertToLongSeed(List<Integer> cardList){
+    public int[] convertToLongSeed(List<Integer> cardList){
         int[] seed = new int[34];
         for (int v : cardList) {
             seed[v]++;
         }
         return seed;
+    }
+
+    public boolean isGang(List<Integer> cardList, Integer card){
+        int[] seed = convertToLongSeed(cardList);
+        return seed[card] == 3;
     }
 }
