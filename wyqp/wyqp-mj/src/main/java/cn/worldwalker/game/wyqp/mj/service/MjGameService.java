@@ -18,6 +18,8 @@ import cn.worldwalker.game.wyqp.mj.cards.MjCardResource;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
 import cn.worldwalker.game.wyqp.mj.enums.*;
 import io.netty.channel.ChannelHandlerContext;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -1373,7 +1375,9 @@ public class MjGameService extends BaseGameService {
         newRoomInfo.setDices(roomInfo.getDices());
         newRoomInfo.setTotalWinnerId(roomInfo.getTotalWinnerId());
         newRoomInfo.setDetailType(roomInfo.getDetailType());
-        newRoomInfo.setRemaindCardCnt(roomInfo.getTableRemainderCardList().size());
+        if (CollectionUtils.isNotEmpty(roomInfo.getTableRemainderCardList())) {
+        	newRoomInfo.setRemaindCardCnt(roomInfo.getTableRemainderCardList().size());
+		}
         for (MjPlayerInfo player : playerList) {
             MjPlayerInfo newPlayer = new MjPlayerInfo();
             newRoomInfo.getPlayerList().add(newPlayer);
