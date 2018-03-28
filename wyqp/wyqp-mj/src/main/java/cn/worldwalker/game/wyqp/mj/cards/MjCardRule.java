@@ -282,7 +282,7 @@ public class MjCardRule {
 			break;
 		case anGang:
 			Integer anGangCardIndex = Integer.valueOf(strArr[0]);
-			List<Integer> anGangCardList = player.getMingGangCardList();
+			List<Integer> anGangCardList = player.getAnGangCardList();
 			/**将4张杠牌从手牌中移出*/
 			handCardList.remove(anGangCardIndex);
 			handCardList.remove(anGangCardIndex);
