@@ -18,6 +18,8 @@ import cn.worldwalker.game.wyqp.mj.cards.MjCardResource;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
 import cn.worldwalker.game.wyqp.mj.enums.*;
 import io.netty.channel.ChannelHandlerContext;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -651,11 +653,12 @@ public class MjGameService extends BaseGameService {
         }
         /**将杠的牌从手牌列表中移动到杠牌列表中*/
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
-        List<Integer> anGangCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.anGang, msg.getGangCards());
         if (player.getCurMoPaiCardIndex() != null) {
             player.getHandCardList().add(player.getCurMoPaiCardIndex());
             player.setCurMoPaiCardIndex(null);
         }
+        List<Integer> anGangCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.anGang, msg.getGangCards());
+        
         //南丰麻将，算杠分
         if (MjCardRule.isJxNf(roomInfo)) {
             mjScoreService.calGangScore(roomInfo, player, MjOperationEnum.anGang);
@@ -1414,7 +1417,9 @@ public class MjGameService extends BaseGameService {
         newRoomInfo.setDices(roomInfo.getDices());
         newRoomInfo.setTotalWinnerId(roomInfo.getTotalWinnerId());
         newRoomInfo.setDetailType(roomInfo.getDetailType());
-        newRoomInfo.setRemaindCardCnt(roomInfo.getTableRemainderCardList().size());
+        if (CollectionUtils.isNotEmpty(roomInfo.getTableRemainderCardList())) {
+        	newRoomInfo.setRemaindCardCnt(roomInfo.getTableRemainderCardList().size());
+		}
         for (MjPlayerInfo player : playerList) {
             MjPlayerInfo newPlayer = new MjPlayerInfo();
             newRoomInfo.getPlayerList().add(newPlayer);

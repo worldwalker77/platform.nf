@@ -29,7 +29,10 @@ public class BackendServiceImpl implements BackendService{
 	
 	private static Map<String, String> adminPhoneMap = new HashMap<String, String>();
 	static{
-		adminPhoneMap.put(Constant.adminMobile, Constant.adminMobile);
+		for(int i = 0,size = Constant.adminMobile.length; i < size ; i++){
+			adminPhoneMap.put(Constant.adminMobile[i], Constant.adminMobile[i]);
+		}
+		
 //		adminPhoneMap.put("13006339022", "13006339022");
 	}
 	@Override

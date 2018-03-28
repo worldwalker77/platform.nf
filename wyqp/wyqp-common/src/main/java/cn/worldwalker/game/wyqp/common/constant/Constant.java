@@ -88,7 +88,7 @@ public class Constant {
 	
 	public final static int gameInfoStorageType = Integer.valueOf(CustomizedPropertyConfigurer.getContextProperty("game.info.storage.type"));
 	
-	public final static String adminMobile = CustomizedPropertyConfigurer.getContextProperty("admin.mobile");
+	public final static String[] adminMobile = CustomizedPropertyConfigurer.getContextProperty("admin.mobile").split(",");
 	
 	public final static String clientFileUploadFolder = CustomizedPropertyConfigurer.getContextProperty("client.file.upload.folder");
 	
