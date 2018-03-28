@@ -64,6 +64,29 @@ public class GameController {
 		return result;
 	}
 	
+	@RequestMapping("preLogin")
+	@ResponseBody
+	public Result preLogin(String token,String deviceType,HttpServletResponse response,HttpServletRequest request){
+		log.info("请求 ,预登录: code=" + token);
+		response.addHeader("Access-Control-Allow-Origin", "*");
+		Result result = null;
+		try {
+			result = commonGameService.preLogin(token, deviceType, request);
+		} catch (BusinessException e) {
+			log.error("uuid:" + token, e);
+			result = new Result();
+			result.setCode(e.getBussinessCode());
+			result.setDesc(e.getMessage());
+		} catch (Exception e) {
+			log.error("uuid:" + token, e);
+			result = new Result();
+			result.setCode(1);
+			result.setDesc("系统异常");
+		}
+		log.info("返回 ,预登录: " + JsonUtil.toJson(result));
+		return result;
+	}
+	
 	@RequestMapping("sendSms")
 	@ResponseBody
 	public Result sendSms(String token, String mobile, HttpServletResponse response){

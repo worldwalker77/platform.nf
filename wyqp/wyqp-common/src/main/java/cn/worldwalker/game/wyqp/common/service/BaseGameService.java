@@ -53,7 +53,6 @@ import cn.worldwalker.game.wyqp.common.roomlocks.RoomLockContainer;
 import cn.worldwalker.game.wyqp.common.rpc.WeiXinRpc;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.IPUtil;
-import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
 import cn.worldwalker.game.wyqp.common.utils.SnowflakeIdGenerator;
 import cn.worldwalker.game.wyqp.common.utils.UrlImgDownLoadUtil;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.DateUtils;
@@ -128,6 +127,21 @@ public abstract class BaseGameService {
 		/****-------*/
 //		redisOperationService.hdelOfflinePlayerIdRoomIdGameTypeTime(userModel.getPlayerId());
 		result.setData(userInfo);
+		return result;
+	}
+	
+	public Result preLogin(String token, String deviceType, HttpServletRequest request) {
+		Result result = new Result();
+		if (StringUtils.isBlank(token)) {
+			throw new BusinessException(ExceptionEnum.PARAMS_ERROR);
+		}
+		UserInfo userInfo = redisOperationService.getUserInfo(token);
+		if (userInfo != null) {
+			UserModel userModel = commonManager.getUserById(userInfo.getPlayerId());
+			userInfo.setRoomCardNum(userModel.getRoomCardNum());
+			result.setData(userInfo);
+			redisOperationService.setUserInfo(token, userInfo);
+		}
 		return result;
 	}
 	
