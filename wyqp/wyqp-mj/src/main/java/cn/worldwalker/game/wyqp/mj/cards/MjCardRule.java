@@ -181,7 +181,7 @@ public class MjCardRule {
 		playerInfo.getDiscardCardList().clear();
 		playerInfo.getFlowerCardList().clear();
 		/**设置每个玩家的解散房间状态为不同意解散，后面大结算返回大厅的时候回根据此状态判断是否解散房间*/
-		playerInfo.setDissolveStatus(DissolveStatusEnum.disagree.status);
+		playerInfo.setDissolveStatus(DissolveStatusEnum.mid.status);
 		playerInfo.setStatus(MjPlayerStatusEnum.notReady.status);
 	}
 	/**

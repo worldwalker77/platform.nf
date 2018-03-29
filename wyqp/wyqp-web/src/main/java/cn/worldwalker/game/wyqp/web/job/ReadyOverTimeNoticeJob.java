@@ -124,7 +124,7 @@ public class ReadyOverTimeNoticeJob {
 				player.setCurStakeScore(0);
 			}
 			/**设置每个玩家的解散房间状态为不同意解散，后面大结算返回大厅的时候回根据此状态判断是否解散房间*/
-			player.setDissolveStatus(DissolveStatusEnum.disagree.status);
+			player.setDissolveStatus(DissolveStatusEnum.mid.status);
 		}
 		/**开始发牌时将房间内当前局数+1*/
 		roomInfo.setCurGame(roomInfo.getCurGame() + 1);
@@ -186,7 +186,7 @@ public class ReadyOverTimeNoticeJob {
 				player.setFifthCard(fifthCard);
 			}
 			/**设置每个玩家的解散房间状态为不同意解散，后面大结算返回大厅的时候回根据此状态判断是否解散房间*/
-			player.setDissolveStatus(DissolveStatusEnum.disagree.status);
+			player.setDissolveStatus(DissolveStatusEnum.mid.status);
 		}
 		/**如果是抢庄类型，则设置房间状态为抢庄阶段*/
 		if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {

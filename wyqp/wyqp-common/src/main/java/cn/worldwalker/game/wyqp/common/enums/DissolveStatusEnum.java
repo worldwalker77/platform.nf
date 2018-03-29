@@ -1,7 +1,7 @@
 package cn.worldwalker.game.wyqp.common.enums;
 
 public enum DissolveStatusEnum {
-	
+	mid(0, "中立状态"),
 	agree(1, "同意解散房间"),
 	disagree(2, "不同意解散房间");
 	
