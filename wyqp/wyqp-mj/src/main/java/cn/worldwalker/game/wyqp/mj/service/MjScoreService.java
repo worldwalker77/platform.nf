@@ -338,7 +338,7 @@ public class MjScoreService {
                 }else{//如果是别人打的牌的明杠
                     player.getGangTypeList().add(GangTypeEnum.MING_GANG.type);
                     MjPlayerInfo lastPlayer = MjCardRule.getLastPlayer(roomInfo);
-                    assignGangScore(roomInfo,Collections.singletonList(player),Collections.singletonList(lastPlayer),1);
+                    assignGangScore(roomInfo,Collections.singletonList(player),Collections.singletonList(lastPlayer),2);
                 }
                 player.setMinGangCount(player.getMinGangCount() + 1);
                 break;
