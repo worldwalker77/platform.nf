@@ -1425,6 +1425,7 @@ public class MjGameService extends BaseGameService {
             newRoomInfo.getPlayerList().add(newPlayer);
             newPlayer.setPlayerId(player.getPlayerId());
             newPlayer.setNickName(player.getNickName());
+            newPlayer.setSex(player.getSex());
             newPlayer.setHeadImgUrl(player.getHeadImgUrl());
             newPlayer.setOrder(player.getOrder());
             newPlayer.setRoomCardNum(player.getRoomCardNum());

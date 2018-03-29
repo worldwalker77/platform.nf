@@ -261,7 +261,7 @@ public abstract class BaseGameService {
 		playerInfo.setHeadImgUrl(userInfo.getHeadImgUrl());
 		/**概率控制*/
 		playerInfo.setWinProbability(userInfo.getWinProbability());
-		
+		playerInfo.setSex(userInfo.getSex());
 		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, request.getGameType(), new Date());
 		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 		redisOperationService.setPlayerIdRoomIdGameType(userInfo.getPlayerId(), roomId, request.getGameType());
@@ -364,6 +364,7 @@ public abstract class BaseGameService {
 		playerInfo.setY(userInfo.getY());
 		/**概率控制*/
 		playerInfo.setWinProbability(userInfo.getWinProbability());
+		playerInfo.setSex(userInfo.getSex());
 		roomInfo.setUpdateTime(new Date());
 		/**计算当前进入的玩家和其他玩家间的距离*/
 		for(int i = size - 2; i >= 0; i-- ){
@@ -454,7 +455,8 @@ public abstract class BaseGameService {
 		roomInfo.setUpdateTime(new Date());
 		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
-		if (playerList.size() == 1) {
+		int size = playerList.size();
+		if (size == 1) {
 			/**解散房间*/
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
 			if (roomInfo.getClubId() != null) {
@@ -487,7 +489,7 @@ public abstract class BaseGameService {
 			return;
 		}
 		/**如果玩家的状态是未准备,并且房间状态是最开始准备阶段，则玩家可以退出*/
-		if (playerStatus.equals(PlayerStatusEnum.notReady.status) && roomInfo.getStatus().equals(RoomStatusEnum.justBegin.status)) {
+		if (roomInfo.getStatus().equals(RoomStatusEnum.justBegin.status)) {
 			
 			/**如果在游戏最开始准备阶段退出的是庄家（即房主），则需要设置一个默认的庄家（房主）,当前退出庄家的下家*/
 			if (roomInfo.getRoomBankerId().equals(playerId)) {
@@ -512,13 +514,28 @@ public abstract class BaseGameService {
 			refreshRoomForAllPlayer(roomInfo);
 			return;
 		}
-		result.setMsgType(MsgTypeEnum.dissolveRoom.msgType);
+		result.setMsgType(MsgTypeEnum.agreeDissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", playerId);
+		data.put("playerList", getPList(playerList));
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 	}
 	
-	
+	private List<Map<String, Object>> getPList(List playerList){
+		int size = playerList.size();
+		List<Map<String, Object>> pList = new ArrayList<Map<String,Object>>();
+		BasePlayerInfo bplayer = null;
+		for(int i = 0; i < size; i++){
+			bplayer = (BasePlayerInfo)playerList.get(i);
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("playerId", bplayer.getPlayerId());
+			map.put("nickName", bplayer.getNickName());
+			map.put("headImgUrl", bplayer.getHeadImgUrl());
+			map.put("dissolveStatus", bplayer.getDissolveStatus());
+			pList.add(map);
+		}
+		return pList;
+	}
 	public void agreeDissolveRoom(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
 		Result result = new Result();
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -565,6 +582,7 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.agreeDissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", msg.getPlayerId());
+		data.put("playerList", getPList(playerList));
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 	}
 	
@@ -595,6 +613,7 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.disagreeDissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", msg.getPlayerId());
+		data.put("playerList", getPList(playerList));
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 	}
 	
