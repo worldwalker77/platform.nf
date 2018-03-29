@@ -84,9 +84,9 @@ public class MjScoreServiceTest {
             mjPlayerInfo.setPengCardList(entry.getKey().get(1));
             mjPlayerInfo.setAnGangCardList(entry.getKey().get(2));
             mjPlayerInfo.setMingGangCardList(entry.getKey().get(3));
-            mjScoreService.calHuPlayer(mjPlayerInfo, null);
+            List<Integer> typeList = mjScoreService.calHuPlayer(mjPlayerInfo, null);
             List<MjScoreEnum> mjScoreEnumList = new ArrayList<>(16);
-            for (Integer type : mjPlayerInfo.getMjCardTypeList()) {
+            for (Integer type : typeList) {
                 mjScoreEnumList.add(MjScoreEnum.getByType(type));
             }
 
@@ -103,6 +103,7 @@ public class MjScoreServiceTest {
         for (int i=0; i<4; i++){
             MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
             mjPlayerInfo.setPlayerId(1000 + i);
+            mjPlayerInfo.setDiscardCardList(Arrays.asList(0,1,2));
             mjRoomInfo.getPlayerList().add(mjPlayerInfo);
         }
         mjRoomInfo.setLastPlayerId(mjRoomInfo.getPlayerList().get(3).getPlayerId());
@@ -112,8 +113,8 @@ public class MjScoreServiceTest {
         mjRoomInfo.getPlayerList().get(0).setIsHu(1);
         mjRoomInfo.getPlayerList().get(0).setMjCardTypeList(Collections.singletonList(MjScoreEnum.PENG_PENG_HU.type));
         mjScoreService.calScoreRoom(mjRoomInfo);
-        Assert.assertEquals(mjRoomInfo.getPlayerList().get(0).getCurScore().intValue(),4);
-        Assert.assertEquals(mjRoomInfo.getPlayerList().get(3).getCurScore().intValue(),-4);
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(0).getHuScore().intValue(),4);
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(3).getHuScore().intValue(),-4);
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(0).getZhuaChongCount().intValue(),1);
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(3).getDianPaoCount().intValue(),1);
 
@@ -123,9 +124,9 @@ public class MjScoreServiceTest {
         mjRoomInfo.getPlayerList().get(1).setIsHu(1);
         mjRoomInfo.getPlayerList().get(1).setMjCardTypeList(Collections.singletonList(MjScoreEnum.PENG_PENG_HU.type));
         mjScoreService.calScoreRoom(mjRoomInfo);
-        Assert.assertEquals(mjRoomInfo.getPlayerList().get(0).getCurScore().intValue(),8);
-        Assert.assertEquals(mjRoomInfo.getPlayerList().get(1).getCurScore().intValue(),4);
-        Assert.assertEquals(mjRoomInfo.getPlayerList().get(3).getCurScore().intValue(),-12);
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(0).getHuScore().intValue(),8);
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(1).getHuScore().intValue(),4);
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(3).getHuScore().intValue(),-12);
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(0).getZhuaChongCount().intValue(),2);
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(1).getZhuaChongCount().intValue(),1);
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(3).getDianPaoCount().intValue(),2);
@@ -135,10 +136,10 @@ public class MjScoreServiceTest {
         mjRoomInfo.getPlayerList().get(0).setHuType(MjHuTypeEnum.gangKai.type);
         mjRoomInfo.getPlayerList().get(1).setIsHu(0);
         mjScoreService.calScoreRoom(mjRoomInfo);
-        Assert.assertEquals(mjRoomInfo.getPlayerList().get(0).getCurScore().intValue(),20);
-        Assert.assertEquals(mjRoomInfo.getPlayerList().get(1).getCurScore().intValue(),0);
-        Assert.assertEquals(mjRoomInfo.getPlayerList().get(2).getCurScore().intValue(),-4);
-        Assert.assertEquals(mjRoomInfo.getPlayerList().get(3).getCurScore().intValue(),-16);
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(0).getHuScore().intValue(),20);
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(1).getHuScore().intValue(),0);
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(2).getHuScore().intValue(),-4);
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(3).getHuScore().intValue(),-16);
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(0).getZhuaChongCount().intValue(),2);
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(0).getZiMoCount().intValue(),1);
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(1).getZhuaChongCount().intValue(),1);
@@ -213,8 +214,8 @@ public class MjScoreServiceTest {
         mjPlayerInfo.setPengCardList(Arrays.asList(13,13,13));
         mjPlayerInfo.setAnGangCardList(Collections.<Integer>emptyList());
         mjPlayerInfo.setMingGangCardList(Collections.<Integer>emptyList());
-        mjScoreService.calHuPlayer(mjPlayerInfo,19);
-        System.out.println(mjPlayerInfo.getMjCardTypeList());
+        List<Integer> typeList = mjScoreService.calHuPlayer(mjPlayerInfo,19);
+        System.out.println(typeList);
     }
 
     @Test
