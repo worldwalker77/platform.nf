@@ -58,8 +58,5 @@ public class MjCardService {
         return seed;
     }
 
-    public boolean isGang(List<Integer> cardList, Integer card){
-        int[] seed = convertToLongSeed(cardList);
-        return seed[card] == 3;
-    }
+
 }

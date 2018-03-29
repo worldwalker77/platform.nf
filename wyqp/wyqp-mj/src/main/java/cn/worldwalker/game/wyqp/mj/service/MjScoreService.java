@@ -78,7 +78,12 @@ public class MjScoreService {
         cardList.addAll(mjPlayerInfo.getAnGangCardList());
 
         if (mjHuService.isQingYiSe(cardList)){
-            if (mjHuService.isNormalHu(cardList)){
+            List<Integer> handAndMoList = new ArrayList<>(16);
+            handAndMoList.addAll(mjPlayerInfo.getHandCardList());
+            if (huCard != null){
+                handAndMoList.add(huCard);
+            }
+            if (mjHuService.isNormalHu(handAndMoList)){
                 typeList.add(MjScoreEnum.HU_QING_YI_SE.type);
             }else if (cardList.get(0) > 26){
                 typeList.add(MjScoreEnum.ZI_QING_YI_SE.type);

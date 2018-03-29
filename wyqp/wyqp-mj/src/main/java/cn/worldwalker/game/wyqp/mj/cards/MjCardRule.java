@@ -643,7 +643,6 @@ public class MjCardRule {
 			throw new BusinessException(ExceptionEnum.NO_MORE_CARD_ERROR);
 		}
 
-
 		Integer tempCard = null;
 		if (roomInfo.getControlGame().contains(roomInfo.getCurGame())
 				&& roomInfo.getControlPlayer().contains(player.getPlayerId())){
@@ -654,8 +653,9 @@ public class MjCardRule {
 			while (it.hasNext()){
 				Integer val = it.next();
 				//todo: 听牌的先不加吧，略微复杂
-				if (!MjCardService.getInstance().isGang(player.getHandCardList(), val) &&
-                        ! MjCardService.getInstance().isGang(player.getPengCardList(), val)) {
+				if (!MjHuService.getInstance().isTing(player, val) &&
+                        ! MjHuService.getInstance().isGang(player.getHandCardList(), val) &&
+                        ! MjHuService.getInstance().isGang(player.getPengCardList(), val)) {
 					tempCard = val;
 					it.remove();
 					break;

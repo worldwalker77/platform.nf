@@ -1,5 +1,6 @@
 package cn.worldwalker.game.wyqp.mj.service;
 
+import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.mj.enums.MjValueEnum;
 import cn.worldwalker.game.wyqp.mj.seed.Seed;
 import cn.worldwalker.game.wyqp.mj.seed.SeedService;
@@ -194,6 +195,25 @@ public class MjHuService {
         return false;
     }
 
+
+
+    public boolean isGang(List<Integer> cardList, Integer card){
+        int[] seed = mjCardService.convertToLongSeed(cardList);
+        return seed[card] == 3;
+    }
+    /*
+    目前只用于输赢控制，所以只判断清一色、碰碰胡、七对的听牌
+     */
+    public boolean isTing(MjPlayerInfo mjPlayerInfo, Integer card){
+//        List<Integer> cardList = new ArrayList<>(16);
+//        cardList.addAll(mjPlayerInfo.getHandCardList());
+//        cardList.addAll(mjPlayerInfo.getPengCardList());
+//        cardList.addAll(mjPlayerInfo.getMingGangCardList());
+//        cardList.addAll(mjPlayerInfo.getAnGangCardList());
+
+
+        return false;
+    }
 }
 
 
