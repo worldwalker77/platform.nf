@@ -20,6 +20,9 @@ import org.apache.log4j.Logger;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum.PING_HU;
+import static cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum.SHI_SHI_SAN_LAN;
+
 
 public class MjCardRule {
 
@@ -1211,8 +1214,8 @@ public class MjCardRule {
 	 */
 	public static boolean checkHu(MjRoomInfo roomInfo, MjPlayerInfo player, Integer cardIndex){
 		boolean isHu = false;
-		if (!MjTypeEnum.jiangxiNanfeng.type.equals(roomInfo.getDetailType())
-                && player.getIsTingHu() == 0) {
+
+        if (!isJxNf(roomInfo) && Integer.valueOf(0).equals(player.getIsTingHu())){
 			return isHu;
 		}
 		
@@ -1229,6 +1232,14 @@ public class MjCardRule {
 		        allCardList.add(cardIndex);
             }
             isHu = MjHuService.getInstance().isHu(allCardList);
+		    if (MjTypeEnum.jiangxiLiChuan.type.equals(roomInfo.getDetailType())){
+		        List<Integer> typeList = MjScoreService.getInstance().calHuPlayer(player,cardIndex);
+		        //黎川不要平胡和十三烂哦
+		        if (typeList != null && typeList.size() == 1 &&
+                        (typeList.contains(PING_HU.type) || typeList.contains(SHI_SHI_SAN_LAN.type) )){
+		            isHu = false;
+                }
+            }
             //清一色单独判断，手上牌和底下牌都要判断
             if (!isHu){
                 allCardList.addAll(player.getChiCardList());
@@ -1248,7 +1259,9 @@ public class MjCardRule {
 	}
 
     public static boolean isJxNf(MjRoomInfo mjRoomInfo) {
-        return mjRoomInfo != null && MjTypeEnum.jiangxiNanfeng.type.equals(mjRoomInfo.getDetailType());
+        return mjRoomInfo != null &&
+                ( MjTypeEnum.jiangxiNanfeng.type.equals(mjRoomInfo.getDetailType())
+                ||MjTypeEnum.jiangxiLiChuan.type.equals(mjRoomInfo.getDetailType()));
     }
 
 	public static void moveCardsFromHandCards(){

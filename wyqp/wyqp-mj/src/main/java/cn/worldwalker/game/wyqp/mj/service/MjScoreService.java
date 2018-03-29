@@ -40,7 +40,7 @@ public class MjScoreService {
                 mjPlayerInfo.getAnGangCardList().size() == 0;
     }
 
-    private void checkPengPeng(MjPlayerInfo mjPlayerInfo, Integer huCard){
+    private void checkPengPeng(MjPlayerInfo mjPlayerInfo, Integer huCard, List<Integer> typeList){
         List<Integer> cardList = new ArrayList<>(16);
         cardList.addAll(mjPlayerInfo.getHandCardList());
         if (huCard != null) cardList.add(huCard);
@@ -61,14 +61,14 @@ public class MjScoreService {
         }
         if (duiCnt ==1 && pengCnt == 4){
             if (isMengQing(mjPlayerInfo)){
-                mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.MENG_QING_PENG_PENG_HU.type);
+                typeList.add(MjScoreEnum.MENG_QING_PENG_PENG_HU.type);
             } else {
-                mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.PENG_PENG_HU.type);
+                typeList.add(MjScoreEnum.PENG_PENG_HU.type);
             }
         }
     }
 
-    private void checkQingYiSe(MjPlayerInfo mjPlayerInfo, Integer huCard){
+    private void checkQingYiSe(MjPlayerInfo mjPlayerInfo, Integer huCard, List<Integer> typeList){
         List<Integer> cardList = new ArrayList<>(16);
         cardList.addAll(mjPlayerInfo.getHandCardList());
         if (huCard != null) cardList.add(huCard);
@@ -79,62 +79,63 @@ public class MjScoreService {
 
         if (mjHuService.isQingYiSe(cardList)){
             if (mjHuService.isNormalHu(cardList)){
-                mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.HU_QING_YI_SE.type);
+                typeList.add(MjScoreEnum.HU_QING_YI_SE.type);
             }else if (cardList.get(0) > 26){
-                mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.ZI_QING_YI_SE.type);
+                typeList.add(MjScoreEnum.ZI_QING_YI_SE.type);
             }else if (isMengQing(mjPlayerInfo)){
-                mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.MENG_QING_QING_YI_SE.type);
+                typeList.add(MjScoreEnum.MENG_QING_QING_YI_SE.type);
             } else {
-                mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.LUAN_QING_YI_SE.type);
+                typeList.add(MjScoreEnum.LUAN_QING_YI_SE.type);
             }
         }
-
     }
 
-    private void checkQiDui(MjPlayerInfo mjPlayerInfo, Integer huCard){
+    private void checkQiDui(MjPlayerInfo mjPlayerInfo, Integer huCard, List<Integer> typeList){
         List<Integer> cardList = new ArrayList<>(16);
         cardList.addAll(mjPlayerInfo.getHandCardList());
         if (huCard != null) cardList.add(huCard);
         if (mjHuService.isQiDui(cardList)){
-            mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.QI_DUI.type);
+            typeList.add(MjScoreEnum.QI_DUI.type);
         }
     }
 
-    private void checkShiSanLan(MjPlayerInfo mjPlayerInfo, Integer huCard){
+    private void checkShiSanLan(MjPlayerInfo mjPlayerInfo, Integer huCard, List<Integer> typeList){
         List<Integer> cardList = new ArrayList<>(16);
         cardList.addAll(mjPlayerInfo.getHandCardList());
         if (huCard != null) cardList.add(huCard);
         if (mjHuService.isShiSanLan(cardList)){
             Map<MjValueEnum, List<Integer>> map = mjCardService.split(mjPlayerInfo.getHandCardList());
             if (map.get(MjValueEnum.feng).size() == 7){
-                mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.QI_XING.type);
+                typeList.add(MjScoreEnum.QI_XING.type);
             } else {
-                mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.SHI_SHI_SAN_LAN.type);
+                typeList.add(MjScoreEnum.SHI_SHI_SAN_LAN.type);
             }
         }
     }
 
-    private void checkDanDiao(MjPlayerInfo mjPlayerInfo, Integer huCard){
+    private void checkDanDiao(MjPlayerInfo mjPlayerInfo, Integer huCard, List<Integer> typeList){
         List<Integer> cardList = new ArrayList<>(16);
         cardList.addAll(mjPlayerInfo.getHandCardList());
         if (huCard != null) cardList.add(huCard);
         if (cardList.size() == 2){
-            mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.DAN_DIAO.type);
+            typeList.add(MjScoreEnum.DAN_DIAO.type);
         }
     }
 
     /*
     计算单个玩家胡牌牌型
      */
-    void calHuPlayer(MjPlayerInfo mjPlayerInfo, Integer huCard){
-        checkPengPeng(mjPlayerInfo,huCard);
-        checkQingYiSe(mjPlayerInfo, huCard);
-        checkQiDui(mjPlayerInfo, huCard);
-        checkShiSanLan(mjPlayerInfo, huCard);
-        checkDanDiao(mjPlayerInfo,huCard);
-        if (mjPlayerInfo.getMjCardTypeList().isEmpty()){
-            mjPlayerInfo.getMjCardTypeList().add(MjScoreEnum.PING_HU.type);
+    public List<Integer> calHuPlayer(MjPlayerInfo mjPlayerInfo, Integer huCard){
+        List<Integer> typeList = new ArrayList<>(16);
+        checkPengPeng(mjPlayerInfo, huCard, typeList);
+        checkQingYiSe(mjPlayerInfo, huCard, typeList);
+        checkQiDui(mjPlayerInfo, huCard, typeList);
+        checkShiSanLan(mjPlayerInfo, huCard, typeList);
+        checkDanDiao(mjPlayerInfo, huCard, typeList);
+        if (typeList.isEmpty()){
+            typeList.add(MjScoreEnum.PING_HU.type);
         }
+        return typeList;
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -162,7 +163,8 @@ public class MjScoreService {
         for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
             if (mjPlayerInfo.getIsHu().equals(1)){
                 Integer huCard = getHuCard(mjRoomInfo, mjPlayerInfo);
-                calHuPlayer(mjPlayerInfo, huCard);
+//                mjPlayerInfo.getMjCardTypeList().clear();
+                mjPlayerInfo.getMjCardTypeList().addAll(calHuPlayer(mjPlayerInfo, huCard));
             }
         }
 

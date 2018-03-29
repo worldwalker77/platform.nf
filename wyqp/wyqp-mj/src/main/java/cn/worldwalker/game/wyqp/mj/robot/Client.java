@@ -66,7 +66,8 @@ public class Client {
         mjRequest.setGameType(GameTypeEnum.mj.gameType);
         mjRequest.setToken(token);
         mjRequest.setMsgType(msgTypeEnum.msgType);
-        mjRequest.setDetailType(MjTypeEnum.jiangxiNanfeng.type);
+//        mjRequest.setDetailType(MjTypeEnum.jiangxiNanfeng.type);
+        mjRequest.setDetailType(MjTypeEnum.jiangxiLiChuan.type);
 
         MjMsg mjMsg = new MjMsg();
         mjMsg.setPlayerId(playerId);

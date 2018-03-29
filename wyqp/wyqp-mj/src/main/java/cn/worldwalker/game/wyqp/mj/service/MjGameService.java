@@ -55,7 +55,7 @@ public class MjGameService extends BaseGameService {
             roomInfo.setNoBaiDaCanZhuaChong(msg.getNoBaiDaCanZhuaChong());
         }
 
-        if (MjTypeEnum.jiangxiNanfeng.type.equals(roomInfo.getDetailType())) {
+        if ( MjCardRule.isJxNf(roomInfo)){
             roomInfo.setIsChiPai(0);
         }
 
