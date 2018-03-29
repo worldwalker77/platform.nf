@@ -137,8 +137,12 @@ public abstract class BaseGameService {
 		}
 		UserInfo userInfo = redisOperationService.getUserInfo(token);
 		if (userInfo != null) {
-			UserModel userModel = commonManager.getUserById(userInfo.getPlayerId());
-			userInfo.setRoomCardNum(userModel.getRoomCardNum());
+			if (redisOperationService.isLoginFuseOpen()) {
+				UserModel userModel = commonManager.getUserById(userInfo.getPlayerId());
+				if (userModel != null) {
+					userInfo.setRoomCardNum(userModel.getRoomCardNum());
+				}
+			}
 			result.setData(userInfo);
 			redisOperationService.setUserInfo(token, userInfo);
 		}
