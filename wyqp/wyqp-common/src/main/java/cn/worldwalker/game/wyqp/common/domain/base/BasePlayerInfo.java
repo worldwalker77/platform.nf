@@ -50,6 +50,15 @@ public class BasePlayerInfo {
 	
 	private List<Integer> winProbabilityGameIndexList = null;
 	
+	private Integer sex;
+	
+	
+	public Integer getSex() {
+		return sex;
+	}
+	public void setSex(Integer sex) {
+		this.sex = sex;
+	}
 	public List<Integer> getWinProbabilityGameIndexList() {
 		return winProbabilityGameIndexList;
 	}
