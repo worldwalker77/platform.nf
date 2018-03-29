@@ -514,7 +514,7 @@ public abstract class BaseGameService {
 			refreshRoomForAllPlayer(roomInfo);
 			return;
 		}
-		result.setMsgType(MsgTypeEnum.agreeDissolveRoom.msgType);
+		result.setMsgType(MsgTypeEnum.dissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", playerId);
 		data.put("playerList", getPList(playerList));

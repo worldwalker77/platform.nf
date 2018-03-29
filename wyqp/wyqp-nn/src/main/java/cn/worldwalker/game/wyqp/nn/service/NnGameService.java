@@ -129,7 +129,7 @@ public class NnGameService extends BaseGameService{
 				player.setRobFourCardList(robFourCardList);
 				player.setFifthCard(fifthCard);
 				/**设置每个玩家的解散房间状态为不同意解散，后面大结算返回大厅的时候回根据此状态判断是否解散房间*/
-				player.setDissolveStatus(DissolveStatusEnum.disagree.status);
+				player.setDissolveStatus(DissolveStatusEnum.mid.status);
 			}
 			/**如果是抢庄类型，则设置房间状态为抢庄阶段*/
 			if (NnRoomBankerTypeEnum.robBanker.type.equals(roomInfo.getRoomBankerType())) {
