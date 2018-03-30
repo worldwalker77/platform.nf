@@ -218,14 +218,14 @@ public class MjScoreService {
                     int loseMaCnt = getCntInList(maPlayerList, losePlayerInfo);
                     if (loseMaCnt > 0){
                         assignMaiMaScore(Collections.singletonList(winPlayerInfo),
-                                Collections.singletonList(bankerPlayer),score * loseMaCnt);
+                                Collections.singletonList(bankerPlayer), winPlayerInfo,score * loseMaCnt );
                     }
                 }
             }
             //赢了马
             int winMaCnt = getCntInList(maPlayerList, winPlayerInfo);
             if (winMaCnt > 0){
-                assignMaiMaScore(Collections.singletonList(bankerPlayer),losePlayList,score * winMaCnt );
+                assignMaiMaScore(Collections.singletonList(bankerPlayer),losePlayList, winPlayerInfo,score * winMaCnt );
             }
 
 
@@ -242,14 +242,6 @@ public class MjScoreService {
         for (MjPlayerInfo player : roomInfo.getPlayerList()) {
             if (player.getIsHu().equals(1)) {
                 huPlayerList.add(player);
-                /*
-                if (player.getDiscardCardList().isEmpty()) {
-                    if (roomInfo.getRoomBankerId().equals(player.getPlayerId())) {
-                        player.setHuType(diHu.type);
-                    }
-                    //天胡在发牌的时候就判断了，这里就不判断了
-                }
-               */
             }
         }
         //计算各个玩家的加分和减分
@@ -318,14 +310,14 @@ public class MjScoreService {
                     int loseCnt = getCntInList(maPlayerList, losePlayerInfo);
                     if (loseCnt > 0){
                         assignMaiMaScore(Collections.singletonList(winPlayerInfo),
-                                Collections.singletonList(bankerPlayer), loseCnt * score);
+                                Collections.singletonList(bankerPlayer), winPlayerInfo,loseCnt * score);
                     }
                 }
             }
             //赢了马
             int winCnt = getCntInList(maPlayerList, winPlayerInfo);
             if (winCnt > 0) {
-                assignMaiMaScore(Collections.singletonList(bankerPlayer), losePlayList, winCnt * score);
+                assignMaiMaScore(Collections.singletonList(bankerPlayer), losePlayList, winPlayerInfo, winCnt * score);
             }
         }
     }
@@ -361,11 +353,15 @@ public class MjScoreService {
     /**
      ** 计算马分
      */
-    private void assignMaiMaScore(List<MjPlayerInfo> winPlayerList, List<MjPlayerInfo> losePlayerList, int score){
-        for (MjPlayerInfo winPlayer: winPlayerList){
+    private void assignMaiMaScore(List<MjPlayerInfo> maPlayerList, List<MjPlayerInfo> losePlayerList,
+                                  MjPlayerInfo winPlayer, int score){
+        for (MjPlayerInfo maPlayer: maPlayerList){
             for (MjPlayerInfo losePlayer: losePlayerList){
-                winPlayer.setMaScore( winPlayer.getMaScore() + score);
-                losePlayer.setMaScore( losePlayer.getMaScore() - score);
+                if (!losePlayer.getPlayerId().equals(maPlayer.getPlayerId()) &&
+                        !losePlayer.getPlayerId().equals(winPlayer.getPlayerId())){
+                    maPlayer.setMaScore( maPlayer.getMaScore() + score);
+                    losePlayer.setMaScore( losePlayer.getMaScore() - score);
+                }
             }
         }
     }

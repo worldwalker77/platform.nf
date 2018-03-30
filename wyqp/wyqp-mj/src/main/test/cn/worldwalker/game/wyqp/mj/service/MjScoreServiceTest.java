@@ -2,6 +2,7 @@ package cn.worldwalker.game.wyqp.mj.service;
 
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
+import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
 import cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum;
@@ -167,7 +168,8 @@ public class MjScoreServiceTest {
         MjPlayerInfo gangPlayer = mjRoomInfo.getPlayerList().get(0);
         gangPlayer.setHandCardList(Arrays.asList(1,2,3,4));
         mjRoomInfo.setRoomBankerId(1001);
-        mjRoomInfo.setMaCardList(Arrays.asList(1,1,1,1));
+        MjPlayerInfo bankerPlayer = MjCardRule.getBankerPlayer(mjRoomInfo);
+        mjRoomInfo.setMaCardList(Arrays.asList(4-1));
 
         mjScoreService.calGangScore(mjRoomInfo, gangPlayer,  MjOperationEnum.anGang);
 
@@ -177,6 +179,8 @@ public class MjScoreServiceTest {
                     ", GangScore:" + mjPlayerInfo.getGangScore() +
                     ", MaScore:" + mjPlayerInfo.getMaScore());
         }
+        Assert.assertEquals(gangPlayer.getMaScore().intValue(),0);
+        Assert.assertEquals(bankerPlayer.getMaScore().intValue(),4);
 
     }
 

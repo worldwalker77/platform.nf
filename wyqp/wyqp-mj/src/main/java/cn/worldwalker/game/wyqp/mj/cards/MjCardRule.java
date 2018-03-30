@@ -344,7 +344,7 @@ public class MjCardRule {
 			/**暗杠校验**/
 			TreeMap<Integer, String> map = checkHandCardGang(cards, curPlayer.getPengCardList());
 			/**胡牌校验*/
-			if (checkHu(roomInfo, curPlayer, null)) {
+			if (checkHu(roomInfo, curPlayer, null, type)) {
 				map.put(MjOperationEnum.hu.type, String.valueOf(MjHuTypeEnum.tianHu.type));
 			}
 			/**听牌校验*/
@@ -394,7 +394,7 @@ public class MjCardRule {
 			}
 			
 			/**胡牌校验*/
-			if (checkHu(roomInfo, curPlayer, cardIndex)) {
+			if (checkHu(roomInfo, curPlayer, cardIndex, type)) {
 				map.put(MjOperationEnum.hu.type, String.valueOf(MjHuTypeEnum.ziMo.type));
 			}
 			/**听牌校验*/
@@ -457,7 +457,7 @@ public class MjCardRule {
 					if (roomInfo.getNoBaiDaCanZhuaChong() > 0) {
 						/**如果手牌无百搭*/
 						if (!nextPlayer.getHandCardList().contains(roomInfo.getBaiDaCardIndex())) {
-							if (checkHu(roomInfo, nextPlayer, cardIndex)) {
+							if (checkHu(roomInfo, nextPlayer, cardIndex, type)) {
 								map1.put(MjOperationEnum.hu.type, String.valueOf(MjHuTypeEnum.zhuaChong.type));
 							}
 						}
@@ -465,7 +465,7 @@ public class MjCardRule {
 					
 				}else{
 				    //南丰在这里处理的
-					if (checkHu(roomInfo, nextPlayer, cardIndex)) {
+					if (checkHu(roomInfo, nextPlayer, cardIndex, type)) {
 						map1.put(MjOperationEnum.hu.type, String.valueOf(MjHuTypeEnum.zhuaChong.type));
 					}
 				}
@@ -500,7 +500,7 @@ public class MjCardRule {
 				if (nextPlayer.getHandCardList().contains(roomInfo.getBaiDaCardIndex())) {
 					continue;
 				}
-				if (checkHu(roomInfo, nextPlayer, cardIndex)) {
+				if (checkHu(roomInfo, nextPlayer, cardIndex,type)) {
 					map1.put(MjOperationEnum.hu.type, String.valueOf(MjHuTypeEnum.qiangGang.type));
 					roomInfo.setLastCardIndex(cardIndex);
 					roomInfo.setLastPlayerId(playerId);
@@ -546,7 +546,7 @@ public class MjCardRule {
 			}
 			
 			/**胡牌校验*/
-			if (checkHu(roomInfo, curPlayer, cardIndex)) {
+			if (checkHu(roomInfo, curPlayer, cardIndex,type)) {
 				map.put(MjOperationEnum.hu.type, String.valueOf(MjHuTypeEnum.gangKai.type));
 			}
 			/**听牌校验*/
@@ -1212,7 +1212,7 @@ public class MjCardRule {
 	 * @param cardIndex
 	 * @return
 	 */
-	public static boolean checkHu(MjRoomInfo roomInfo, MjPlayerInfo player, Integer cardIndex){
+	public static boolean checkHu(MjRoomInfo roomInfo, MjPlayerInfo player, Integer cardIndex, Integer type){
 		boolean isHu = false;
 
         if (!isJxNf(roomInfo) && Integer.valueOf(0).equals(player.getIsTingHu())){
@@ -1235,7 +1235,7 @@ public class MjCardRule {
 		    if (MjTypeEnum.jiangxiLiChuan.type.equals(roomInfo.getDetailType())){
 		        List<Integer> typeList = MjScoreService.getInstance().calHuPlayer(player,cardIndex);
 		        //黎川不要平胡和十三烂哦
-		        if (typeList != null && typeList.size() == 1 &&
+		        if (typeList != null && typeList.size() == 1 && type == 2 &&
                         (typeList.contains(PING_HU.type) || typeList.contains(SHI_SHI_SAN_LAN.type) )){
 		            isHu = false;
                 }
