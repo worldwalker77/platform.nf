@@ -1,5 +1,6 @@
 package cn.worldwalker.game.wyqp.mj.service;
 
+import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.mj.seed.SeedService;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -111,6 +112,21 @@ public class MjHuServiceTest {
         System.out.println(isHu);
 //        isHu = mjHuService.isHuLaizi(Arrays.asList(7,7,12,12,24,24,32,32),0);
 //        System.out.println(isHu);
+    }
+
+    @Test
+    public void testTing() throws Exception{
+
+        MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
+        mjPlayerInfo.setHandCardList(Arrays.asList(0,0,1,1,2,2,3,3,4,4,8,9,10));
+        System.out.println(mjHuService.isTingQiDui(mjPlayerInfo,11));
+        mjPlayerInfo.setHandCardList(Arrays.asList(0,0,1,1,2,2,3,3,4,4,5,5,10));
+        System.out.println(mjHuService.isTingQingYiSe(mjPlayerInfo,5));
+        SeedService.getInstance();
+        SeedService.getInstanceFeng();
+        mjPlayerInfo.setHandCardList(Arrays.asList(0,0,0,1,1,1,2,2,2,6,7,9,10));
+        boolean isNormalTing = mjHuService.isNormalTing(mjPlayerInfo,15);
+        System.out.println(isNormalTing);
     }
 
 

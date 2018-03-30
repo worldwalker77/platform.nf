@@ -90,10 +90,7 @@ public class MjHuService {
             return false;
         }
         //将手牌进行格式化*/
-        int[] cards = new int[34];
-        for (Integer aCardList : cardList) {
-            cards[aCardList]++;
-        }
+        int[] cards = mjCardService.convertToLongSeed(cardList);
         for (int i = 0; i < 34; ++i) {
             if (cards[i] % 2 != 0)
                 return false;
@@ -195,24 +192,70 @@ public class MjHuService {
         return false;
     }
 
-
-
     public boolean isGang(List<Integer> cardList, Integer card){
         int[] seed = mjCardService.convertToLongSeed(cardList);
         return seed[card] == 3;
     }
+
+    public boolean isTingQiDui(MjPlayerInfo mjPlayerInfo, Integer card){
+        List<Integer> cardList = mjPlayerInfo.getHandCardList();
+        if (cardList.size() != 13){
+            return false;
+        }
+        int[] cards = mjCardService.convertToLongSeed(mjPlayerInfo.getHandCardList());
+        int duiCnt = 0;
+        for (int i=0; i<34; i++){
+            if (cards[i] % 2 == 0){
+                duiCnt = duiCnt + cards[i] / 2;
+            }
+        }
+        return duiCnt == 5 && cards[card] % 2 == 1;
+    }
+
+    public boolean isTingQingYiSe(MjPlayerInfo mjPlayerInfo, Integer card){
+        List<Integer> cardList = new ArrayList<>(16);
+        cardList.addAll(mjPlayerInfo.getHandCardList());
+        cardList.addAll(mjPlayerInfo.getPengCardList());
+        cardList.addAll(mjPlayerInfo.getAnGangCardList());
+        cardList.addAll(mjPlayerInfo.getMingGangCardList());
+        Map<MjValueEnum,List<Integer>> map = mjCardService.split(cardList);
+        MjValueEnum mjValueEnum = null;
+        int maxSize = 0;
+        for (Map.Entry<MjValueEnum, List<Integer>> entry : map.entrySet()){
+            int size = entry.getValue().size();
+            if (size > maxSize){
+                maxSize = size;
+                mjValueEnum = entry.getKey();
+            }
+        }
+        int restSize = cardList.size() - maxSize;
+        return restSize == 1 && mjValueEnum != null && card > mjValueEnum.min && card <= mjValueEnum.max;
+    }
+
+    public boolean isNormalTing(MjPlayerInfo mjPlayerInfo, Integer card){
+        List<Integer> cardList = new LinkedList<>();
+        cardList.addAll(mjPlayerInfo.getHandCardList());
+        cardList.add(card);
+        int[] seeds = mjCardService.convertToLongSeed(mjPlayerInfo.getHandCardList());
+        for (int i=0; i<34; i++){
+            if (seeds[i] > 0){
+                cardList.remove(Integer.valueOf(i));
+                if (isHuLaizi(cardList,1)){
+//                    System.out.println("card:" + mjPlayerInfo.getHandCardList() + " ,card:" + card +  " remove:" + i + " and ting");
+                    return true;
+                }
+                cardList.add(i);
+            }
+        }
+        return false;
+    }
+
+
     /*
     目前只用于输赢控制，所以只判断清一色、碰碰胡、七对的听牌
      */
     public boolean isTing(MjPlayerInfo mjPlayerInfo, Integer card){
-//        List<Integer> cardList = new ArrayList<>(16);
-//        cardList.addAll(mjPlayerInfo.getHandCardList());
-//        cardList.addAll(mjPlayerInfo.getPengCardList());
-//        cardList.addAll(mjPlayerInfo.getMingGangCardList());
-//        cardList.addAll(mjPlayerInfo.getAnGangCardList());
-
-
-        return false;
+        return isTingQiDui(mjPlayerInfo,card) || isTingQingYiSe(mjPlayerInfo, card) || isNormalTing(mjPlayerInfo, card);
     }
 }
 

@@ -650,9 +650,10 @@ public class MjCardRule {
 
 			//摸牌控制
 			List<Integer> controlCard = new ArrayList<>(16);
-			while (it.hasNext()){
+			//最多换两次吧，免得效率低
+			int cnt = 0;
+			while (it.hasNext() && cnt++ < 2 ){
 				Integer val = it.next();
-				//todo: 听牌的先不加吧，略微复杂
 				if (!MjHuService.getInstance().isTing(player, val) &&
                         ! MjHuService.getInstance().isGang(player.getHandCardList(), val) &&
                         ! MjHuService.getInstance().isGang(player.getPengCardList(), val)) {
