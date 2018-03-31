@@ -102,7 +102,6 @@ public class MjGameService extends BaseGameService {
             }
         }
 
-        if (readyCount == 4) {
             /**计算庄家*/
             calculateRoomBanker(roomInfo);
             MjCardRule.initMjRoom(roomInfo);
@@ -117,7 +116,7 @@ public class MjGameService extends BaseGameService {
             roomInfo.setTableRemainderCardList(tableRemainderCardList);
 
 
-            playerList.get(0).setWinProbability(50);
+//            playerList.get(0).setWinProbability(50);
             //输赢控制数据初始化
             if (roomInfo.getCurGame().equals(0)){
                 calculateControl(roomInfo);
