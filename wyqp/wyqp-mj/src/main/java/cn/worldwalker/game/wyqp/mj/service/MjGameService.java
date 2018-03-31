@@ -1597,6 +1597,7 @@ public class MjGameService extends BaseGameService {
                 case curSettlement:
                     data.put("curPlayerId", oPlayer.getPlayerId());
                     data.put("huType", oPlayer.getHuType());
+                    data.put("maCardList",roomInfo.getMaCardList());
                     if (MjHuTypeEnum.zhuaChong.type.equals(oPlayer.getHuType()) || MjHuTypeEnum.qiangGang.type.equals(oPlayer.getHuType())) {
                         data.put("cardIndex", roomInfo.getLastCardIndex());
                         data.put("dianPaoPlayerId", roomInfo.getLastPlayerId());
@@ -1621,6 +1622,7 @@ public class MjGameService extends BaseGameService {
                 case totalSettlement:
                     data.put("curPlayerId", oPlayer.getPlayerId());
                     data.put("huType", oPlayer.getHuType());
+                    data.put("maCardList",roomInfo.getMaCardList());
                     if (MjHuTypeEnum.zhuaChong.type.equals(oPlayer.getHuType()) || MjHuTypeEnum.qiangGang.type.equals(oPlayer.getHuType())) {
                         data.put("cardIndex", roomInfo.getLastCardIndex());
                         data.put("dianPaoPlayerId", roomInfo.getLastPlayerId());
