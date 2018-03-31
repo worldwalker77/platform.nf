@@ -102,6 +102,7 @@ public class MjGameService extends BaseGameService {
             }
         }
 
+        if (readyCount == 4) {
             /**计算庄家*/
             calculateRoomBanker(roomInfo);
             MjCardRule.initMjRoom(roomInfo);
