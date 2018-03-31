@@ -1417,6 +1417,7 @@ public class MjGameService extends BaseGameService {
         newRoomInfo.setDices(roomInfo.getDices());
         newRoomInfo.setTotalWinnerId(roomInfo.getTotalWinnerId());
         newRoomInfo.setDetailType(roomInfo.getDetailType());
+        newRoomInfo.setMaiMaCount(roomInfo.getMaiMaCount());
         if (CollectionUtils.isNotEmpty(roomInfo.getTableRemainderCardList())) {
         	newRoomInfo.setRemaindCardCnt(roomInfo.getTableRemainderCardList().size());
 		}
@@ -1462,6 +1463,9 @@ public class MjGameService extends BaseGameService {
                     newPlayer.setHuType(player.getHuType());
                     newPlayer.setMjCardTypeList(player.getMjCardTypeList());
                     newPlayer.setCurScore(player.getCurScore());
+                    newPlayer.setGangScore(player.getGangScore());
+                    newPlayer.setMaScore(player.getMaScore());
+                    newPlayer.setHuScore(player.getHuScore());
                     newPlayer.setMultiple(player.getMultiple());
                     newPlayer.setButtomAndFlowerScore(player.getButtomAndFlowerScore());
                     break;
@@ -1471,10 +1475,18 @@ public class MjGameService extends BaseGameService {
                     newPlayer.setHuType(player.getHuType());
                     newPlayer.setMjCardTypeList(player.getMjCardTypeList());
                     newPlayer.setCurScore(player.getCurScore());
+                    newPlayer.setGangScore(player.getGangScore());
+                    newPlayer.setMaScore(player.getMaScore());
+                    newPlayer.setHuScore(player.getHuScore());
                     newPlayer.setMultiple(player.getMultiple());
                     newPlayer.setButtomAndFlowerScore(player.getButtomAndFlowerScore());
                     newPlayer.setWinTimes(player.getWinTimes());
                     newPlayer.setLoseTimes(player.getLoseTimes());
+                    newPlayer.setZiMoCount(player.getZiMoCount());
+                    newPlayer.setDianPaoCount(player.getDianPaoCount());
+                    newPlayer.setZhuaChongCount(player.getZhuaChongCount());
+                    newPlayer.setMinGangCount(player.getMinGangCount());
+                    newPlayer.setAnGangCount(player.getAnGangCount());
                     break;
                 default:
                     break;
