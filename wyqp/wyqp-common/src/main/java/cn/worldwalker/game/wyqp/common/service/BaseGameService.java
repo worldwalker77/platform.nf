@@ -560,6 +560,7 @@ public abstract class BaseGameService {
 			}
 		}
 		roomInfo.setUpdateTime(new Date());
+		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 		/**如果大部分人同意，则推送解散消息并解散房间*/
 		if (agreeDissolveCount >= (playerList.size()/2 + 1)) {
@@ -615,6 +616,7 @@ public abstract class BaseGameService {
 		data.put("playerId", msg.getPlayerId());
 		data.put("playerList", getPList(playerList));
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 	}
 	
 	public void delRoomConfirmBeforeReturnHall(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
@@ -704,6 +706,7 @@ public abstract class BaseGameService {
 		data.put("chatMsg", msg.getChatMsg());
 		data.put("chatType", msg.getChatType());
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 	}
 	
 	public void syncPlayerLocation(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
@@ -760,6 +763,7 @@ public abstract class BaseGameService {
 		}
 		result.setMsgType(MsgTypeEnum.queryPlayerInfo.msgType);
 		channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
+		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, request.getGameType(), new Date());
 	}
 	
 	public void getAllPlayerDistance(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
@@ -770,6 +774,7 @@ public abstract class BaseGameService {
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
 		result.setData(roomInfo.getDistanceMap());
 		channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
+		redisOperationService.setRoomIdGameTypeUpdateTime(msg.getRoomId(), request.getGameType(), new Date());
 	}
 	
 	public void userRecord(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
@@ -875,6 +880,7 @@ public abstract class BaseGameService {
 		channelContainer.sendTextMsgByPlayerIds(result1, GameUtil.getPlayerIdArrWithOutSelf(playerList, playerId));
 		/**删除此玩家的离线标记*/
 		redisOperationService.hdelOfflinePlayerIdRoomIdGameTypeTime(playerId);
+		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 	}
 	
 	public abstract List<BaseRoomInfo> doRefreshRoom(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo);

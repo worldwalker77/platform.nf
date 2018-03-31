@@ -214,6 +214,7 @@ public class MjGameService extends BaseGameService {
             roomInfo.setStatus(MjRoomStatusEnum.inGame.status);
             roomInfo.setUpdateTime(new Date());
             redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+            redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
             /**给所有玩家返回桌面剩余牌张数*/
             noticeAllPlayerRemaindCardNum(roomInfo);
             /**记录回放操作日志*/
@@ -287,6 +288,7 @@ public class MjGameService extends BaseGameService {
             roomInfo.setCurPlayerId(curPlayerId);
             roomInfo.setUpdateTime(new Date());
             redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+            redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 
             /**给其他玩家返回出牌消息及当前说话玩家*/
             Map<String, Object> data = new HashMap<String, Object>();
@@ -336,6 +338,7 @@ public class MjGameService extends BaseGameService {
             roomInfo.setCurPlayerId(curPlayerId);
             roomInfo.setUpdateTime(new Date());
             redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+            redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
             /**记录回放操作日志*/
             addOperationLog(MsgTypeEnum.chuPai.msgType, (MjMsg) request.getMsg(), roomInfo, null, null, null, null);
             /**给其他玩家返回出牌消息及当前说话玩家*/
@@ -415,6 +418,7 @@ public class MjGameService extends BaseGameService {
         MjCardRule.calculateAllPlayerOperations(roomInfo, null, playerId, 0);
         roomInfo.setUpdateTime(new Date());
         redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+        redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 
         /**给其他玩家返回吃牌消息*/
         Map<String, Object> data = new HashMap<String, Object>();
@@ -482,6 +486,7 @@ public class MjGameService extends BaseGameService {
         MjCardRule.calculateAllPlayerOperations(roomInfo, null, playerId, 0);
         roomInfo.setUpdateTime(new Date());
         redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+        redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 
         /**给其他玩家返回碰牌消息*/
         Map<String, Object> data = new HashMap<String, Object>();
@@ -533,6 +538,7 @@ public class MjGameService extends BaseGameService {
         if (!MjCardRule.checkCurOperationValid(roomInfo, playerId, MjOperationEnum.mingGang.type, msg.getGangCards())) {
             throw new BusinessException(ExceptionEnum.NO_AUTHORITY);
         }
+        redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
         /**将杠的牌从手牌列表中移动到杠牌列表中*/
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
         List<Integer> mingGangCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.mingGang, msg.getGangCards());
@@ -651,6 +657,7 @@ public class MjGameService extends BaseGameService {
         if (!MjCardRule.checkCurOperationValid(roomInfo, playerId, MjOperationEnum.anGang.type, msg.getGangCards())) {
             throw new BusinessException(ExceptionEnum.NO_AUTHORITY);
         }
+        redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
         /**将杠的牌从手牌列表中移动到杠牌列表中*/
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
         if (player.getCurMoPaiCardIndex() != null) {
@@ -750,6 +757,7 @@ public class MjGameService extends BaseGameService {
         if (!MjCardRule.checkCurOperationValid(roomInfo, playerId, MjOperationEnum.tingHu.type, null)) {
             throw new BusinessException(ExceptionEnum.NO_AUTHORITY);
         }
+        redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
         /**设置状态为听牌*/
         player.setIsTingHu(1);
@@ -787,6 +795,7 @@ public class MjGameService extends BaseGameService {
         if (!roomInfo.getCurPlayerId().equals(playerId)) {
             throw new BusinessException(ExceptionEnum.IS_NOT_YOUR_TURN);
         }
+        redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
         /**将当前玩家的可操作性权限删除*/
         TreeMap<Integer, String> delOperation = MjCardRule.delPlayerOperationByPlayerId(roomInfo, playerId);
@@ -908,6 +917,7 @@ public class MjGameService extends BaseGameService {
         if (!MjCardRule.checkCurOperationValid(roomInfo, playerId, MjOperationEnum.hu.type, null)) {
             throw new BusinessException(ExceptionEnum.NO_AUTHORITY);
         }
+        redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
         player.setIsHu(1);
         /**获取胡牌的类型*/
