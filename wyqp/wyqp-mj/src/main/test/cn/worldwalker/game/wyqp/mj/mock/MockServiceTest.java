@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class MockServiceTest {
@@ -44,24 +43,24 @@ public class MockServiceTest {
         for (int i=0; i<4; i++){
             MockPlayer mockPlayer = new MockPlayer();
             mockPlayer.setPlayerId(1000+i);
-            mockPlayer.setHandCardList(Arrays.asList(0,1,2,3,4,5,6,7,8,9,10,11,12));
-            mockPlayer.setPengCardList(Collections.EMPTY_LIST);
-            mockPlayer.setMinGangCardList(Collections.EMPTY_LIST);
-            mockPlayer.setAnGangCardList(Collections.EMPTY_LIST);
             mockPlayerList.add(mockPlayer);
         }
         mockRoom.setMockPlayerList(mockPlayerList);
-
-        String xx = "{\"curPlayerId\":1001,\"discardList\":[1],\"maCardList\":[],\"mockPlayerList\":[{\"anGangCardList\":[],\"handCardList\":[0,1,2,3,4,5,6,7,8,9],\"minGangCardList\":[],\"pengCardList\":[33,33,33],\"playerId\":1000},{\"anGangCardList\":[],\"handCardList\":[0,1,2,3,4,5,6,7,8,9,10,11,12],\"minGangCardList\":[],\"pengCardList\":[],\"playerId\":1001},{\"anGangCardList\":[],\"handCardList\":[0,1,2,3,4,5,6,7,8,9,10,11,12],\"minGangCardList\":[],\"pengCardList\":[],\"playerId\":1002},{\"anGangCardList\":[],\"handCardList\":[0,1,2,3,4,5,6,7,8,9,10,11,12],\"minGangCardList\":[],\"pengCardList\":[],\"playerId\":1003}],\"remainCardList\":[],\"roomBankerId\":1001}";
-
-        mockRoom = JSON.parseObject(xx, MockRoom.class);
+        mockPlayerList.get(0).getHandCardList().addAll(Arrays.asList(1,2,3,3));
+        mockPlayerList.get(0).setCurMoCard(0);
+        mockPlayerList.get(1).getHandCardList().addAll(Arrays.asList(0,0,0));
+        mockPlayerList.get(1).setCurMoCard(0);
+        mockPlayerList.get(2).getHandCardList().addAll(Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13));
+        mockPlayerList.get(2).setCurMoCard(0);
+        mockPlayerList.get(3).getHandCardList().addAll(Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13));
+        mockPlayerList.get(3).setCurMoCard(0);
 
 
         MjRoomInfo mjRoomInfo = mockService.convertToRoom(mockRoom);
         System.out.println(JSON.toJSONString(mockRoom));
         System.out.println(JSON.toJSONString(mjRoomInfo));
 //        System.out.println(JSON.toJSONString(mockRoom));
-        Integer roomId = 916711;
+        Integer roomId = 898044;
         String data = URLEncoder.encode(JSON.toJSONString(mjRoomInfo));
         String ret = HttpClientUtils.get(HTTP_URL + "/refreshRoom?roomId=" + roomId + "&data=" + data);
         System.out.println(ret);

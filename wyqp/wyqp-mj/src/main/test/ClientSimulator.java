@@ -15,7 +15,7 @@ public class ClientSimulator {
         clientOwner.createRoom();
         Thread.sleep(waitTime);
         clientOwner.playerReady();
-        Thread.sleep(waitTime*10);
+        Thread.sleep(waitTime * 100);
 
 //        clientOwner.addRobot();
 

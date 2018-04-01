@@ -2,6 +2,7 @@ package cn.worldwalker.game.wyqp.web.backend;
 
 import cn.worldwalker.game.wyqp.common.backend.BackendService;
 import cn.worldwalker.game.wyqp.common.backend.GameQuery;
+import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.common.result.Result;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
@@ -126,5 +127,45 @@ public class LoginController {
         return isOK ? "OK" : "No Card";
 
     }
+
+
+    @RequestMapping("setNextCard2")
+    @ResponseBody
+    public String setNextCard2(Integer roomId, Integer card){
+        MjRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, MjRoomInfo.class);
+        if (roomInfo == null){
+            return "room not exist";
+        }
+        List<Integer> cardList = roomInfo.getTableRemainderCardList();
+        cardList.add(0,card);
+        redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+        return "OK";
+    }
+
+
+
+    @RequestMapping
+    @ResponseBody
+    public String setCard(Integer roomId, Integer playerId, String cards){
+
+        String[] cardArray = cards.split(",");
+        MjRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, MjRoomInfo.class);
+        if (roomInfo == null){
+            return "room not exist";
+        }
+        for (MjPlayerInfo  mjPlayerInfo : roomInfo.getPlayerList()){
+            if (mjPlayerInfo.getPlayerId().equals(playerId)){
+                mjPlayerInfo.getHandCardList().clear();
+                for (String s : cardArray){
+                    mjPlayerInfo.getHandCardList().add(Integer.valueOf(s));
+                }
+            }
+        }
+        redisOperationService.setRoomIdRoomInfo(roomId,roomInfo);
+        return "ok";
+
+    }
+
+
 }
 

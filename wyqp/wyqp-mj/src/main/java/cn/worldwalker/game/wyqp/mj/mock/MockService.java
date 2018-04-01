@@ -40,9 +40,9 @@ public class MockService {
             MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
             MockPlayer mockPlayer = mockPlayerList.get(i);
             mjPlayerInfo.setPlayerId(mockPlayer.getPlayerId());
-            if (mockPlayer.getPlayerId().equals(mockRoom.getCurPlayerId())){
+//            if (mockPlayer.getPlayerId().equals(mockRoom.getCurPlayerId())){
                 mjPlayerInfo.setCurMoPaiCardIndex(mockPlayer.getCurMoCard());
-            }
+//            }
             mjPlayerInfo.setHandCardList(mockPlayer.getHandCardList());
             mjPlayerInfo.setPengCardList(mockPlayer.getPengCardList());
             mjPlayerInfo.setMingGangCardList(mockPlayer.getMinGangCardList());

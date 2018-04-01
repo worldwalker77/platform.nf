@@ -1,15 +1,16 @@
 package cn.worldwalker.game.wyqp.mj.mock;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MockPlayer {
 
     private Integer playerId;
     private Integer curMoCard;
-    private List<Integer> handCardList;
-    private List<Integer> pengCardList;
-    private List<Integer> minGangCardList;
-    private List<Integer> anGangCardList;
+    private List<Integer> handCardList = new ArrayList<>(16);
+    private List<Integer> pengCardList = new ArrayList<>(16);
+    private List<Integer> minGangCardList = new ArrayList<>(16);
+    private List<Integer> anGangCardList = new ArrayList<>(16);
 
     public Integer getCurMoCard() {
         return curMoCard;

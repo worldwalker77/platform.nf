@@ -9,10 +9,7 @@ import cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum;
 import cn.worldwalker.game.wyqp.mj.enums.MjValueEnum;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum.getMjHuTypeEnum;
 
@@ -247,7 +244,6 @@ public class MjScoreService {
         //计算各个玩家的加分和减分
         switch (getMjHuTypeEnum(huPlayerList.get(0).getHuType())){
             case zhuaChong:
-            case qiangGang:
             case diHu:
                 MjPlayerInfo dianPaoPlayer = MjCardRule.getLastPlayer(roomInfo);
                 assignScore(huPlayerList, Collections.singletonList(dianPaoPlayer), roomInfo);
@@ -255,6 +251,14 @@ public class MjScoreService {
                     mjPlayerInfo.setZhuaChongCount( mjPlayerInfo.getZhuaChongCount() + 1);
                 }
                 dianPaoPlayer.setDianPaoCount( dianPaoPlayer.getDianPaoCount() + 1 );
+                break;
+            case qiangGang:
+                MjPlayerInfo qiangGangpPlayer = MjCardRule.getLastPlayer(roomInfo);
+                assignScore(huPlayerList, Arrays.asList(qiangGangpPlayer,qiangGangpPlayer,qiangGangpPlayer), roomInfo);
+                for (MjPlayerInfo mjPlayerInfo: huPlayerList){
+                    mjPlayerInfo.setZhuaChongCount( mjPlayerInfo.getZhuaChongCount() + 1);
+                }
+                qiangGangpPlayer.setDianPaoCount( qiangGangpPlayer.getDianPaoCount() + 1 );
                 break;
             case ziMo:
             case gangKai:

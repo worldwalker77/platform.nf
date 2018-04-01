@@ -19,6 +19,7 @@ import java.util.List;
 @SuppressWarnings("ConstantConditions")
 public class Socket extends WebSocketClient implements Runnable {
 
+    private static final Integer DELAY_TIME = 3000;
     private Client client;
 
     public Socket(URI serverUri, Client client) {
@@ -61,6 +62,11 @@ public class Socket extends WebSocketClient implements Runnable {
     }
     @Override
     public void onMessage(String arg0) {
+//        try {
+//            Thread.sleep(DELAY_TIME);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         JSONObject jsonObject = JSON.parseObject(arg0);
         Integer msgType = jsonObject.getInteger("msgType");
         JSONObject jsonData = jsonObject.getJSONObject("data");
