@@ -382,7 +382,8 @@ public class MjScoreService {
             MjPlayerInfo mjPlayerInfo = roomInfo.getPlayerList().get(i);
             if (mjPlayerInfo.getPlayerId().equals(roomInfo.getRoomBankerId())){
                 for (Integer maCard : roomInfo.getMaCardList()){
-                    maPlayerList.add(roomInfo.getPlayerList().get( (i + 3 + (maCard +1) %9 ) % 4));
+                    int pos = (maCard +1) %9 == 0 ? 9 :(maCard + 1) % 9;
+                    maPlayerList.add(roomInfo.getPlayerList().get( (i + 3 + pos ) % 4));
                 }
                 break;
             }

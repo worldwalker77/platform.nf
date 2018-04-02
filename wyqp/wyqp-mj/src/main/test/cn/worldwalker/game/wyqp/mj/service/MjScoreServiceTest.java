@@ -193,6 +193,57 @@ public class MjScoreServiceTest {
             mjPlayerInfo.setPlayerId(1000 + i);
             mjRoomInfo.getPlayerList().add(mjPlayerInfo);
         }
+
+        mjRoomInfo.setRoomBankerId(1000);
+        int val = 0;
+        for (int i = 0; i < 9; i++) {
+            val = val + 1;
+            mjRoomInfo.setMaCardList(Arrays.asList(i));
+            List<MjPlayerInfo> maPlayerList = mjScoreService.getMaPlayerList(mjRoomInfo);
+            for (MjPlayerInfo player : maPlayerList) {
+                if (!player.getPlayerId().equals(1000 + (val - 1) % 4)){
+                    System.out.println("i:" + i + " ,val:" + val);
+                }
+                Assert.assertEquals(player.getPlayerId(), Integer.valueOf(1000 + (val-1)%4 ));
+            }
+        }
+        val = 0;
+        for (int i=9; i<18; i++){
+            val = val + 1;
+            mjRoomInfo.setMaCardList(Arrays.asList(i));
+            List<MjPlayerInfo> maPlayerList = mjScoreService.getMaPlayerList(mjRoomInfo);
+            for (MjPlayerInfo player : maPlayerList){
+                if (!player.getPlayerId().equals(1000 + (val - 1) % 4)){
+                    System.out.println("i:" + i + " ,val:" + val);
+                }
+                Assert.assertEquals(player.getPlayerId(), Integer.valueOf(1000 + (val-1)%4 ));
+            }
+        }
+        val = 0;
+        for (int i=18; i<27; i++){
+            val = val + 1;
+            mjRoomInfo.setMaCardList(Arrays.asList(i));
+            List<MjPlayerInfo> maPlayerList = mjScoreService.getMaPlayerList(mjRoomInfo);
+            for (MjPlayerInfo player : maPlayerList){
+                if (!player.getPlayerId().equals(1000 + (val - 1) % 4)){
+                    System.out.println("i:" + i + " ,val:" + val);
+                }
+                Assert.assertEquals(player.getPlayerId(), Integer.valueOf(1000 + (val-1)%4 ));
+            }
+        }
+        val = 0;
+        for (int i=27; i<34; i++){
+            val = val + 1;
+            mjRoomInfo.setMaCardList(Arrays.asList(i));
+            List<MjPlayerInfo> maPlayerList = mjScoreService.getMaPlayerList(mjRoomInfo);
+            for (MjPlayerInfo player : maPlayerList){
+                if (!player.getPlayerId().equals(1000 + (val - 1) % 4)){
+                    System.out.println("i:" + i + " ,val:" + val);
+                }
+                Assert.assertEquals(player.getPlayerId(), Integer.valueOf(1000 + (val-1)%4 ));
+            }
+        }
+        /*
         for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
             mjRoomInfo.setRoomBankerId(mjPlayerInfo.getPlayerId());
             List<Integer> allCard = new ArrayList<>(64);
@@ -207,6 +258,7 @@ public class MjScoreServiceTest {
                 System.out.println(player.getPlayerId());
             }
         }
+     */
 
     }
 
