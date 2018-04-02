@@ -44,7 +44,12 @@ public class RoomInfoCleanJob /**extends SingleServerJobByRedis*/ {
 					redisOperationService.delGameTypeUpdateTimeByRoomId(model.getRoomId());
 					return;
 				}
+				/**如果微信开关打开，则房间不删除，需要用户手动删除房间*/
+				if (redisOperationService.isLoginFuseOpen()) {
+					return;
+				}
 				List playerList = roomInfo.getPlayerList();
+				log.info("定时任务销毁房间,roomId=" + model.getRoomId());
 				redisOperationService.cleanPlayerAndRoomInfo(model.getRoomId(), GameUtil.getPlayerIdStrArr(playerList));
 				if (roomInfo.getClubId() != null) {
 					redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomInfo.getRoomId());

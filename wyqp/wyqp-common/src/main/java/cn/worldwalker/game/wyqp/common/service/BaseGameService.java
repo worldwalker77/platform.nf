@@ -755,11 +755,13 @@ public abstract class BaseGameService {
 			data.put("address", otherPlayer.getAddress());
 			String distance = GameUtil.getLatLngDistance(curPlayer, otherPlayer);
 			data.put("distance", distance);
+			data.put("ip", otherPlayer.getIp());
 		}else{
 			data.put("playerId", curPlayer.getPlayerId());
 			data.put("nickName", curPlayer.getNickName());
 			data.put("headImgUrl", curPlayer.getHeadImgUrl());
 			data.put("address", curPlayer.getAddress());
+			data.put("ip", curPlayer.getIp());
 		}
 		result.setMsgType(MsgTypeEnum.queryPlayerInfo.msgType);
 		channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());

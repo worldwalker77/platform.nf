@@ -144,7 +144,7 @@ public class LoginController {
 
 
 
-    @RequestMapping
+    @RequestMapping("setCard")
     @ResponseBody
     public String setCard(Integer roomId, Integer playerId, String cards){
 

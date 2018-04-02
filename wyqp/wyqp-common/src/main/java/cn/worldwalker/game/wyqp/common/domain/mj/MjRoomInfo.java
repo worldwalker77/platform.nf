@@ -57,16 +57,16 @@ public class MjRoomInfo extends BaseRoomInfo{
 
     private List<Integer> maCardList = new ArrayList<>(4);
     
-    private Integer remaindCardCnt;
+    private Integer remaindCardNum;
 
     private Set<Integer> controlGame = new HashSet<>(16);
     private Set<Integer> controlPlayer = new HashSet<>(4);
-
-	public Integer getRemaindCardCnt() {
-		return remaindCardCnt;
+    
+	public Integer getRemaindCardNum() {
+		return remaindCardNum;
 	}
-	public void setRemaindCardCnt(Integer remaindCardCnt) {
-		this.remaindCardCnt = remaindCardCnt;
+	public void setRemaindCardNum(Integer remaindCardNum) {
+		this.remaindCardNum = remaindCardNum;
 	}
 	public Integer getIndexLine() {
 		return indexLine;
