@@ -563,7 +563,23 @@ public class MjCardRule {
 			if (map.size() > 0) {
 				operations.put(curPlayer.getPlayerId(), map);
 			}
-		}
+		} else if (type == 5) {/**手牌列表校验*/
+            /**格式化手牌*/
+            int len = handCardList.size();
+            int[] cards = new int[roomInfo.getIndexLine()];
+            for(int j = 0; j < len; j++){
+                if (handCardList.get(j) < roomInfo.getIndexLine()) {
+                    cards[handCardList.get(j)]++;
+                }
+            }
+            /**暗杠校验**/
+            TreeMap<Integer, String> map = checkHandCardGang(cards, curPlayer.getPengCardList());
+            if (map.size() > 0) {
+                operations.put(curPlayer.getPlayerId(), map);
+            }
+
+        }
+
 		roomInfo.setPlayerOperationMap(operations);
 		return operations;
 	}

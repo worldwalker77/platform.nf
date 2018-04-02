@@ -214,7 +214,7 @@ public class MjScoreService {
                     //输了马了哦
                     int loseMaCnt = getCntInList(maPlayerList, losePlayerInfo);
                     if (loseMaCnt > 0){
-                        assignMaiMaScore(Collections.singletonList(winPlayerInfo),
+                        assignHuMaScore(Collections.singletonList(winPlayerInfo),
                                 Collections.singletonList(bankerPlayer), winPlayerInfo,score * loseMaCnt );
                     }
                 }
@@ -222,7 +222,7 @@ public class MjScoreService {
             //赢了马
             int winMaCnt = getCntInList(maPlayerList, winPlayerInfo);
             if (winMaCnt > 0){
-                assignMaiMaScore(Collections.singletonList(bankerPlayer),losePlayList, winPlayerInfo,score * winMaCnt );
+                assignHuMaScore(Collections.singletonList(bankerPlayer),losePlayList, winPlayerInfo,score * winMaCnt );
             }
 
 
@@ -313,7 +313,7 @@ public class MjScoreService {
                     //输了马
                     int loseCnt = getCntInList(maPlayerList, losePlayerInfo);
                     if (loseCnt > 0){
-                        assignMaiMaScore(Collections.singletonList(winPlayerInfo),
+                        assignGangMaScore(Collections.singletonList(winPlayerInfo),
                                 Collections.singletonList(bankerPlayer), winPlayerInfo,loseCnt * score);
                     }
                 }
@@ -321,7 +321,7 @@ public class MjScoreService {
             //赢了马
             int winCnt = getCntInList(maPlayerList, winPlayerInfo);
             if (winCnt > 0) {
-                assignMaiMaScore(Collections.singletonList(bankerPlayer), losePlayList, winPlayerInfo, winCnt * score);
+                assignGangMaScore(Collections.singletonList(bankerPlayer), losePlayList, winPlayerInfo, winCnt * score);
             }
         }
     }
@@ -359,7 +359,7 @@ public class MjScoreService {
     /**
      ** 计算马分
      */
-    private void assignMaiMaScore(List<MjPlayerInfo> maPlayerList, List<MjPlayerInfo> losePlayerList,
+    private void assignHuMaScore(List<MjPlayerInfo> maPlayerList, List<MjPlayerInfo> losePlayerList,
                                   MjPlayerInfo winPlayer, int score){
         for (MjPlayerInfo maPlayer: maPlayerList){
             for (MjPlayerInfo losePlayer: losePlayerList){
@@ -367,6 +367,19 @@ public class MjScoreService {
                         !losePlayer.getPlayerId().equals(winPlayer.getPlayerId())){
                     maPlayer.setMaScore( maPlayer.getMaScore() + score);
                     losePlayer.setMaScore( losePlayer.getMaScore() - score);
+                }
+            }
+        }
+    }
+
+    private void assignGangMaScore(List<MjPlayerInfo> maPlayerList, List<MjPlayerInfo> losePlayerList,
+                                  MjPlayerInfo winPlayer, int score){
+        for (MjPlayerInfo maPlayer: maPlayerList){
+            for (MjPlayerInfo losePlayer: losePlayerList){
+                if (!losePlayer.getPlayerId().equals(maPlayer.getPlayerId()) &&
+                        !losePlayer.getPlayerId().equals(winPlayer.getPlayerId())){
+                    maPlayer.setGangScore( maPlayer.getGangScore() + score);
+                    losePlayer.setGangScore( losePlayer.getGangScore() - score);
                 }
             }
         }

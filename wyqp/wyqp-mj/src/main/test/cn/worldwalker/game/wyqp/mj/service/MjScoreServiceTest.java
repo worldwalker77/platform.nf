@@ -179,8 +179,8 @@ public class MjScoreServiceTest {
                     ", GangScore:" + mjPlayerInfo.getGangScore() +
                     ", MaScore:" + mjPlayerInfo.getMaScore());
         }
-        Assert.assertEquals(gangPlayer.getMaScore().intValue(),0);
-        Assert.assertEquals(bankerPlayer.getMaScore().intValue(),4);
+        Assert.assertEquals(gangPlayer.getGangScore().intValue(),6);
+        Assert.assertEquals(bankerPlayer.getGangScore().intValue(),2);
 
     }
 

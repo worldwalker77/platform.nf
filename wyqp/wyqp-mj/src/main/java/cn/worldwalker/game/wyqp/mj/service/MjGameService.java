@@ -415,7 +415,7 @@ public class MjGameService extends BaseGameService {
             handCardAddFlower = MjCardRule.replaceFlowerCards(player.getHandCardList(), handCardAddFlower);
         }
         /**计算当前玩家剩余可操作权限*/
-        MjCardRule.calculateAllPlayerOperations(roomInfo, null, playerId, 0);
+        MjCardRule.calculateAllPlayerOperations(roomInfo, null, playerId, 5);
         roomInfo.setUpdateTime(new Date());
         redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
         redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
@@ -483,7 +483,7 @@ public class MjGameService extends BaseGameService {
             handCardAddFlower = MjCardRule.replaceFlowerCards(player.getHandCardList(), handCardAddFlower);
         }
         /**计算当前玩家剩余可操作权限*/
-        MjCardRule.calculateAllPlayerOperations(roomInfo, null, playerId, 0);
+        MjCardRule.calculateAllPlayerOperations(roomInfo, null, playerId, 5);
         roomInfo.setUpdateTime(new Date());
         redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
         redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
