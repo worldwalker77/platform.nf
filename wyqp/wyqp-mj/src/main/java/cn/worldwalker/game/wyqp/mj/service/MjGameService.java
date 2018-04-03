@@ -1316,7 +1316,6 @@ public class MjGameService extends BaseGameService {
             if (mjPlayerInfo.getWinProbability() > 0){
                 winCnt = winCnt + 1;
                 winRate = mjPlayerInfo.getWinProbability();
-            } else {
                 roomInfo.getControlPlayer().add(mjPlayerInfo.getPlayerId());
             }
         }

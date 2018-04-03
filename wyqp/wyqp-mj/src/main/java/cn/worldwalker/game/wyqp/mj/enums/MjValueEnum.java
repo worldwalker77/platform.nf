@@ -16,4 +16,16 @@ public enum MjValueEnum {
     public int max;
     public boolean isFeng;
 
+
+    public static MjValueEnum getCardEnum(Integer card){
+        MjValueEnum mjValueEnum = null;
+        for (MjValueEnum valueEnum: MjValueEnum.values()){
+            if (card >= valueEnum.min && card <= valueEnum.max ){
+                mjValueEnum = valueEnum;
+                break;
+            }
+        }
+        return mjValueEnum;
+    }
+
 }

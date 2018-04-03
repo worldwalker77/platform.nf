@@ -131,4 +131,47 @@ public class MjHuServiceTest {
     }
 
 
+    @Test
+    public void testIsGoodCard() throws Exception{
+        boolean isGood = mjHuService.isGoodCard(Arrays.asList(2,3,22,23,24,27,28),0);
+        Assert.assertEquals(isGood,false);
+        isGood = mjHuService.isGoodCard(Arrays.asList(1,2),0);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(2,2),0);
+        Assert.assertEquals(isGood,false);
+        isGood = mjHuService.isGoodCard(Arrays.asList(0,2,3),0);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(0,0,3),0);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(0,0,0,3),0);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(0,0,0,3),0);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(0,3),1);
+        Assert.assertEquals(isGood,false);
+        isGood = mjHuService.isGoodCard(Arrays.asList(0,2),1);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(2,3),1);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(1,3),2);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(3,4),2);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(7,9),8);
+        Assert.assertEquals(isGood,false);
+        isGood = mjHuService.isGoodCard(Arrays.asList(9,10),8);
+        Assert.assertEquals(isGood,false);
+        isGood = mjHuService.isGoodCard(Arrays.asList(27,28),30);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(27,29),30);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(29,30),30);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(29,31),30);
+        Assert.assertEquals(isGood,false);
+        isGood = mjHuService.isGoodCard(Arrays.asList(32,33),31);
+        Assert.assertEquals(isGood,true);
+
+    }
+
 }

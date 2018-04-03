@@ -257,6 +257,46 @@ public class MjHuService {
     public boolean isTing(MjPlayerInfo mjPlayerInfo, Integer card){
         return isTingQiDui(mjPlayerInfo,card) || isTingQingYiSe(mjPlayerInfo, card) || isNormalTing(mjPlayerInfo, card);
     }
+
+
+    public boolean isGoodCard(List<Integer> cardList, Integer card){
+        Map<MjValueEnum, List<Integer>> map = mjCardService.split(cardList);
+        MjValueEnum mjValueEnum =  MjValueEnum.getCardEnum(card);
+        if (mjValueEnum != null){
+            List<Integer> cardValueList = map.get(mjValueEnum);
+            if (cardValueList != null){
+                int[] seed = mjCardService.convertToSeed(cardValueList);
+                int val = card % 9;
+
+                if (mjValueEnum.isFeng ){
+                    if (seed[val] > 0) {
+                        return true;
+                    } else {
+                        int min = 0, max = 4, cnt = 0;
+                        if (val > 3){
+                            min = 4;
+                            max = 7;
+                        }
+                        for (int i=min; i<max; i++){
+                            if (i!=val && seed[i] > 0){
+                                cnt++;
+                            }
+                        }
+                        if (cnt >= 2){
+                            return true;
+                        }
+                    }
+                }else {
+                    if ( seed[val] > 0 || (val > 1 && seed[val-2] > 0 && seed[val-1] > 0 ) ||
+                            (val > 0 && val < 8 && seed[val-1] > 0 && seed[val+1] > 0 ) ||
+                            (val < 7 && seed[val+1] > 0 && seed[val+2] > 0 ) ){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }
 
 

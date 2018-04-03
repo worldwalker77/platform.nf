@@ -653,7 +653,6 @@ public class MjCardRule {
 	 * @return
 	 */
 	public static String checkMoPaiAddFlower(MjRoomInfo roomInfo,  MjPlayerInfo player){
-        MjCardService mjCardService = MjCardService.getInstance();
 		List<Integer> tableRemainderCardList = roomInfo.getTableRemainderCardList();
 		/**如果桌牌数为0，则结束*/
 		if (tableRemainderCardList.size() <= roomInfo.getMaiMaCount()) {
@@ -669,11 +668,19 @@ public class MjCardRule {
 			List<Integer> controlCard = new ArrayList<>(16);
 			//最多换两次吧，免得效率低
 			int cnt = 0;
+			boolean isGood = roomInfo.getControlPlayer().contains(player.getPlayerId());
 			while (it.hasNext() && cnt++ < 2 ){
 				Integer val = it.next();
-				if (!MjHuService.getInstance().isTing(player, val) &&
-                        ! MjHuService.getInstance().isGang(player.getHandCardList(), val) &&
-                        ! MjHuService.getInstance().isGang(player.getPengCardList(), val)) {
+				boolean notChange;
+				if (isGood){
+				    notChange = MjHuService.getInstance().isGoodCard(player.getHandCardList(),val) ||
+                            MjHuService.getInstance().isGang(player.getPengCardList(),val);
+                } else {
+                    notChange = !MjHuService.getInstance().isTing(player, val) &&
+                            ! MjHuService.getInstance().isGang(player.getHandCardList(), val) &&
+                            ! MjHuService.getInstance().isGang(player.getPengCardList(), val);
+                }
+				if (notChange) {
 					tempCard = val;
 					it.remove();
 					break;
@@ -683,7 +690,7 @@ public class MjCardRule {
 			}
 
             if (tempCard != null && controlCard.size() > 0){
-                log.info( "controlGame:" + roomInfo.getControlGame() + " ,curGame:" + roomInfo.getCurGame()
+                log.info( isGood ? "[Good]" : "[Bad]" + "--controlGame:" + roomInfo.getControlGame() + " ,curGame:" + roomInfo.getCurGame()
                         + ":controlPlayer:" + roomInfo.getControlPlayer() + " ,player:" + player.getPlayerId()
                         + " handCard:" + player.getHandCardList() + ", peng:" + player.getPengCardList()
                         + " replace " + controlCard + " to " + tempCard);
