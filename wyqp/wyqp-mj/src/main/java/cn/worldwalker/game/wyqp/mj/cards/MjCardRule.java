@@ -14,7 +14,9 @@ import cn.worldwalker.game.wyqp.mj.huvalidate.TableMgr;
 import cn.worldwalker.game.wyqp.mj.service.MjCardService;
 import cn.worldwalker.game.wyqp.mj.service.MjHuService;
 import cn.worldwalker.game.wyqp.mj.service.MjScoreService;
+
 import com.alibaba.fastjson.JSON;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -1291,5 +1293,37 @@ public class MjCardRule {
 
 	public static void moveCardsFromHandCards(){
 
+	}
+	
+	public static void genOpMap(MjRoomInfo roomInfo, MjPlayerInfo player, MjOperationEnum mjOperationEnum){
+		Map<Integer, String> opMap = roomInfo.getOpMap();
+		Integer curPlayerId = player.getPlayerId();
+		Integer moCardIndex = player.getCurMoPaiCardIndex();
+		Integer lastCardIndex = roomInfo.getLastCardIndex();
+		Integer lastPlayerId = roomInfo.getLastPlayerId();
+		switch (mjOperationEnum) {
+			case chi:
+				String chiPais = opMap.get(curPlayerId);
+				if (StringUtils.isBlank(chiPais)) {
+					opMap.put(curPlayerId, String.valueOf(roomInfo.getLastCardIndex()));
+				}else{
+					opMap.put(curPlayerId, opMap.get(curPlayerId) + "_" + String.valueOf(roomInfo.getLastCardIndex()));
+				}
+				break;
+			case peng:
+				opMap.put(lastCardIndex, String.valueOf(lastPlayerId));
+				break;
+			case mingGang:
+				/**如果是自摸的明杠*/
+				if (moCardIndex != null) {
+					opMap.put(moCardIndex, String.valueOf(curPlayerId));
+				}else{/**如果是别人点的明杠*/
+					opMap.put(lastCardIndex, String.valueOf(lastPlayerId));
+				}
+				break;
+	
+			default:
+				break;
+		}
 	}
 }
