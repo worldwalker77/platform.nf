@@ -132,9 +132,8 @@ public class MjScoreServiceTest {
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(1).getZhuaChongCount().intValue(),1);
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(3).getDianPaoCount().intValue(),2);
 
-
         //自摸
-        mjRoomInfo.getPlayerList().get(0).setHuType(MjHuTypeEnum.gangKai.type);
+        mjRoomInfo.getPlayerList().get(0).setHuType(MjHuTypeEnum.ziMo.type);
         mjRoomInfo.getPlayerList().get(1).setIsHu(0);
         mjScoreService.calScoreRoom(mjRoomInfo);
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(0).getHuScore().intValue(),20);
@@ -146,8 +145,112 @@ public class MjScoreServiceTest {
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(1).getZhuaChongCount().intValue(),1);
         Assert.assertEquals(mjRoomInfo.getPlayerList().get(3).getDianPaoCount().intValue(),2);
 
+    }
+
+    @Test
+    public void testQiangGangScore() throws Exception{
+        MjRoomInfo mjRoomInfo = new MjRoomInfo();
+        for (int i=0; i<4; i++){
+            MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
+            mjPlayerInfo.setPlayerId(2000 + i);
+            mjPlayerInfo.setDiscardCardList(Arrays.asList(0,1,2));
+            mjRoomInfo.getPlayerList().add(mjPlayerInfo);
+        }
+        MjPlayerInfo dianPaoPlayer = mjRoomInfo.getPlayerList().get(3);
+        MjPlayerInfo winPlayer = mjRoomInfo.getPlayerList().get(0);
+        MjPlayerInfo zhuangPlayer = mjRoomInfo.getPlayerList().get(1);
+
+        mjRoomInfo.setLastPlayerId(dianPaoPlayer.getPlayerId());
+        mjRoomInfo.setRoomBankerId(zhuangPlayer.getPlayerId());
+        winPlayer.setIsHu(1);
+        winPlayer.setHuType(MjHuTypeEnum.qiangGang.type);
+        winPlayer.setMjCardTypeList(Collections.singletonList(MjScoreEnum.PING_HU.type));
+
+
+
+        for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
+            mjPlayerInfo.setHuScore(0);
+            mjPlayerInfo.setMaScore(0);
+        }
+        mjRoomInfo.setMaCardList(Arrays.asList(1,2));
+        mjScoreService.calScoreRoom(mjRoomInfo);
+        for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
+            System.out.println(mjPlayerInfo.getPlayerId() + " ,huScore:" + mjPlayerInfo.getHuScore());
+            System.out.println(mjPlayerInfo.getPlayerId() + " ,maScore:" + mjPlayerInfo.getMaScore());
+        }
+        Assert.assertEquals(winPlayer.getHuScore(),Integer.valueOf(4));
+        Assert.assertEquals(dianPaoPlayer.getHuScore(),Integer.valueOf(-4));
+        Assert.assertEquals(zhuangPlayer.getMaScore(),Integer.valueOf(-4));
+        Assert.assertEquals(winPlayer.getMaScore(),Integer.valueOf(4));
+
+
+        for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
+            mjPlayerInfo.setHuScore(0);
+            mjPlayerInfo.setMaScore(0);
+        }
+        mjRoomInfo.setMaCardList(Arrays.asList(1,3));
+        mjScoreService.calScoreRoom(mjRoomInfo);
+        for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
+            System.out.println(mjPlayerInfo.getPlayerId() + " ,huScore:" + mjPlayerInfo.getHuScore());
+            System.out.println(mjPlayerInfo.getPlayerId() + " ,maScore:" + mjPlayerInfo.getMaScore());
+        }
+        Assert.assertEquals(winPlayer.getHuScore(),Integer.valueOf(4));
+        Assert.assertEquals(dianPaoPlayer.getHuScore(),Integer.valueOf(-4));
+        Assert.assertEquals(zhuangPlayer.getMaScore(),Integer.valueOf(4));
+        Assert.assertEquals(dianPaoPlayer.getMaScore(),Integer.valueOf(-4));
+
+
+
+        for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
+            mjPlayerInfo.setHuScore(0);
+            mjPlayerInfo.setMaScore(0);
+        }
+        mjRoomInfo.setMaCardList(Arrays.asList(0,2));
+        mjScoreService.calScoreRoom(mjRoomInfo);
+        for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
+            System.out.println(mjPlayerInfo.getPlayerId() + " ,huScore:" + mjPlayerInfo.getHuScore());
+            System.out.println(mjPlayerInfo.getPlayerId() + " ,maScore:" + mjPlayerInfo.getMaScore());
+        }
+        Assert.assertEquals(winPlayer.getHuScore(),Integer.valueOf(4));
+        Assert.assertEquals(dianPaoPlayer.getHuScore(),Integer.valueOf(-4));
+        Assert.assertEquals(zhuangPlayer.getMaScore(),Integer.valueOf(-4));
+        Assert.assertEquals(winPlayer.getMaScore(),Integer.valueOf(4));
 
     }
+
+
+    @Test
+    public void testGangKaiScore() throws Exception{
+        MjRoomInfo mjRoomInfo = new MjRoomInfo();
+        for (int i=0; i<4; i++){
+            MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
+            mjPlayerInfo.setPlayerId(3000 + i);
+            mjPlayerInfo.setDiscardCardList(Arrays.asList(0,1,2));
+            mjRoomInfo.getPlayerList().add(mjPlayerInfo);
+        }
+        MjPlayerInfo dianPaoPlayer = mjRoomInfo.getPlayerList().get(3);
+        MjPlayerInfo winPlayer = mjRoomInfo.getPlayerList().get(0);
+        MjPlayerInfo zhuangPlayer = mjRoomInfo.getPlayerList().get(1);
+
+//        mjRoomInfo.setLastPlayerId(dianPaoPlayer.getPlayerId());
+//        mjRoomInfo.setRoomBankerId(zhuangPlayer.getPlayerId());
+        winPlayer.setIsHu(1);
+        winPlayer.setHuType(MjHuTypeEnum.gangKai.type);
+        winPlayer.setMjCardTypeList(Collections.singletonList(MjScoreEnum.PENG_PENG_HU.type));
+
+
+//        mjRoomInfo.setMaCardList(Arrays.asList(0,2));
+        mjScoreService.calScoreRoom(mjRoomInfo);
+        for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
+            System.out.println(mjPlayerInfo.getPlayerId() + " ,huScore:" + mjPlayerInfo.getHuScore());
+            System.out.println(mjPlayerInfo.getPlayerId() + " ,maScore:" + mjPlayerInfo.getMaScore());
+        }
+        Assert.assertEquals(winPlayer.getHuScore(),Integer.valueOf(24));
+        Assert.assertEquals(dianPaoPlayer.getHuScore(),Integer.valueOf(-8));
+        Assert.assertEquals(zhuangPlayer.getHuScore(),Integer.valueOf(-8));
+
+    }
+
 
     private boolean isListEqual(List list1, List list2) {
         return (list1 == null && list2 == null)

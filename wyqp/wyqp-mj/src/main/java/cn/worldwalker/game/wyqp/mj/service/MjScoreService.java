@@ -3,10 +3,7 @@ package cn.worldwalker.game.wyqp.mj.service;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
-import cn.worldwalker.game.wyqp.mj.enums.GangTypeEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjValueEnum;
+import cn.worldwalker.game.wyqp.mj.enums.*;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -204,7 +201,25 @@ public class MjScoreService {
                 for (Integer type : winPlayerInfo.getMjCardTypeList()){
                     score = score + MjScoreEnum.getByType(type).score;
                 }
+                //杠开
+                if (MjHuTypeEnum.gangKai.type.equals(winPlayerInfo.getHuType())){
+                    score = score * 4;
+                }
                 score = score > 8 ? 8 : score;
+            }
+
+            //抢杠先把三家分和马都算到被抢杠的头上
+            if (MjHuTypeEnum.qiangGang.type.equals(winPlayerInfo.getHuType())){
+                int loseMaCnt = getCntInList(maPlayerList, losePlayList.get(0));
+                int winMaCnt = getCntInList(maPlayerList, winPlayerInfo);
+                int cnt = 3;
+                if (loseMaCnt + winMaCnt < maPlayerList.size()){
+                   cnt = 3 + maPlayerList.size() - loseMaCnt - winMaCnt;
+                }else {
+                    log.error("抢杠马错，allMa:" + maPlayerList.size()  +
+                            " ,loseMa:" + loseMaCnt + " ,winMa" + winMaCnt);
+                }
+                score = score * cnt;
             }
 
             for (MjPlayerInfo losePlayerInfo : losePlayList) {
@@ -253,12 +268,12 @@ public class MjScoreService {
                 dianPaoPlayer.setDianPaoCount( dianPaoPlayer.getDianPaoCount() + 1 );
                 break;
             case qiangGang:
-                MjPlayerInfo qiangGangpPlayer = MjCardRule.getLastPlayer(roomInfo);
-                assignScore(huPlayerList, Arrays.asList(qiangGangpPlayer,qiangGangpPlayer,qiangGangpPlayer), roomInfo);
+                MjPlayerInfo qiangGangPlayer = MjCardRule.getLastPlayer(roomInfo);
+                assignScore(huPlayerList, Collections.singletonList(qiangGangPlayer), roomInfo);
                 for (MjPlayerInfo mjPlayerInfo: huPlayerList){
                     mjPlayerInfo.setZhuaChongCount( mjPlayerInfo.getZhuaChongCount() + 1);
                 }
-                qiangGangpPlayer.setDianPaoCount( qiangGangpPlayer.getDianPaoCount() + 1 );
+                qiangGangPlayer.setDianPaoCount( qiangGangPlayer.getDianPaoCount() + 1 );
                 break;
             case ziMo:
             case gangKai:
