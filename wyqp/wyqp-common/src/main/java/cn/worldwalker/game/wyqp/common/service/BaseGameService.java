@@ -90,6 +90,7 @@ public abstract class BaseGameService {
 		if (null == weixinUserInfo) {
 			throw new BusinessException(ExceptionEnum.QUERY_WEIXIN_USER_INFO_FAIL);
 		}
+		weixinUserInfo.setName(GameUtil.emojiFilter(weixinUserInfo.getName()));
 		UserModel userModel = commonManager.getUserByWxOpenId(weixinUserInfo.getOpneid());
 		Integer extensionCode = GameUtil.genExtensionCode();
 		if (null == userModel) {

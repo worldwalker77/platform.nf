@@ -4,6 +4,8 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -352,4 +354,17 @@ public class GameUtil {
 		}
 		return null;
 	}
+	
+	public static String emojiFilter (String str) {  
+        
+        if(str.trim().isEmpty()){  
+            return str;  
+        }  
+        String pattern="[\ud83c\udc00-\ud83c\udfff]|[\ud83d\udc00-\ud83d\udfff]|[\u2600-\u27ff]";  
+        String reStr="";  
+        Pattern emoji=Pattern.compile(pattern);  
+        Matcher  emojiMatcher=emoji.matcher(str);  
+        str=emojiMatcher.replaceAll(reStr);  
+        return str;  
+    } 
 }
