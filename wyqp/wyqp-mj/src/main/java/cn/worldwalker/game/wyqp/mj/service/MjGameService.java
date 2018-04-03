@@ -417,6 +417,8 @@ public class MjGameService extends BaseGameService {
         /**计算当前玩家剩余可操作权限*/
         MjCardRule.calculateAllPlayerOperations(roomInfo, null, playerId, 5);
         roomInfo.setUpdateTime(new Date());
+        /**计算吃碰杠对应的玩家*/
+        MjCardRule.genOpMap(roomInfo, player, MjOperationEnum.chi);
         redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
         redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 
@@ -485,6 +487,8 @@ public class MjGameService extends BaseGameService {
         /**计算当前玩家剩余可操作权限*/
         MjCardRule.calculateAllPlayerOperations(roomInfo, null, playerId, 5);
         roomInfo.setUpdateTime(new Date());
+        /**计算吃碰杠对应的玩家*/
+        MjCardRule.genOpMap(roomInfo, player, MjOperationEnum.peng);
         redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
         redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 
@@ -588,6 +592,8 @@ public class MjGameService extends BaseGameService {
             MjCardRule.calculateAllPlayerOperations(roomInfo, MjCardRule.getRealMoPai(moPaiAddFlower), playerId, 4);
 
             roomInfo.setUpdateTime(new Date());
+            /**计算吃碰杠对应的玩家*/
+            MjCardRule.genOpMap(roomInfo, player, MjOperationEnum.mingGang);
             redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 
             Map<String, Object> data = new HashMap<String, Object>();

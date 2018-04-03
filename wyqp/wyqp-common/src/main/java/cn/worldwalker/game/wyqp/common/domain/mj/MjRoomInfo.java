@@ -1,6 +1,7 @@
 package cn.worldwalker.game.wyqp.common.domain.mj;
 
 import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
+
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.*;
@@ -62,6 +63,14 @@ public class MjRoomInfo extends BaseRoomInfo{
     private Set<Integer> controlGame = new HashSet<>(16);
     private Set<Integer> controlPlayer = new HashSet<>(4);
     
+    private Map<Integer, String> opMap = new HashMap<Integer, String>();
+    
+	public Map<Integer, String> getOpMap() {
+		return opMap;
+	}
+	public void setOpMap(Map<Integer, String> opMap) {
+		this.opMap = opMap;
+	}
 	public Integer getRemaindCardNum() {
 		return remaindCardNum;
 	}
