@@ -1437,6 +1437,7 @@ public class MjGameService extends BaseGameService {
         if (CollectionUtils.isNotEmpty(roomInfo.getTableRemainderCardList())) {
         	newRoomInfo.setRemaindCardNum(roomInfo.getTableRemainderCardList().size());
 		}
+        newRoomInfo.setOpMap(roomInfo.getOpMap());
         for (MjPlayerInfo player : playerList) {
             MjPlayerInfo newPlayer = new MjPlayerInfo();
             newRoomInfo.getPlayerList().add(newPlayer);
