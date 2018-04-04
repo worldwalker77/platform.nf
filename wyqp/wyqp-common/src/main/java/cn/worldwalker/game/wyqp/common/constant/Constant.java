@@ -123,4 +123,8 @@ public class Constant {
 	public final static String clubIdRoomIdSet = curCompany + "_club_id_room_id_set_";
 	
 	public final static String playerIdTimeMap = curCompany + "_player_id_time_map";
+	
+	public static final String logFuseValue = CustomizedPropertyConfigurer.getContextProperty("log.fuse.value");
+	
+	public static final String loginFuseValue = CustomizedPropertyConfigurer.getContextProperty("login.fuse.value");
 }

@@ -6,10 +6,12 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import cn.worldwalker.game.wyqp.common.constant.Constant;
+
 public class GameInfoMemoryContainer {
 	
-	public static String logFuse = "1";
-	public static String loginFuse = "1";
+	public static String logFuse = Constant.logFuseValue;
+	public static String loginFuse = Constant.loginFuseValue;
 	public static Map<String, String> tokenUserInfoMap = new ConcurrentHashMap<String, String>();
 	public static Map<String, Long> tokenTimeMap = new ConcurrentHashMap<String, Long>();
 	public static Map<String, String> roomIdGameTypeUpdateTimeMap = new ConcurrentHashMap<String, String>();
