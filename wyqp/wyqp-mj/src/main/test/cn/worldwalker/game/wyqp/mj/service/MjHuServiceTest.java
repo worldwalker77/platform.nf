@@ -171,6 +171,16 @@ public class MjHuServiceTest {
         Assert.assertEquals(isGood,false);
         isGood = mjHuService.isGoodCard(Arrays.asList(32,33),31);
         Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(0,3,8,9,12,15,18,27,28,29,30,30,33),24);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(3,8,9,12,15,18,24,27,28,29,30,30,33),0);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(3,8,9,12,15,18,24,27,28,29,30,30,32),33);
+        Assert.assertEquals(isGood,true);
+        isGood = mjHuService.isGoodCard(Arrays.asList(3,8,9,12,15,18,24,27,28,29,30,30,32),30);
+        Assert.assertEquals(isGood,false);
+        isGood = mjHuService.isGoodCard(Arrays.asList(0,3,9,12,15,18,24,27,28,29,30,30,31),8);
+        Assert.assertEquals(isGood,true);
 
     }
 
