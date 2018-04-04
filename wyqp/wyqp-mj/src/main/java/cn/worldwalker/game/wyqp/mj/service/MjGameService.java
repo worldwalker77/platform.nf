@@ -928,6 +928,8 @@ public class MjGameService extends BaseGameService {
                 		/**走上个玩家杠没走完的逻辑*/
                         mingGangAfter(roomInfo);
                         return;
+					}else{
+						curPlayerId = GameUtil.getNextPlayerId(playerList, roomInfo.getLastPlayerId());
 					}
                 } else {/**否则，出牌玩家的下家摸牌*/
                     curPlayerId = GameUtil.getNextPlayerId(playerList, roomInfo.getLastPlayerId());
