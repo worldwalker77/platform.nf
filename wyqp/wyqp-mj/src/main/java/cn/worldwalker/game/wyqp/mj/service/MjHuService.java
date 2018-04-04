@@ -267,7 +267,7 @@ public class MjHuService {
             List<Integer> fengCardList = map.get(MjValueEnum.feng);
             //可以搞烂
             if ( fengCardList != null && new HashSet<>(fengCardList).size() > 4
-                    && cardList.size() == 13 && fengCardList.size() < 8){
+                    && cardList.size() == 13 && fengCardList.size() < 7){
                 if (mjValueEnum.isFeng){
                     if (!fengCardList.contains(card % 9)){
                         return true;
