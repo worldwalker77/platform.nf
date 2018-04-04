@@ -367,13 +367,12 @@ public class MjScoreService {
                 if (!StringUtils.isEmpty(dianGangId)){
                     fangGangPlayer = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), Integer.valueOf(dianGangId));
                 }
-                //如果是摸牌后的明杠
                 if ( fangGangPlayer != null && !player.getPlayerId().equals(fangGangPlayer.getPlayerId())) {
                     player.getGangTypeList().add(GangTypeEnum.MING_GANG.type);
                     assignGangScore(roomInfo,Collections.singletonList(player),roomInfo.getPlayerList(),1);
                     //放杠2分，补1分
                     assignGangScore(roomInfo,Collections.singletonList(player),Collections.singletonList(fangGangPlayer),1);
-                }else{//如果是别人打的牌的明杠
+                }else{
                     player.getGangTypeList().add(GangTypeEnum.ZI_MO_MING_GANG.type);
                     assignGangScore(roomInfo,Collections.singletonList(player),roomInfo.getPlayerList(),1);
                 }

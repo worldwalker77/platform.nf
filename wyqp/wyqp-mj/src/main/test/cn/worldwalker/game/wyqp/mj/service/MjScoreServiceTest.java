@@ -320,6 +320,42 @@ public class MjScoreServiceTest {
         Assert.assertEquals(otherPlayer2.getGangScore(),Integer.valueOf(-4));
     }
 
+
+    @Test
+    public void testGangScoreRoom2() throws Exception {
+        MjRoomInfo mjRoomInfo = new MjRoomInfo();
+        for (int i=0; i<4; i++){
+            MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
+            mjPlayerInfo.setPlayerId(1000 + i);
+            mjRoomInfo.getPlayerList().add(mjPlayerInfo);
+        }
+
+        MjPlayerInfo gangPlayer1 = mjRoomInfo.getPlayerList().get(0);
+        gangPlayer1.setMingGangCardList(Arrays.asList(1,1,1,1));
+        MjPlayerInfo gangPlayer2 = mjRoomInfo.getPlayerList().get(3);
+        gangPlayer2.setMingGangCardList(Arrays.asList(2,2,2,2));
+//        MjPlayerInfo fangGangPlayer = mjRoomInfo.getPlayerList().get(1);
+        mjRoomInfo.setRoomBankerId(gangPlayer1.getPlayerId());
+        mjRoomInfo.getOpMap().put(1, String.valueOf(gangPlayer1.getPlayerId()));
+        mjRoomInfo.getOpMap().put(2, String.valueOf(gangPlayer2.getPlayerId()));
+
+//        MjPlayerInfo otherPlayer1 = mjRoomInfo.getPlayerList().get(2);
+//        MjPlayerInfo otherPlayer2 = mjRoomInfo.getPlayerList().get(3);
+
+        mjRoomInfo.setMaCardList(Arrays.asList(1,4,17,28));
+
+        mjScoreService.calGangScoreRoom(mjRoomInfo);
+
+        for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
+            System.out.println(mjPlayerInfo.getGangScore());
+        }
+
+//        Assert.assertEquals(gangPlayer.getGangScore(),Integer.valueOf(13));
+//        Assert.assertEquals(fangGangPlayer.getGangScore(),Integer.valueOf(-5));
+//        Assert.assertEquals(otherPlayer1.getGangScore(),Integer.valueOf(-4));
+//        Assert.assertEquals(otherPlayer2.getGangScore(),Integer.valueOf(-4));
+    }
+
     @Test
     public void testControlMa() throws Exception{
         MjRoomInfo mjRoomInfo = new MjRoomInfo();
