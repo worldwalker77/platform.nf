@@ -670,8 +670,7 @@ public class MjCardRule {
 		}
 
 		Integer tempCard = null;
-		if (roomInfo.getControlGame().contains(roomInfo.getCurGame())
-				&& roomInfo.getControlPlayer().contains(player.getPlayerId())){
+		if (roomInfo.getControlGame().contains(roomInfo.getCurGame())){
 			Iterator<Integer> it = tableRemainderCardList.iterator();
 
 			//摸牌控制

@@ -262,35 +262,61 @@ public class MjHuService {
     public boolean isGoodCard(List<Integer> cardList, Integer card){
         Map<MjValueEnum, List<Integer>> map = mjCardService.split(cardList);
         MjValueEnum mjValueEnum =  MjValueEnum.getCardEnum(card);
-        if (mjValueEnum != null){
-            List<Integer> cardValueList = map.get(mjValueEnum);
-            if (cardValueList != null){
-                int[] seed = mjCardService.convertToSeed(cardValueList);
-                int val = card % 9;
 
-                if (mjValueEnum.isFeng ){
-                    if (seed[val] > 0) {
+        if (mjValueEnum != null){
+            List<Integer> fengCardList = map.get(MjValueEnum.feng);
+            //可以搞烂
+            if ( fengCardList != null && new HashSet<>(fengCardList).size() > 4
+                    && cardList.size() == 13 && fengCardList.size() < 8){
+                if (mjValueEnum.isFeng){
+                    if (!fengCardList.contains(card % 9)){
                         return true;
-                    } else {
-                        int min = 0, max = 4, cnt = 0;
-                        if (val > 3){
-                            min = 4;
-                            max = 7;
-                        }
-                        for (int i=min; i<max; i++){
-                            if (i!=val && seed[i] > 0){
-                                cnt++;
-                            }
-                        }
-                        if (cnt >= 2){
-                            return true;
-                        }
                     }
                 }else {
-                    if ( seed[val] > 0 || (val > 1 && seed[val-2] > 0 && seed[val-1] > 0 ) ||
-                            (val > 0 && val < 8 && seed[val-1] > 0 && seed[val+1] > 0 ) ||
-                            (val < 7 && seed[val+1] > 0 && seed[val+2] > 0 ) ){
-                        return true;
+                    List<Integer> cardValueList = map.get(mjValueEnum);
+                    if (cardValueList != null) {
+                        int[] seed = mjCardService.convertToSeed(cardValueList);
+                        int val = card % 9;
+                        boolean isLan = true;
+                        for (int i=-2; i<3 && val + i > -1 && val + i < 9; i++){
+                           if (seed[val+i] > 0){
+                               isLan =false;
+                               break;
+                           }
+                        }
+                        if (isLan) return true;
+                    }
+                }
+            } else {
+                List<Integer> cardValueList = map.get(mjValueEnum);
+                if (cardValueList != null) {
+                    int[] seed = mjCardService.convertToSeed(cardValueList);
+                    int val = card % 9;
+
+                    if (mjValueEnum.isFeng) {
+                        if (seed[val] > 0) {
+                            return true;
+                        } else {
+                            int min = 0, max = 4, cnt = 0;
+                            if (val > 3) {
+                                min = 4;
+                                max = 7;
+                            }
+                            for (int i = min; i < max; i++) {
+                                if (i != val && seed[i] > 0) {
+                                    cnt++;
+                                }
+                            }
+                            if (cnt >= 2) {
+                                return true;
+                            }
+                        }
+                    } else {
+                        if (seed[val] > 0 || (val > 1 && seed[val - 2] > 0 && seed[val - 1] > 0) ||
+                                (val > 0 && val < 8 && seed[val - 1] > 0 && seed[val + 1] > 0) ||
+                                (val < 7 && seed[val + 1] > 0 && seed[val + 2] > 0)) {
+                            return true;
+                        }
                     }
                 }
             }

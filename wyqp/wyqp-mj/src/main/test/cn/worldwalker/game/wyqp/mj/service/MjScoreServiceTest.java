@@ -491,7 +491,10 @@ public class MjScoreServiceTest {
 
     @Test
     public void testTemp() throws Exception{
-        System.out.println(new HashSet<>(Arrays.asList(1,1,1,2,2,3,3,3,3)));
+//        System.out.println(new HashSet<>(Arrays.asList(1,1,1,2,2,3,3,3,3)));
+        for (int i=0; i<10 && false; i++){
+            System.out.println(i);
+        }
 
     }
 
