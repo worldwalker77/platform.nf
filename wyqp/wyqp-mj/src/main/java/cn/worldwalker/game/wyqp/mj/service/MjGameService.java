@@ -1,11 +1,36 @@
 package cn.worldwalker.game.wyqp.mj.service;
 
+import io.netty.channel.ChannelHandlerContext;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeMap;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Service;
+
 import cn.worldwalker.game.wyqp.common.constant.Constant;
-import cn.worldwalker.game.wyqp.common.domain.base.*;
+import cn.worldwalker.game.wyqp.common.domain.base.BaseMsg;
+import cn.worldwalker.game.wyqp.common.domain.base.BaseRequest;
+import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
+import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
+import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjMsg;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
-import cn.worldwalker.game.wyqp.common.enums.*;
+import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
+import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
+import cn.worldwalker.game.wyqp.common.enums.OnlineStatusEnum;
+import cn.worldwalker.game.wyqp.common.enums.RoomCardOperationEnum;
+import cn.worldwalker.game.wyqp.common.enums.RoomStatusEnum;
 import cn.worldwalker.game.wyqp.common.exception.BusinessException;
 import cn.worldwalker.game.wyqp.common.exception.ExceptionEnum;
 import cn.worldwalker.game.wyqp.common.result.Result;
@@ -16,14 +41,11 @@ import cn.worldwalker.game.wyqp.common.utils.SnowflakeIdGenerator;
 import cn.worldwalker.game.wyqp.common.utils.log.ThreadPoolMgr;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardResource;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
-import cn.worldwalker.game.wyqp.mj.enums.*;
-import io.netty.channel.ChannelHandlerContext;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
+import cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjPlayerStatusEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjRoomStatusEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjTypeEnum;
 @Service(value="mjGameService")
 public class MjGameService extends BaseGameService {
 
@@ -408,6 +430,8 @@ public class MjGameService extends BaseGameService {
         }
         /**将吃的牌从手牌列表中移动到吃牌列表中*/
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
+        /**计算吃碰杠对应的玩家*/
+        MjCardRule.genOpMap(roomInfo, player, MjOperationEnum.chi);
         List<Integer> chiCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.chi, msg.getChiCards());
         /**计算剩余手牌列表补花情况*/
         String handCardAddFlower = MjCardRule.checkHandCardsAddFlower(roomInfo, player);
@@ -417,8 +441,7 @@ public class MjGameService extends BaseGameService {
         /**计算当前玩家剩余可操作权限*/
         MjCardRule.calculateAllPlayerOperations(roomInfo, null, playerId, 5);
         roomInfo.setUpdateTime(new Date());
-        /**计算吃碰杠对应的玩家*/
-        MjCardRule.genOpMap(roomInfo, player, MjOperationEnum.chi);
+        
         redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
         redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 
@@ -569,6 +592,8 @@ public class MjGameService extends BaseGameService {
             /**记录回放操作日志*/
             addOperationLog(MsgTypeEnum.mingGang.msgType, (MjMsg) request.getMsg(), roomInfo, player, null, null, null);
         } else {/**如果没有其他玩家可以抢杠*/
+        	 /**计算吃碰杠对应的玩家*/
+            MjCardRule.genOpMap(roomInfo, player, MjOperationEnum.mingGang);
         	/**将杠的牌从手牌列表中移动到杠牌列表中*/
         	MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.mingGang, msg.getGangCards());
             /**将玩家当前轮补花数设置为0*/
@@ -589,8 +614,7 @@ public class MjGameService extends BaseGameService {
             MjCardRule.calculateAllPlayerOperations(roomInfo, MjCardRule.getRealMoPai(moPaiAddFlower), playerId, 4);
 
             roomInfo.setUpdateTime(new Date());
-            /**计算吃碰杠对应的玩家*/
-            MjCardRule.genOpMap(roomInfo, player, MjOperationEnum.mingGang);
+           
             redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 
             Map<String, Object> data = new HashMap<String, Object>();
@@ -648,8 +672,11 @@ public class MjGameService extends BaseGameService {
         Integer gangCardIndex = roomInfo.getLastCardIndex();
         List<MjPlayerInfo> playerList = roomInfo.getPlayerList();
         redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
+        
         /**将杠的牌从手牌列表中移动到杠牌列表中*/
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
+        /**计算吃碰杠对应的玩家*/
+        MjCardRule.genOpMap(roomInfo, player, MjOperationEnum.mingGang);
         List<Integer> mingGangCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.mingGang, String.valueOf(gangCardIndex));
         /**将玩家当前轮补花数设置为0*/
         player.setCurAddFlowerNum(0);
@@ -669,8 +696,7 @@ public class MjGameService extends BaseGameService {
         MjCardRule.calculateAllPlayerOperations(roomInfo, MjCardRule.getRealMoPai(moPaiAddFlower), playerId, 4);
 
         roomInfo.setUpdateTime(new Date());
-        /**计算吃碰杠对应的玩家*/
-        MjCardRule.genOpMap(roomInfo, player, MjOperationEnum.mingGang);
+        
         redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -1083,6 +1109,7 @@ public class MjGameService extends BaseGameService {
                 newPlayerList.add(newPlayer);
             }
             data.put("playerList", newPlayerList);
+            data.put("opMap", roomInfo.getOpMap());
             channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
             /**记录回放操作日志*/
             addOperationLog(result.getMsgType(), null, roomInfo, player, null, null, null);
@@ -1163,6 +1190,7 @@ public class MjGameService extends BaseGameService {
                     newPlayerList.add(newPlayer);
                 }
                 data.put("playerList", newPlayerList);
+                data.put("opMap", roomInfo.getOpMap());
                 channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
                 /**记录回放操作日志*/
                 addOperationLog(result.getMsgType(), null, roomInfo, player, null, null, null);

@@ -161,6 +161,8 @@ public class MjCardRule {
 			roomInfo.setIsCurGameHuangZhuang(0);
 		}
 		roomInfo.setCurGameUuid(SnowflakeIdGenerator.idWorker.nextId());
+		roomInfo.getOpMap().clear();
+		roomInfo.setPlayerOperationMap(null);
 	}
 	
 	public static void initMjPlayer(MjPlayerInfo playerInfo){
