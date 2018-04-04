@@ -103,7 +103,7 @@ public class MjScoreService {
         cardList.addAll(mjPlayerInfo.getHandCardList());
         if (huCard != null) cardList.add(huCard);
         if (mjHuService.isShiSanLan(cardList)){
-            Map<MjValueEnum, List<Integer>> map = mjCardService.split(mjPlayerInfo.getHandCardList());
+            Map<MjValueEnum, List<Integer>> map = mjCardService.split(cardList);
             if (map.get(MjValueEnum.feng).size() == 7){
                 typeList.add(MjScoreEnum.QI_XING.type);
             } else {

@@ -1433,6 +1433,7 @@ public class MjGameService extends BaseGameService {
         newRoomInfo.setTotalWinnerId(roomInfo.getTotalWinnerId());
         newRoomInfo.setDetailType(roomInfo.getDetailType());
         newRoomInfo.setMaiMaCount(roomInfo.getMaiMaCount());
+        newRoomInfo.setMaCardList(roomInfo.getMaCardList());
         if (CollectionUtils.isNotEmpty(roomInfo.getTableRemainderCardList())) {
         	newRoomInfo.setRemaindCardNum(roomInfo.getTableRemainderCardList().size());
 		}
