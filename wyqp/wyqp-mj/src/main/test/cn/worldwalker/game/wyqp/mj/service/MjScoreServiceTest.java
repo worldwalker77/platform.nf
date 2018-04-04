@@ -121,7 +121,7 @@ public class MjScoreServiceTest {
 
 
         //一炮2响
-        mjRoomInfo.getPlayerList().get(1).setHuType(MjHuTypeEnum.qiangGang.type);
+        mjRoomInfo.getPlayerList().get(1).setHuType(MjHuTypeEnum.zhuaChong.type);
         mjRoomInfo.getPlayerList().get(1).setIsHu(1);
         mjRoomInfo.getPlayerList().get(1).setMjCardTypeList(Collections.singletonList(MjScoreEnum.PENG_PENG_HU.type));
         mjScoreService.calScoreRoom(mjRoomInfo);
@@ -274,7 +274,7 @@ public class MjScoreServiceTest {
         MjPlayerInfo bankerPlayer = MjCardRule.getBankerPlayer(mjRoomInfo);
         mjRoomInfo.setMaCardList(Arrays.asList(4-1));
 
-        mjScoreService.calGangScore(mjRoomInfo, gangPlayer,  MjOperationEnum.anGang);
+        mjScoreService.calGangScore(mjRoomInfo, gangPlayer,  MjOperationEnum.anGang,0);
 
         for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
             System.out.println("id:" + mjPlayerInfo.getPlayerId() +
@@ -287,6 +287,105 @@ public class MjScoreServiceTest {
 
     }
 
+    @Test
+    public void tetCalGangScoreRoom() throws Exception{
+        MjRoomInfo mjRoomInfo = new MjRoomInfo();
+        for (int i=0; i<4; i++){
+            MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
+            mjPlayerInfo.setPlayerId(1000 + i);
+            mjRoomInfo.getPlayerList().add(mjPlayerInfo);
+        }
+
+        MjPlayerInfo gangPlayer = mjRoomInfo.getPlayerList().get(0);
+        gangPlayer.setMingGangCardList(Arrays.asList(1,1,1,1,2,2,2,2));
+        gangPlayer.setAnGangCardList(Arrays.asList(0,0,0,0));
+        gangPlayer.setHandCardList(Arrays.asList(1,2,3,4));
+        MjPlayerInfo fangGangPlayer = mjRoomInfo.getPlayerList().get(1);
+        mjRoomInfo.getOpMap().put(1, String.valueOf(fangGangPlayer.getPlayerId()));
+        mjRoomInfo.getOpMap().put(2, String.valueOf(gangPlayer.getPlayerId()));
+
+        MjPlayerInfo otherPlayer1 = mjRoomInfo.getPlayerList().get(2);
+        MjPlayerInfo otherPlayer2 = mjRoomInfo.getPlayerList().get(3);
+
+
+        mjScoreService.calGangScoreRoom(mjRoomInfo);
+
+        for (MjPlayerInfo mjPlayerInfo : mjRoomInfo.getPlayerList()){
+            System.out.println(mjPlayerInfo.getGangScore());
+        }
+
+        Assert.assertEquals(gangPlayer.getGangScore(),Integer.valueOf(13));
+        Assert.assertEquals(fangGangPlayer.getGangScore(),Integer.valueOf(-5));
+        Assert.assertEquals(otherPlayer1.getGangScore(),Integer.valueOf(-4));
+        Assert.assertEquals(otherPlayer2.getGangScore(),Integer.valueOf(-4));
+    }
+
+    @Test
+    public void testControlMa() throws Exception{
+        MjRoomInfo mjRoomInfo = new MjRoomInfo();
+        for (int i=0; i<4; i++){
+            MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
+            mjPlayerInfo.setPlayerId(1000 + i);
+            mjRoomInfo.getPlayerList().add(mjPlayerInfo);
+        }
+        MjPlayerInfo bankPlayer = mjRoomInfo.getPlayerList().get(0);
+        mjRoomInfo.setRoomBankerId(bankPlayer.getPlayerId());
+        mjRoomInfo.getControlPlayer().add(bankPlayer.getPlayerId());
+
+        MjPlayerInfo huPlayer = mjRoomInfo.getPlayerList().get(0);
+        huPlayer.setIsHu(1);
+        int val = mjScoreService.getWinPos(mjRoomInfo);
+        Assert.assertEquals(val,1);
+        huPlayer.setIsHu(0);
+
+        huPlayer = mjRoomInfo.getPlayerList().get(1);
+        huPlayer.setIsHu(1);
+        val = mjScoreService.getWinPos(mjRoomInfo);
+        Assert.assertEquals(val,2);
+        huPlayer.setIsHu(0);
+
+        huPlayer = mjRoomInfo.getPlayerList().get(2);
+        huPlayer.setIsHu(1);
+        val = mjScoreService.getWinPos(mjRoomInfo);
+        Assert.assertEquals(val,3);
+        huPlayer.setIsHu(0);
+
+        huPlayer = mjRoomInfo.getPlayerList().get(3);
+        huPlayer.setIsHu(1);
+        val = mjScoreService.getWinPos(mjRoomInfo);
+        Assert.assertEquals(val,4);
+    }
+
+
+    @Test
+    public void testGenerateMaCard() throws Exception{
+        MjRoomInfo mjRoomInfo = new MjRoomInfo();
+        for (int i=0; i<4; i++){
+            MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
+            mjPlayerInfo.setPlayerId(1000 + i);
+            mjRoomInfo.getPlayerList().add(mjPlayerInfo);
+        }
+        mjRoomInfo.setMaiMaCount(2);
+        MjPlayerInfo bankPlayer = mjRoomInfo.getPlayerList().get(0);
+        mjRoomInfo.setRoomBankerId(bankPlayer.getPlayerId());
+        mjRoomInfo.getControlPlayer().add(bankPlayer.getPlayerId());
+        MjPlayerInfo huPlayer = mjRoomInfo.getPlayerList().get(0);
+        huPlayer.setIsHu(1);
+
+
+        mjRoomInfo.setTableRemainderCardList(Arrays.asList(8,10,10,28,29,29,29));
+        mjScoreService.generateMaCard(mjRoomInfo);
+        System.out.println(mjRoomInfo.getMaCardList());
+        Assert.assertTrue(mjRoomInfo.getMaCardList().contains(8));
+        Assert.assertEquals(mjRoomInfo.getMaCardList().size(), 2);
+
+        mjRoomInfo.setTableRemainderCardList(Arrays.asList(10,28,28,31));
+        mjScoreService.generateMaCard(mjRoomInfo);
+        System.out.println(mjRoomInfo.getMaCardList());
+        Assert.assertTrue(mjRoomInfo.getMaCardList().contains(31));
+        Assert.assertEquals(mjRoomInfo.getMaCardList().size(), 2);
+
+    }
 
     @Test
     public void testGetMaPlayerList() throws Exception{
@@ -368,12 +467,12 @@ public class MjScoreServiceTest {
     @Test
     public void testCalHuPlayer() throws Exception {
         MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
-        mjPlayerInfo.setHandCardList(Arrays.asList(23,23,23,17,17,17,18,18,18,19));
+        mjPlayerInfo.setHandCardList(Arrays.asList(3,6,9,17,18,21,24,27,29,30,31,32,33));
         mjPlayerInfo.setChiCardList(Collections.<Integer>emptyList());
-        mjPlayerInfo.setPengCardList(Arrays.asList(13,13,13));
+        mjPlayerInfo.setPengCardList(Collections.<Integer>emptyList());
         mjPlayerInfo.setAnGangCardList(Collections.<Integer>emptyList());
         mjPlayerInfo.setMingGangCardList(Collections.<Integer>emptyList());
-        List<Integer> typeList = mjScoreService.calHuPlayer(mjPlayerInfo,19);
+        List<Integer> typeList = mjScoreService.calHuPlayer(mjPlayerInfo,28);
         System.out.println(typeList);
     }
 
@@ -389,4 +488,11 @@ public class MjScoreServiceTest {
         mjRoomInfo.setRoomBankerId(1001);
         mjRoomInfo.setMaCardList(Arrays.asList(3,3,3));
     }
+
+    @Test
+    public void testTemp() throws Exception{
+        System.out.println(new HashSet<>(Arrays.asList(1,1,1,2,2,3,3,3,3)));
+
+    }
+
 }

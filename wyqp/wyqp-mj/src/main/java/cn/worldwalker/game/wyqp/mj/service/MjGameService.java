@@ -546,11 +546,7 @@ public class MjGameService extends BaseGameService {
         /**将杠的牌从手牌列表中移动到杠牌列表中*/
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
         List<Integer> mingGangCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.mingGang, msg.getGangCards());
-        //南丰,计算杠分
-        if (MjCardRule.isJxNf(roomInfo)) {
-            mjScoreService.calGangScore(roomInfo, player, MjOperationEnum.mingGang);
-        }
-        
+
         /**计算其玩家是否可以抢杠*/
         MjCardRule.calculateAllPlayerOperations(roomInfo, Integer.valueOf(msg.getGangCards()), playerId, 3);
         Integer curPlayerId = MjCardRule.getPlayerHighestPriorityPlayerId(roomInfo);
@@ -654,10 +650,7 @@ public class MjGameService extends BaseGameService {
         /**将杠的牌从手牌列表中移动到杠牌列表中*/
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
         List<Integer> mingGangCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.mingGang, String.valueOf(gangCardIndex));
-        //南丰,计算杠分
-        if (MjCardRule.isJxNf(roomInfo)) {
-            mjScoreService.calGangScore(roomInfo, player, MjOperationEnum.mingGang);
-        }
+
         /**如果没有其他玩家可以抢杠*/
         /**将玩家当前轮补花数设置为0*/
         player.setCurAddFlowerNum(0);
@@ -758,11 +751,6 @@ public class MjGameService extends BaseGameService {
             player.setCurMoPaiCardIndex(null);
         }
         List<Integer> anGangCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.anGang, msg.getGangCards());
-        
-        //南丰麻将，算杠分
-        if (MjCardRule.isJxNf(roomInfo)) {
-            mjScoreService.calGangScore(roomInfo, player, MjOperationEnum.anGang);
-        }
 
         /**将玩家当前轮补花数设置为0*/
         player.setCurAddFlowerNum(0);
@@ -1323,13 +1311,17 @@ public class MjGameService extends BaseGameService {
      * @param roomInfo
      */
     private void calculateScore(MjRoomInfo roomInfo) {
-//		log.info("第" + roomInfo.getCurGame() + "局结算前roomInfo:" + JsonUtil.toJson(roomInfo));
-        //如果当前局没有荒
+        //分配马牌
+        mjScoreService.generateMaCard(roomInfo);
+        //胡分
         if (roomInfo.getIsCurGameHuangZhuang() == 0) {
             mjScoreService.calHuRoom(roomInfo);
             mjScoreService.calScoreRoom(roomInfo);
         }
-
+        //杠分
+        if (MjCardRule.isJxNf(roomInfo)){
+            mjScoreService.calGangScoreRoom(roomInfo);
+        }
         //南丰，黄了，杠分,马分也要去算总赢家
         mjScoreService.calTotalWin(roomInfo);
 

@@ -5,6 +5,7 @@ import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
 import cn.worldwalker.game.wyqp.mj.enums.*;
 import org.apache.log4j.Logger;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -341,22 +342,40 @@ public class MjScoreService {
         }
     }
 
+
+    public void calGangScoreRoom(MjRoomInfo roomInfo){
+        for (MjPlayerInfo mjPlayerInfo : roomInfo.getPlayerList()){
+            Set<Integer> mingGangSet= new HashSet<>(mjPlayerInfo.getMingGangCardList());
+            for (Integer card: mingGangSet){
+                calGangScore(roomInfo, mjPlayerInfo, MjOperationEnum.mingGang,card);
+            }
+            Set<Integer> anGangSet = new HashSet<>(mjPlayerInfo.getAnGangCardList());
+            for (Integer card: anGangSet){
+                calGangScore(roomInfo, mjPlayerInfo, MjOperationEnum.anGang, card);
+            }
+        }
+    }
+
     /*
     计算杠的分数
      */
-    public void calGangScore(MjRoomInfo roomInfo, MjPlayerInfo player, MjOperationEnum operationType){
+    public void calGangScore(MjRoomInfo roomInfo, MjPlayerInfo player, MjOperationEnum operationType, Integer gangCard){
         switch (operationType) {
             case mingGang:
+                String dianGangId = roomInfo.getOpMap().get(gangCard);
+                MjPlayerInfo fangGangPlayer = null;
+                if (!StringUtils.isEmpty(dianGangId)){
+                    fangGangPlayer = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), Integer.valueOf(dianGangId));
+                }
                 //如果是摸牌后的明杠
-                if (MjCardRule.isHandCard3n2(player)) {
-                    player.getGangTypeList().add(GangTypeEnum.ZI_MO_MING_GANG.type);
-                    assignGangScore(roomInfo,Collections.singletonList(player),roomInfo.getPlayerList(),1);
-                }else{//如果是别人打的牌的明杠
+                if ( fangGangPlayer != null && !player.getPlayerId().equals(fangGangPlayer.getPlayerId())) {
                     player.getGangTypeList().add(GangTypeEnum.MING_GANG.type);
-                    MjPlayerInfo lastPlayer = MjCardRule.getLastPlayer(roomInfo);
                     assignGangScore(roomInfo,Collections.singletonList(player),roomInfo.getPlayerList(),1);
                     //放杠2分，补1分
-                    assignGangScore(roomInfo,Collections.singletonList(player),Collections.singletonList(lastPlayer),1);
+                    assignGangScore(roomInfo,Collections.singletonList(player),Collections.singletonList(fangGangPlayer),1);
+                }else{//如果是别人打的牌的明杠
+                    player.getGangTypeList().add(GangTypeEnum.ZI_MO_MING_GANG.type);
+                    assignGangScore(roomInfo,Collections.singletonList(player),roomInfo.getPlayerList(),1);
                 }
                 player.setMinGangCount(player.getMinGangCount() + 1);
                 break;
@@ -369,6 +388,7 @@ public class MjScoreService {
                 break;
         }
     }
+
 
 
     /**
@@ -400,6 +420,54 @@ public class MjScoreService {
         }
     }
 
+    public int getWinPos(MjRoomInfo mjRoomInfo){
+        if (mjRoomInfo.getControlPlayer().contains(mjRoomInfo.getRoomBankerId())){
+            int bankerPos = -1, huPos = -1;
+            for (int i=0; i<mjRoomInfo.getPlayerList().size(); i++){
+                MjPlayerInfo mjPlayerInfo = mjRoomInfo.getPlayerList().get(i);
+                if (mjPlayerInfo.getPlayerId().equals(mjRoomInfo.getRoomBankerId())) {
+                    bankerPos = i;
+                }
+                if (Integer.valueOf(1).equals(mjPlayerInfo.getIsHu() )){
+                    huPos = i;
+                }
+            }
+            if (bankerPos != -1 && huPos != -1){
+                int val = (huPos - bankerPos + 5) % 4;
+                return val == 0 ? 4 : val;
+            }
+        }
+        return -1;
+    }
+
+    public void generateMaCard(MjRoomInfo roomInfo){
+        List<Integer> remainCardList = new ArrayList<>(128);
+        remainCardList.addAll(roomInfo.getTableRemainderCardList());
+        Collections.shuffle(remainCardList);
+        roomInfo.getMaCardList().clear();
+        //找到赢家相对位置
+        int winPos = getWinPos(roomInfo);
+        //发一半的赢马
+        int winMaCnt = 0;
+        if (winPos > 0){
+            Iterator<Integer> it = remainCardList.iterator();
+            while (it.hasNext() && winMaCnt < roomInfo.getMaiMaCount() / 2){
+                int card = it.next();
+                int cardValue = (card + 1) % 9 == 0 ? 9 : (card + 1) % 9;
+                int position = cardValue % 4 == 0 ? 4 : cardValue % 4;
+                if (position == winPos){
+                    winMaCnt = winMaCnt + 1;
+                    roomInfo.getMaCardList().add(card);
+                    it.remove();
+                }
+            }
+        }
+        //发剩下的马
+        for (int i=0; i<roomInfo.getMaiMaCount()-winMaCnt; i++){
+            roomInfo.getMaCardList().add(remainCardList.get(remainCardList.size()-i-1));
+        }
+        Collections.sort(roomInfo.getMaCardList());
+    }
 
     /**
      * 获取中马的玩家
@@ -418,6 +486,5 @@ public class MjScoreService {
         }
         return maPlayerList;
     }
-
 
 }
