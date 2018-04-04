@@ -1600,6 +1600,7 @@ public class MjGameService extends BaseGameService {
                     newPlayer.setHuScore(player.getHuScore());
                     newPlayer.setMultiple(player.getMultiple());
                     newPlayer.setButtomAndFlowerScore(player.getButtomAndFlowerScore());
+                    newPlayer.setCurMoPaiCardIndex(player.getCurMoPaiCardIndex());
                     break;
                 case totalGameOver:
                     newPlayer.setHandCardList(player.getHandCardList());
@@ -1619,6 +1620,7 @@ public class MjGameService extends BaseGameService {
                     newPlayer.setZhuaChongCount(player.getZhuaChongCount());
                     newPlayer.setMinGangCount(player.getMinGangCount());
                     newPlayer.setAnGangCount(player.getAnGangCount());
+                    newPlayer.setCurMoPaiCardIndex(player.getCurMoPaiCardIndex());
                     break;
                 default:
                     break;
