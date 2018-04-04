@@ -263,7 +263,12 @@ public class MjCardRule {
 			List<Integer> mingGangCardList = player.getMingGangCardList();
 			/**如果是摸牌后的明杠*/
 			if (isHandCard3n2(player)) {
-				handCardList.remove(mingGangCardIndex);
+				/**如果是摸的牌杠*/
+				if (mingGangCardIndex.equals(player.getCurMoPaiCardIndex())) {
+					player.setCurMoPaiCardIndex(null);
+				}else{/**如果是手牌里面的牌和碰的牌组成杠*/
+					handCardList.remove(mingGangCardIndex);
+				}
 				player.getPengCardList().remove(mingGangCardIndex);
 				player.getPengCardList().remove(mingGangCardIndex);
 				player.getPengCardList().remove(mingGangCardIndex);

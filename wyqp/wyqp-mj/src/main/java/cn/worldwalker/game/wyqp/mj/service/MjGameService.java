@@ -543,10 +543,9 @@ public class MjGameService extends BaseGameService {
             throw new BusinessException(ExceptionEnum.NO_AUTHORITY);
         }
         redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
-        /**将杠的牌从手牌列表中移动到杠牌列表中*/
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
-        List<Integer> mingGangCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.mingGang, msg.getGangCards());
-
+        Integer gangCardIndex = Integer.valueOf(msg.getGangCards());
+        List<Integer> mingGangCardList = Arrays.asList(gangCardIndex, gangCardIndex, gangCardIndex, gangCardIndex);
         /**计算其玩家是否可以抢杠*/
         MjCardRule.calculateAllPlayerOperations(roomInfo, Integer.valueOf(msg.getGangCards()), playerId, 3);
         Integer curPlayerId = MjCardRule.getPlayerHighestPriorityPlayerId(roomInfo);
@@ -560,7 +559,7 @@ public class MjGameService extends BaseGameService {
             /**给抢杠玩家以外的玩家返回杠玩家的信息及获取操作权限的玩家*/
             data.put("curPlayerId", curPlayerId);
             data.put("playerId", playerId);
-            data.put("cardIndex", mingGangCardList.get(0));
+            data.put("cardIndex", gangCardIndex);
             data.put("mingGangCardList", mingGangCardList);
             result.setMsgType(MsgTypeEnum.mingGang.msgType);
             channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArrWithOutSelf(playerList, curPlayerId));
@@ -570,6 +569,8 @@ public class MjGameService extends BaseGameService {
             /**记录回放操作日志*/
             addOperationLog(MsgTypeEnum.mingGang.msgType, (MjMsg) request.getMsg(), roomInfo, player, null, null, null);
         } else {/**如果没有其他玩家可以抢杠*/
+        	/**将杠的牌从手牌列表中移动到杠牌列表中*/
+        	MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.mingGang, msg.getGangCards());
             /**将玩家当前轮补花数设置为0*/
             player.setCurAddFlowerNum(0);
             String moPaiAddFlower = null;
@@ -650,8 +651,6 @@ public class MjGameService extends BaseGameService {
         /**将杠的牌从手牌列表中移动到杠牌列表中*/
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
         List<Integer> mingGangCardList = MjCardRule.moveOperationCards(roomInfo, player, MjOperationEnum.mingGang, String.valueOf(gangCardIndex));
-
-        /**如果没有其他玩家可以抢杠*/
         /**将玩家当前轮补花数设置为0*/
         player.setCurAddFlowerNum(0);
         String moPaiAddFlower = null;
@@ -896,7 +895,9 @@ public class MjGameService extends BaseGameService {
                 String huStr = delOperation.get(MjOperationEnum.hu.type);
                 /**如果pass的是抢杠，则需要给当时杠的玩家返回摸牌*/
                 if (StringUtils.isNotBlank(huStr) && huStr.startsWith("3")) {
-                    curPlayerId = roomInfo.getLastPlayerId();
+                	/**走上个玩家杠没走完的逻辑*/
+                    mingGangAfter(roomInfo);
+                    return;
                 } else {/**否则，出牌玩家的下家摸牌*/
                     curPlayerId = GameUtil.getNextPlayerId(playerList, roomInfo.getLastPlayerId());
                 }
