@@ -1,36 +1,11 @@
 package cn.worldwalker.game.wyqp.mj.service;
 
-import io.netty.channel.ChannelHandlerContext;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Service;
-
 import cn.worldwalker.game.wyqp.common.constant.Constant;
-import cn.worldwalker.game.wyqp.common.domain.base.BaseMsg;
-import cn.worldwalker.game.wyqp.common.domain.base.BaseRequest;
-import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
-import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
-import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
+import cn.worldwalker.game.wyqp.common.domain.base.*;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjMsg;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
-import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
-import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
-import cn.worldwalker.game.wyqp.common.enums.OnlineStatusEnum;
-import cn.worldwalker.game.wyqp.common.enums.RoomCardOperationEnum;
-import cn.worldwalker.game.wyqp.common.enums.RoomStatusEnum;
+import cn.worldwalker.game.wyqp.common.enums.*;
 import cn.worldwalker.game.wyqp.common.exception.BusinessException;
 import cn.worldwalker.game.wyqp.common.exception.ExceptionEnum;
 import cn.worldwalker.game.wyqp.common.result.Result;
@@ -41,11 +16,13 @@ import cn.worldwalker.game.wyqp.common.utils.SnowflakeIdGenerator;
 import cn.worldwalker.game.wyqp.common.utils.log.ThreadPoolMgr;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardResource;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
-import cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjPlayerStatusEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjRoomStatusEnum;
-import cn.worldwalker.game.wyqp.mj.enums.MjTypeEnum;
+import cn.worldwalker.game.wyqp.mj.enums.*;
+import io.netty.channel.ChannelHandlerContext;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 @Service(value="mjGameService")
 public class MjGameService extends BaseGameService {
 
@@ -138,8 +115,6 @@ public class MjGameService extends BaseGameService {
             /**初始化桌牌*/
             roomInfo.setTableRemainderCardList(tableRemainderCardList);
 
-
-//            playerList.get(0).setWinProbability(50);
             //输赢控制数据初始化
             if (roomInfo.getCurGame().equals(0)){
                 calculateControl(roomInfo);

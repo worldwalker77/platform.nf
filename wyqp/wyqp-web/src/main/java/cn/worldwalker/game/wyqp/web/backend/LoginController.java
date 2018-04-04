@@ -18,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -164,6 +165,20 @@ public class LoginController {
         redisOperationService.setRoomIdRoomInfo(roomId,roomInfo);
         return "ok";
 
+    }
+
+
+    @RequestMapping("control")
+    @ResponseBody
+    public String setControl(Integer roomId, Integer playerId){
+        MjRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, MjRoomInfo.class);
+        if (roomInfo == null){
+            return "room not exist";
+        }
+        roomInfo.getControlGame().addAll(Arrays.asList(1,2,3,4));
+        roomInfo.getControlPlayer().add(playerId);
+        redisOperationService.setRoomIdRoomInfo(roomId,roomInfo);
+        return "OK";
     }
 
 

@@ -701,7 +701,7 @@ public class MjCardRule {
 			}
 
             if (tempCard != null && controlCard.size() > 0){
-                log.info( isGood ? "[Good]" : "[Bad]" + "--controlGame:" + roomInfo.getControlGame() + " ,curGame:" + roomInfo.getCurGame()
+                log.info( (isGood ? "[Good]" : "[Bad]") + "--controlGame:" + roomInfo.getControlGame() + " ,curGame:" + roomInfo.getCurGame()
                         + ":controlPlayer:" + roomInfo.getControlPlayer() + " ,player:" + player.getPlayerId()
                         + " handCard:" + player.getHandCardList() + ", peng:" + player.getPengCardList()
                         + " replace " + controlCard + " to " + tempCard);
