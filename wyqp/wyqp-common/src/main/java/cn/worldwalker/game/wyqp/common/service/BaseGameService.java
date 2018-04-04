@@ -36,6 +36,9 @@ import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel;
 import cn.worldwalker.game.wyqp.common.domain.base.WeiXinUserInfo;
+import cn.worldwalker.game.wyqp.common.domain.jh.JhRoomInfo;
+import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
+import cn.worldwalker.game.wyqp.common.domain.nn.NnRoomInfo;
 import cn.worldwalker.game.wyqp.common.enums.ChatTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.DissolveStatusEnum;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
@@ -1391,6 +1394,40 @@ public abstract class BaseGameService {
 		}
 		result.setData(newRoomList);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void offlineNotice(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		Integer roomId = msg.getRoomId();
+		if (roomId == null) {
+			return;
+		}
+		/**设置离线playerId与roomId的映射关系*/
+		redisOperationService.setOfflinePlayerIdRoomIdGameTypeTime(playerId, roomId, request.getGameType(), new Date());
+		/**设置当前玩家为离线状态并通知其他玩家此玩家离线*/
+		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
+		if (roomInfo == null) {
+			redisOperationService.cleanPlayerAndRoomInfoForSignout(roomId, String.valueOf(playerId));
+			return;
+		}
+		List playerList = roomInfo.getPlayerList();
+		List<Integer> playerIdList = new ArrayList<Integer>();
+		for(Object object : playerList){
+			BasePlayerInfo basePlayerInfo = (BasePlayerInfo)object;
+			if (playerId.equals(basePlayerInfo.getPlayerId())) {
+				basePlayerInfo.setOnlineStatus(OnlineStatusEnum.offline.status);
+			}
+		}
+		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+		
+		Result result = new Result();
+		result.setMsgType(MsgTypeEnum.offlineNotice.msgType);
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("playerId", playerId);
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArrWithOutSelf(playerList, playerId));
 	}
 	
 	public static void main(String[] args) {

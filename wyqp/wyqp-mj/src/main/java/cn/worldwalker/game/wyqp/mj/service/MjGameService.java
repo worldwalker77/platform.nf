@@ -893,11 +893,16 @@ public class MjGameService extends BaseGameService {
             /**如果剩余玩家都没有操作权限了，则下家摸牌*/
             if (curPlayerId == null) {
                 String huStr = delOperation.get(MjOperationEnum.hu.type);
-                /**如果pass的是抢杠，则需要给当时杠的玩家返回摸牌*/
-                if (StringUtils.isNotBlank(huStr) && huStr.startsWith("3")) {
-                	/**走上个玩家杠没走完的逻辑*/
-                    mingGangAfter(roomInfo);
-                    return;
+                /**如果放弃的是胡*/
+                if (StringUtils.isNotBlank(huStr)) {
+                	/**放弃胡，则一圈内此玩家不能胡牌*/
+                	player.setCheckHuflag(false);
+                	/**如果pass的胡是抢杠，则需要让杠的玩家走完剩余流程*/
+                	if (huStr.startsWith("3")) {
+                		/**走上个玩家杠没走完的逻辑*/
+                        mingGangAfter(roomInfo);
+                        return;
+					}
                 } else {/**否则，出牌玩家的下家摸牌*/
                     curPlayerId = GameUtil.getNextPlayerId(playerList, roomInfo.getLastPlayerId());
                 }
