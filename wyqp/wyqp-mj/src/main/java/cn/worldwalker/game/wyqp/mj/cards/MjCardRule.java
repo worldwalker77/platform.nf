@@ -230,8 +230,12 @@ public class MjCardRule {
 		List<Integer> operationList = new  ArrayList<Integer>();
 		String[] strArr = operationStr.split(",");
 		int len = strArr.length;
-		MjPlayerInfo lastPlayer = getPlayerInfoByPlayerId(roomInfo.getPlayerList(), roomInfo.getLastPlayerId());
-		List<Integer> lastPlayerDiscardCardList = lastPlayer.getDiscardCardList();
+		MjPlayerInfo lastPlayer = null;
+		List<Integer> lastPlayerDiscardCardList = null;
+		if (roomInfo.getLastPlayerId() != null) {
+			lastPlayer = getPlayerInfoByPlayerId(roomInfo.getPlayerList(), roomInfo.getLastPlayerId());
+			lastPlayerDiscardCardList = lastPlayer.getDiscardCardList();
+		}
 		List<Integer> handCardList = player.getHandCardList();
 		switch (operationType) {
 		case chi:
