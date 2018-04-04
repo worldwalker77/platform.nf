@@ -76,6 +76,9 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			case getClubRooms:
 				commonGameService.getClubRooms(ctx, request, userInfo);
 				break;
+			case offlineNotice:
+				commonGameService.offlineNotice(ctx, request, userInfo);
+				break;
 			default:
 				break;
 			}

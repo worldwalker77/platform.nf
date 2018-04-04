@@ -189,6 +189,7 @@ public class MjCardRule {
 		/**设置每个玩家的解散房间状态为不同意解散，后面大结算返回大厅的时候回根据此状态判断是否解散房间*/
 		playerInfo.setDissolveStatus(DissolveStatusEnum.mid.status);
 		playerInfo.setStatus(MjPlayerStatusEnum.notReady.status);
+		playerInfo.setCheckHuflag(true);
 	}
 	/**
 	 * 摇色子
@@ -660,6 +661,8 @@ public class MjCardRule {
 	 * @return
 	 */
 	public static String checkMoPaiAddFlower(MjRoomInfo roomInfo,  MjPlayerInfo player){
+		/**把是否可以胡牌标记设置为true*/
+		player.setCheckHuflag(true);
 		List<Integer> tableRemainderCardList = roomInfo.getTableRemainderCardList();
 		/**如果桌牌数为0，则结束*/
 		if (tableRemainderCardList.size() <= roomInfo.getMaiMaCount()) {
@@ -1257,6 +1260,10 @@ public class MjCardRule {
 		}
 
 		if (isJxNf(roomInfo)){
+			/**可胡牌标志为false，则不能胡牌*/
+			if (!player.getCheckHuflag()) {
+				return false;
+			}
             List<Integer> allCardList = new ArrayList<>(16);
             allCardList.addAll(handCardList);
 		    if (cardIndex != null){

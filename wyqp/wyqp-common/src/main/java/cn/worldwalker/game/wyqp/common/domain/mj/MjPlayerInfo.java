@@ -62,7 +62,15 @@ public class MjPlayerInfo extends BasePlayerInfo{
     private Integer maScore = 0;
     //胡分
     private Integer huScore = 0;
+    /**是否可以胡的标记*/
+    private boolean checkHuflag = true;
 
+	public boolean getCheckHuflag() {
+		return checkHuflag;
+	}
+	public void setCheckHuflag(boolean checkHuflag) {
+		this.checkHuflag = checkHuflag;
+	}
 	public Integer getFeiCangYingCardIndex() {
 		return feiCangYingCardIndex;
 	}
