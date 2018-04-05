@@ -1737,6 +1737,10 @@ public class MjGameService extends BaseGameService {
                         newPlayer.put("buttomAndFlowerScore", player.getButtomAndFlowerScore());
                         newPlayer.put("multiple", player.getMultiple());
                         newPlayer.put("totalScore", player.getTotalScore());
+                        newPlayer.put("gangTypeList",player.getGangTypeList());
+                        newPlayer.put("gangScore",player.getGangScore());
+                        newPlayer.put("maScore",player.getMaScore());
+                        newPlayer.put("huScore",player.getHuScore());
                         csPlayerList.add(newPlayer);
                     }
                     break;
@@ -1766,6 +1770,12 @@ public class MjGameService extends BaseGameService {
                         newPlayer.put("zhuaChongCount", player.getZhuaChongCount());
                         newPlayer.put("dianPaoCount", player.getDianPaoCount());
                         newPlayer.put("totalScore", player.getTotalScore());
+                        newPlayer.put("gangTypeList",player.getGangTypeList());
+                        newPlayer.put("huScore",player.getHuScore());
+                        newPlayer.put("maScore",player.getMaScore());
+                        newPlayer.put("gangScore",player.getGangScore());
+                        newPlayer.put("mingGangCount",player.getMinGangCount());
+                        newPlayer.put("anGangCount",player.getAnGangCount());
                         newPlayerList.add(newPlayer);
                     }
                     break;
