@@ -503,12 +503,20 @@ public class MjScoreServiceTest {
     @Test
     public void testCalHuPlayer() throws Exception {
         MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
-        mjPlayerInfo.setHandCardList(Arrays.asList(3,6,9,17,18,21,24,27,29,30,31,32,33));
+        mjPlayerInfo.setHandCardList(Arrays.asList(9,10,11,14,15,16,16));
         mjPlayerInfo.setChiCardList(Collections.<Integer>emptyList());
-        mjPlayerInfo.setPengCardList(Collections.<Integer>emptyList());
+        mjPlayerInfo.setPengCardList(Arrays.asList(13,13,13,17,17,17));
         mjPlayerInfo.setAnGangCardList(Collections.<Integer>emptyList());
         mjPlayerInfo.setMingGangCardList(Collections.<Integer>emptyList());
-        List<Integer> typeList = mjScoreService.calHuPlayer(mjPlayerInfo,28);
+        List<Integer> allCardList = new ArrayList<>(16);
+        allCardList.addAll(mjPlayerInfo.getHandCardList());
+        allCardList.addAll(mjPlayerInfo.getPengCardList());
+        allCardList.addAll(mjPlayerInfo.getMingGangCardList());
+        allCardList.addAll(mjPlayerInfo.getAnGangCardList());
+        allCardList.add(16);
+        boolean isHu = MjHuService.getInstance().isHu(allCardList);
+        System.out.println(isHu);
+        List<Integer> typeList = mjScoreService.calHuPlayer(mjPlayerInfo,16);
         System.out.println(typeList);
     }
 

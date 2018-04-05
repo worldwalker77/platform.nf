@@ -490,6 +490,11 @@ public class MjCardRule {
 				}
 			}
 		}else if(type == 3){/**判断是否可以抢杠*/
+
+		//自摸明杠才能抢杠
+            if (MjCardRule.isJxNf(roomInfo) && !MjCardRule.isHandCard3n2(curPlayer)){
+                return operations;
+            }
 			if (MjTypeEnum.shangHaiBaiDa.type.equals(roomInfo.getDetailType())) {
 				/**如果无百搭不能抢杠，则直接返回*/
 				if (roomInfo.getNoBaiDaCanQiangGang() < 1) {
@@ -1276,7 +1281,7 @@ public class MjCardRule {
 		        allCardList.add(cardIndex);
             }
             isHu = MjHuService.getInstance().isHu(allCardList);
-		    if (MjTypeEnum.jiangxiLiChuan.type.equals(roomInfo.getDetailType())){
+		    if (isHu && MjTypeEnum.jiangxiLiChuan.type.equals(roomInfo.getDetailType())){
 		        List<Integer> typeList = MjScoreService.getInstance().calHuPlayer(player,cardIndex);
 		        //黎川不要平胡和十三烂哦
 		        if (typeList != null && typeList.size() == 1 && type == 2 &&
