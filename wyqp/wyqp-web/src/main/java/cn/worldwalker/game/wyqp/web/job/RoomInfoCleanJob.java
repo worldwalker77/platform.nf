@@ -35,7 +35,7 @@ public class RoomInfoCleanJob /**extends SingleServerJobByRedis*/ {
 		/**如果微信开关打开,通过删除房间标志位进行房间删除*/
 			List<RedisRelaModel> list = redisOperationService.getAllDissolveIpRoomIdTime();
 			for(RedisRelaModel model : list){
-				if (System.currentTimeMillis() - model.getUpdateTime() > 6*60*1000) {
+				if (System.currentTimeMillis() - model.getUpdateTime() > 5*60*1000) {
 					BaseRoomInfo roomInfo = null;
 					if (GameTypeEnum.nn.gameType.equals(model.getGameType()) ) {
 						roomInfo = redisOperationService.getRoomInfoByRoomId(model.getRoomId(), NnRoomInfo.class);
