@@ -136,6 +136,60 @@ public class RedisOperationService {
 		return list;
 	}
 	
+	/**解散房间ip->roomId->time 映射*/
+	public void setDissolveIpRoomIdTime(Integer roomId, Integer gameType){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.hset(Constant.dissolveIpRoomIdTimeMap, String.valueOf(roomId), gameType + "_" + String.valueOf(System.currentTimeMillis()));
+		}else{
+			GameInfoMemoryContainer.dissolveIpRoomIdTimeMap.put(String.valueOf(roomId), gameType + "_" + String.valueOf(System.currentTimeMillis()));
+		}
+		
+	}
+	
+	public void delDissolveIpRoomIdTime(Integer roomId){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.hdel(Constant.dissolveIpRoomIdTimeMap, String.valueOf(roomId));
+		}else{
+			GameInfoMemoryContainer.dissolveIpRoomIdTimeMap.remove(String.valueOf(roomId));
+		}
+	}
+	
+	public RedisRelaModel getDissolveIpRoomIdTime(Integer roomId){
+		String str = null;
+		if (gameInfoStorageType == 0 ) {
+			str = jedisTemplate.hget(Constant.dissolveIpRoomIdTimeMap, String.valueOf(roomId));
+		}else{
+			str = GameInfoMemoryContainer.dissolveIpRoomIdTimeMap.get(String.valueOf(roomId));
+		}
+		if (StringUtils.isBlank(str)) {
+			return null;
+		}
+		String[] arr = str.split("_");
+		return new RedisRelaModel(null, Integer.valueOf(roomId), Integer.valueOf(arr[0]), Long.valueOf(arr[1]));
+	}
+	
+	public List<RedisRelaModel> getAllDissolveIpRoomIdTime(){
+		Map<String, String> map = new HashMap<String, String>();
+		if (gameInfoStorageType == 0 ) {
+			map = jedisTemplate.hgetAll(Constant.dissolveIpRoomIdTimeMap);
+		}else{
+			map.putAll(GameInfoMemoryContainer.dissolveIpRoomIdTimeMap);
+			
+		}
+		if (map == null) {
+			return null;
+		}
+		List<RedisRelaModel> list = new ArrayList<RedisRelaModel>();
+		Set<Entry<String, String>> set = map.entrySet();
+		for(Entry<String, String> entry : set){
+			String key = entry.getKey();
+			String value = entry.getValue();
+			String[] arr = value.split("_");
+			list.add(new RedisRelaModel(null, Integer.valueOf(key), Integer.valueOf(arr[0]), Long.valueOf(arr[1])));
+		}
+		return list;
+	}
+	
 	/**playerId->roomId,gameType 映射*/
 	public void setPlayerIdRoomIdGameType(Integer playerId, Integer roomId, Integer gameType){
 		if (gameInfoStorageType == 0 ) {
@@ -309,6 +363,8 @@ public class RedisOperationService {
 		}
 		return map;
 	}
+	
+	
 	
 	/**短信验证码超时map*/
 	public void setSmsMobileValideCodeTime(String mobile, String validCode){

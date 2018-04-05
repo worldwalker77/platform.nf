@@ -36,6 +36,8 @@ public class Constant {
 	public final static String nnShowCardIpRoomIdTimeMap = curCompany + "_nn_show_card_ip_room_id_time_map_" + localIp;
 	/**炸金花两个玩家开始准备后，倒计时10秒，没准备的玩家直接设置为观察者，其余的玩家继续游戏*/
 	public final static String notReadyIpRoomIdTimeMap = curCompany + "_not_ready_ip_room_id_time_map_" + localIp;
+	/**解散房间标志位*/
+	public final static String dissolveIpRoomIdTimeMap = curCompany + "_dissolve_room_ip_room_id_time_map_" + localIp;
 	/**炸金花玩家超过30s没操作，则自动弃牌*/
 	public final static String jhNoOperationIpPlayerIdRoomIdTimeMap = curCompany + "_jh_no_operation_ip_player_id_room_id_time_map_" + localIp;
 	

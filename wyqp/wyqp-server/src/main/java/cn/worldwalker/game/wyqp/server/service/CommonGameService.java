@@ -127,6 +127,9 @@ public class CommonGameService extends BaseGameService{
 			BaseRequest request, UserInfo userInfo) {
 		Integer roomId = userInfo.getRoomId();
 		RedisRelaModel model = redisOperationService.getGameTypeUpdateTimeByRoomId(roomId);
+		if (model == null) {
+			return null;
+		}
 		BaseRoomInfo roomInfo = null;
 		if (model.getGameType().equals(GameTypeEnum.nn.gameType)) {
 			roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, NnRoomInfo.class);

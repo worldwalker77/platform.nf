@@ -36,9 +36,6 @@ import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel;
 import cn.worldwalker.game.wyqp.common.domain.base.WeiXinUserInfo;
-import cn.worldwalker.game.wyqp.common.domain.jh.JhRoomInfo;
-import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
-import cn.worldwalker.game.wyqp.common.domain.nn.NnRoomInfo;
 import cn.worldwalker.game.wyqp.common.enums.ChatTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.DissolveStatusEnum;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
@@ -492,7 +489,7 @@ public abstract class BaseGameService {
 			refreshRoomForAllPlayer(roomInfo);
 			return;
 		}
-		/**如果玩家的状态是未准备,并且房间状态是最开始准备阶段，则玩家可以退出*/
+		/**房间状态是最开始准备阶段，则玩家可以退出*/
 		if (roomInfo.getStatus().equals(RoomStatusEnum.justBegin.status)) {
 			
 			/**如果在游戏最开始准备阶段退出的是庄家（即房主），则需要设置一个默认的庄家（房主）,当前退出庄家的下家*/
@@ -518,28 +515,16 @@ public abstract class BaseGameService {
 			refreshRoomForAllPlayer(roomInfo);
 			return;
 		}
+		/**设置解散房间标志位*/
+		redisOperationService.setDissolveIpRoomIdTime(roomId, request.getGameType());
 		result.setMsgType(MsgTypeEnum.dissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", playerId);
-		data.put("playerList", getPList(playerList));
+		data.put("playerList", GameUtil.getPList(playerList));
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 	}
 	
-	private List<Map<String, Object>> getPList(List playerList){
-		int size = playerList.size();
-		List<Map<String, Object>> pList = new ArrayList<Map<String,Object>>();
-		BasePlayerInfo bplayer = null;
-		for(int i = 0; i < size; i++){
-			bplayer = (BasePlayerInfo)playerList.get(i);
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("playerId", bplayer.getPlayerId());
-			map.put("nickName", bplayer.getNickName());
-			map.put("headImgUrl", bplayer.getHeadImgUrl());
-			map.put("dissolveStatus", bplayer.getDissolveStatus());
-			pList.add(map);
-		}
-		return pList;
-	}
+	
 	public void agreeDissolveRoom(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
 		Result result = new Result();
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -573,6 +558,9 @@ public abstract class BaseGameService {
 			if (roomInfo.getClubId() != null) {
 				redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomId);
 			}
+			/**删除解散标志位*/
+			redisOperationService.delDissolveIpRoomIdTime(roomId);
+			
 			/**解散后需要进行结算*/
 			data.put("roomInfo", roomInfo);
 			result.setMsgType(MsgTypeEnum.successDissolveRoom.msgType);
@@ -587,7 +575,7 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.agreeDissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", msg.getPlayerId());
-		data.put("playerList", getPList(playerList));
+		data.put("playerList", GameUtil.getPList(playerList));
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 	}
 	
@@ -606,19 +594,31 @@ public abstract class BaseGameService {
 		if (!GameUtil.isExistPlayerInRoom(msg.getPlayerId(), playerList)) {
 			throw new BusinessException(ExceptionEnum.PLAYER_NOT_IN_ROOM);
 		}
+		int disagreeDissolveCount = 0;
 		int size = playerList.size();
 		for(int i = 0; i < size; i++){
 			BasePlayerInfo player = (BasePlayerInfo)playerList.get(i);
 			if (player.getPlayerId().equals(msg.getPlayerId())) {
 				player.setDissolveStatus(DissolveStatusEnum.disagree.status);
 			}
+			if (DissolveStatusEnum.disagree.status.equals(player.getDissolveStatus())) {
+				disagreeDissolveCount++;
+			}
 		}
 		roomInfo.setUpdateTime(new Date());
+		List<Map<String, Object>> disPlayerList = GameUtil.getPList(playerList);
+		/**如果一半人不同意，则不能解散房间*/
+		if (disagreeDissolveCount >= (playerList.size()/2)) {
+			/**删除解散房间标志位*/
+			redisOperationService.delDissolveIpRoomIdTime(roomId);
+			/**将玩家解散标志位都置为0*/
+			GameUtil.resetPlayerDissolve(playerList);
+		}
 		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 		result.setMsgType(MsgTypeEnum.disagreeDissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", msg.getPlayerId());
-		data.put("playerList", getPList(playerList));
+		data.put("playerList", disPlayerList);
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 	}
@@ -868,6 +868,10 @@ public abstract class BaseGameService {
 		}
 		result.setGameType(roomInfo.getGameType());
 		result.setMsgType(MsgTypeEnum.refreshRoom.msgType);
+		/**设置解散玩家列表，如果有*/
+		if (redisOperationService.getDissolveIpRoomIdTime(roomId) != null) {
+			returnRoomInfo.setDisList(GameUtil.getPList(playerList));
+		}
 		result.setData(returnRoomInfo);
 		/**返回给当前玩家刷新信息*/
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
@@ -1409,6 +1413,8 @@ public abstract class BaseGameService {
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
 		if (roomInfo == null) {
 			redisOperationService.cleanPlayerAndRoomInfoForSignout(roomId, String.valueOf(playerId));
+			userInfo.setRoomId(null);
+			redisOperationService.setUserInfo(request.getToken(), userInfo);
 			return;
 		}
 		List playerList = roomInfo.getPlayerList();
@@ -1443,6 +1449,8 @@ public abstract class BaseGameService {
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
 		if (roomInfo == null) {
 			redisOperationService.cleanPlayerAndRoomInfoForSignout(roomId, String.valueOf(playerId));
+			userInfo.setRoomId(null);
+			redisOperationService.setUserInfo(request.getToken(), userInfo);
 			return;
 		}
 		List playerList = roomInfo.getPlayerList();

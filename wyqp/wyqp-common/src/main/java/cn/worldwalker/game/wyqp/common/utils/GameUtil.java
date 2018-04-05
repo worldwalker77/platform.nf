@@ -2,7 +2,9 @@ package cn.worldwalker.game.wyqp.common.utils;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -367,4 +369,29 @@ public class GameUtil {
         str=emojiMatcher.replaceAll(reStr);  
         return str;  
     } 
+	
+	public static List<Map<String, Object>> getPList(List playerList){
+		int size = playerList.size();
+		List<Map<String, Object>> pList = new ArrayList<Map<String,Object>>();
+		BasePlayerInfo bplayer = null;
+		for(int i = 0; i < size; i++){
+			bplayer = (BasePlayerInfo)playerList.get(i);
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("playerId", bplayer.getPlayerId());
+			map.put("nickName", bplayer.getNickName());
+			map.put("headImgUrl", bplayer.getHeadImgUrl());
+			map.put("dissolveStatus", bplayer.getDissolveStatus());
+			pList.add(map);
+		}
+		return pList;
+	}
+	
+	public static void resetPlayerDissolve(List playerList){
+		int size = playerList.size();
+		BasePlayerInfo bplayer = null;
+		for(int i = 0; i < size; i++){
+			bplayer = (BasePlayerInfo)playerList.get(i);
+			bplayer.setDissolveStatus(DissolveStatusEnum.mid.status);
+		}
+	}
 }
