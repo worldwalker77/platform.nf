@@ -52,7 +52,17 @@ public class BaseRoomInfo {
 	private Integer clubId;
 	/**玩家相互之间的距离*/
 	private Map<String, String> distanceMap = new HashMap<String, String>();
+	/**解散玩家列表*/
+	private List<Map<String, Object>> disList = null;
 	
+	public List<Map<String, Object>> getDisList() {
+		return disList;
+	}
+
+	public void setDisList(List<Map<String, Object>> disList) {
+		this.disList = disList;
+	}
+
 	public Map<String, String> getDistanceMap() {
 		return distanceMap;
 	}

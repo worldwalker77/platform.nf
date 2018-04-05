@@ -25,7 +25,7 @@ http://www.springframework.org/schema/task/spring-task-3.0.xsd
     </task:scheduled-tasks>
     
     <task:scheduled-tasks scheduler="scheduler">
-    	<task:scheduled ref="roomInfoCleanJob" method="doTask" cron="0/5 * * * * ?"/>
+    	<task:scheduled ref="roomInfoCleanJob" method="doTask" cron="0/1 * * * * ?"/>
     </task:scheduled-tasks>
     
     <task:scheduled-tasks scheduler="scheduler">
