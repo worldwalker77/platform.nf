@@ -1430,6 +1430,40 @@ public abstract class BaseGameService {
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArrWithOutSelf(playerList, playerId));
 	}
 	
+	public void onlineNotice(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		Integer roomId = msg.getRoomId();
+		if (roomId == null) {
+			return;
+		}
+		/**删除离线playerId与roomId的映射关系*/
+		redisOperationService.hdelOfflinePlayerIdRoomIdGameTypeTime(playerId);
+		/**设置当前玩家为离线状态并通知其他玩家此玩家离线*/
+		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
+		if (roomInfo == null) {
+			redisOperationService.cleanPlayerAndRoomInfoForSignout(roomId, String.valueOf(playerId));
+			return;
+		}
+		List playerList = roomInfo.getPlayerList();
+		List<Integer> playerIdList = new ArrayList<Integer>();
+		for(Object object : playerList){
+			BasePlayerInfo basePlayerInfo = (BasePlayerInfo)object;
+			if (playerId.equals(basePlayerInfo.getPlayerId())) {
+				basePlayerInfo.setOnlineStatus(OnlineStatusEnum.online.status);
+			}
+		}
+		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+		
+		Result result = new Result();
+		result.setMsgType(MsgTypeEnum.onlineNotice.msgType);
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("playerId", playerId);
+		result.setData(data);
+		result.setGameType(request.getGameType());
+		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArrWithOutSelf(playerList, playerId));
+	}
+	
 	public static void main(String[] args) {
 		Integer status = null;
 		if (status == 1) {

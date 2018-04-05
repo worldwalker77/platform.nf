@@ -133,5 +133,6 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.getClubRooms.msgType, MsgTypeEnum.getClubRooms);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.getAllPlayerDistance.msgType, MsgTypeEnum.getAllPlayerDistance);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.offlineNotice.msgType, MsgTypeEnum.offlineNotice);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.onlineNotice.msgType, MsgTypeEnum.onlineNotice);
 	}
 }

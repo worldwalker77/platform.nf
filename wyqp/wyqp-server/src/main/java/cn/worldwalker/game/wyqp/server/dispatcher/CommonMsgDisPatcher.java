@@ -79,6 +79,9 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			case offlineNotice:
 				commonGameService.offlineNotice(ctx, request, userInfo);
 				break;
+			case onlineNotice:
+				commonGameService.onlineNotice(ctx, request, userInfo);
+				break;
 			default:
 				break;
 			}
