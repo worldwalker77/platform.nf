@@ -1285,7 +1285,8 @@ public class MjGameService extends BaseGameService {
         }
         data.put("playerList", newPlayerList);
         channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
-
+        /**记录回放操作日志*/
+        addOperationLog(result.getMsgType(), null, roomInfo, MjCardRule.getPlayerInfoByPlayerId(playerList, roomInfo.getCurPlayerId()), null, null, null);
 
     }
 
