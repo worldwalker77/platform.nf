@@ -370,7 +370,7 @@ public class GameUtil {
         return str;  
     } 
 	
-	public static List<Map<String, Object>> getPList(List playerList){
+	public static List<Map<String, Object>> getPList(List playerList, Integer initiatorPlayerId, Long startTime){
 		int size = playerList.size();
 		List<Map<String, Object>> pList = new ArrayList<Map<String,Object>>();
 		BasePlayerInfo bplayer = null;
@@ -381,6 +381,13 @@ public class GameUtil {
 			map.put("nickName", bplayer.getNickName());
 			map.put("headImgUrl", bplayer.getHeadImgUrl());
 			map.put("dissolveStatus", bplayer.getDissolveStatus());
+			if (initiatorPlayerId.equals(bplayer.getPlayerId())) {
+				map.put("initiator", 1);
+				Long leftTime = (300 - (System.currentTimeMillis() - startTime))/1000;
+				map.put("leftTime", leftTime);
+			}else{
+				map.put("initiator", 0);
+			}
 			pList.add(map);
 		}
 		return pList;

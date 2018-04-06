@@ -137,11 +137,11 @@ public class RedisOperationService {
 	}
 	
 	/**解散房间ip->roomId->time 映射*/
-	public void setDissolveIpRoomIdTime(Integer roomId, Integer gameType){
+	public void setDissolveIpRoomIdTime(Integer playerId, Integer roomId, Integer gameType){
 		if (gameInfoStorageType == 0 ) {
-			jedisTemplate.hset(Constant.dissolveIpRoomIdTimeMap, String.valueOf(roomId), gameType + "_" + String.valueOf(System.currentTimeMillis()));
+			jedisTemplate.hset(Constant.dissolveIpRoomIdTimeMap, String.valueOf(roomId), playerId + "_" + gameType + "_" + String.valueOf(System.currentTimeMillis()));
 		}else{
-			GameInfoMemoryContainer.dissolveIpRoomIdTimeMap.put(String.valueOf(roomId), gameType + "_" + String.valueOf(System.currentTimeMillis()));
+			GameInfoMemoryContainer.dissolveIpRoomIdTimeMap.put(String.valueOf(roomId), playerId + "_" + gameType + "_" + String.valueOf(System.currentTimeMillis()));
 		}
 		
 	}
@@ -165,7 +165,7 @@ public class RedisOperationService {
 			return null;
 		}
 		String[] arr = str.split("_");
-		return new RedisRelaModel(null, Integer.valueOf(roomId), Integer.valueOf(arr[0]), Long.valueOf(arr[1]));
+		return new RedisRelaModel(Integer.valueOf(arr[0]), Integer.valueOf(roomId), Integer.valueOf(arr[1]), Long.valueOf(arr[2]));
 	}
 	
 	public List<RedisRelaModel> getAllDissolveIpRoomIdTime(){
@@ -185,7 +185,7 @@ public class RedisOperationService {
 			String key = entry.getKey();
 			String value = entry.getValue();
 			String[] arr = value.split("_");
-			list.add(new RedisRelaModel(null, Integer.valueOf(key), Integer.valueOf(arr[0]), Long.valueOf(arr[1])));
+			list.add(new RedisRelaModel(Integer.valueOf(arr[0]), Integer.valueOf(key), Integer.valueOf(arr[1]), Long.valueOf(arr[2])));
 		}
 		return list;
 	}
@@ -502,9 +502,11 @@ public class RedisOperationService {
 			jedisTemplate.hdel(Constant.roomIdGameTypeUpdateTimeMap, String.valueOf(roomId));
 			jedisTemplate.hdel(Constant.playerIdRoomIdGameTypeMap, playerIds);
 			jedisTemplate.hdel(Constant.offlinePlayerIdRoomIdGameTypeTimeMap, playerIds);
+			jedisTemplate.hdel(Constant.dissolveIpRoomIdTimeMap, String.valueOf(roomId));
 		}else{
 			GameInfoMemoryContainer.roomIdRoomInfoMap.remove(String.valueOf(roomId));
 			GameInfoMemoryContainer.roomIdGameTypeUpdateTimeMap.remove(String.valueOf(roomId));
+			GameInfoMemoryContainer.dissolveIpRoomIdTimeMap.remove(String.valueOf(roomId));
 			for(String playerId : playerIds){
 				GameInfoMemoryContainer.playerIdRoomIdGameTypeMap.remove(playerId);
 				GameInfoMemoryContainer.offlinePlayerIdRoomIdGameTypeTimeMap.remove(playerId);
