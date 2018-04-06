@@ -671,7 +671,7 @@ public class MjGameService extends BaseGameService {
         MjCardRule.calculateAllPlayerOperations(roomInfo, MjCardRule.getRealMoPai(moPaiAddFlower), playerId, 4);
 
         roomInfo.setUpdateTime(new Date());
-        
+        roomInfo.setCurPlayerId(playerId);
         redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 
         Map<String, Object> data = new HashMap<String, Object>();
