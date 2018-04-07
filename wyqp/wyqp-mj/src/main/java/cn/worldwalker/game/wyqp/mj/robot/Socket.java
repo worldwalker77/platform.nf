@@ -19,8 +19,11 @@ import java.util.List;
 @SuppressWarnings("ConstantConditions")
 public class Socket extends WebSocketClient implements Runnable {
 
-    private static final Integer DELAY_TIME = 3000;
     private Client client;
+
+    private boolean isPrintLog = false;
+
+    private final static Integer DELAY_TIME = 10;
 
     public Socket(URI serverUri, Client client) {
         super(serverUri);
@@ -32,7 +35,12 @@ public class Socket extends WebSocketClient implements Runnable {
 //        type = "";
         String msg = JSON.toJSONString(mjRequest);
 //        System.out.println(client.getPosition() + "--[>>>>" + type + "]: " + msg);
-        send(msg);
+        try {
+            send(msg);
+        } catch (Exception e){
+            System.out.println(e + msg);
+        }
+
     }
 
     public List<Integer> cardValue(List<Integer> cardList) {
@@ -62,25 +70,29 @@ public class Socket extends WebSocketClient implements Runnable {
     }
     @Override
     public void onMessage(String arg0) {
-//        try {
-//            Thread.sleep(DELAY_TIME);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            Thread.sleep(DELAY_TIME);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         JSONObject jsonObject = JSON.parseObject(arg0);
         Integer msgType = jsonObject.getInteger("msgType");
         JSONObject jsonData = jsonObject.getJSONObject("data");
         String type = MsgTypeEnum.getMsgTypeEnumByType(msgType).desc;
-        if (!Integer.valueOf(0).equals(jsonObject.getInteger("code"))){
-            System.out.println(client.getPosition() + "(" + client.getPlayerId() +  ")--[<<<<" + type + "]: " + arg0);
-        }
-//        type = "";
-        if (msgType!=220 && msgType != 211 && msgType != 210){
-            System.out.println(client.getPosition() + "(" + client.getPlayerId() +  ")--[<<<<" + type + "]: " + arg0);
+        if (isPrintLog){
+            if (!Integer.valueOf(0).equals(jsonObject.getInteger("code"))){
+                System.out.println(client.getPosition() + "(" + client.getPlayerId() +  ")--[<<<<" + type + "]: " + arg0);
+            }
+            if (msgType!=220 && msgType != 211 && msgType != 210){
+                System.out.println(client.getPosition() + "(" + client.getPlayerId() +  ")--[<<<<" + type + "]: " + arg0);
+            }
         }
         if (jsonData != null) {
             Integer curPlayerId = jsonData.getInteger("curPlayerId");
             switch (msgType) {
+                case 6:
+                    client.setRoomId(jsonData.getInteger("roomId"));
+                    break;
                 case 209:
                     client.setGameOver(false);
                     refreshCardList(jsonData);
@@ -89,7 +101,9 @@ public class Socket extends WebSocketClient implements Runnable {
                     refreshCardList(jsonData);
                     break;
                 case 210:
-                    System.out.println(client.getPosition() + "<<" + jsonData.getString("moPaiAddFlower"));
+                    if (isPrintLog){
+                        System.out.println(client.getPosition() + "<<" + jsonData.getString("moPaiAddFlower"));
+                    }
                     refreshCardList(jsonData);
                     break;
                 case 220:
@@ -101,12 +115,15 @@ public class Socket extends WebSocketClient implements Runnable {
                 case 24:
                     client.setGameOver(true);
                     client.playerReady();
-                    System.out.println(client.getPosition() + "(" + client.getPlayerId() +  ")--[<<<<" + type + "]: " + arg0);
-//                    client.close();
+                    if (isPrintLog){
+                        System.out.println(client.getPosition() + "(" + client.getPlayerId() +  ")--[<<<<" + type + "]: " + arg0);
+                    }
                     break;
                 case 25:
                     client.setGameOver(true);
-                    System.out.println(client.getPosition() + "(" + client.getPlayerId() +  ")--[<<<<" + type + "]: " + arg0);
+                    if (isPrintLog){
+                        System.out.println(client.getPosition() + "(" + client.getPlayerId() +  ")--[<<<<" + type + "]: " + arg0);
+                    }
                     client.close();
                     break;
 
@@ -115,20 +132,13 @@ public class Socket extends WebSocketClient implements Runnable {
                     && msgType != 214 && msgType != 215) {
                 JSONObject operationMap = jsonData.getJSONObject("operations");
                 if (operationMap != null) {
-                    System.out.println(client.getPosition() + "--operations:" + operationMap);
-                    if (operationMap.size() > 1){
-                        System.out.println(operationMap);
-                    }
-
-                    /*
-                    for (int i=5; i>1; i--){
-                        String openrationValue = (String) operationMap.get(String.valueOf(i));
-                        if (openrationValue != null){
-
+                    if (isPrintLog){
+                        System.out.println(client.getPosition() + "--operations:" + operationMap);
+                        if (operationMap.size() > 1){
+                            System.out.println(operationMap);
                         }
-
                     }
-                   */
+
 
                     for (MjOperationEnum mjOperationEnum: MjOperationEnum.values()) {
                         String operationValue = (String) operationMap.get(String.valueOf(mjOperationEnum.type));
@@ -167,7 +177,9 @@ public class Socket extends WebSocketClient implements Runnable {
                 cardList.add((Integer) o);
             }
             client.setCardList(cardList);
-            System.out.println(client.getPlayerId() + ":allCardList:" + cardValue(cardList));
+            if (isPrintLog){
+                System.out.println(client.getPlayerId() + ":allCardList:" + cardValue(cardList));
+            }
         } else if (msgType == 403) {
             Integer landlordId = jsonObject.getJSONObject("data").getInteger("landlord");
             if (landlordId.equals(client.getPlayerId())) {
@@ -176,13 +188,17 @@ public class Socket extends WebSocketClient implements Runnable {
                 for (Object o : jsonArray) {
                     cardList.add((Integer) o);
                 }
-                System.out.println(client.getPlayerId() + ":allCardList:" + cardValue(cardList));
+                if (isPrintLog){
+                    System.out.println(client.getPlayerId() + ":allCardList:" + cardValue(cardList));
+                }
             }
 
         } else if (msgType == 406) {
             JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("cueCardList");
             if (jsonArray == null || jsonArray.isEmpty()) {
-                System.out.println(client.getPlayerId() + ":pass:");
+                if (isPrintLog){
+                    System.out.println(client.getPlayerId() + ":pass:");
+                }
                 client.setCueCardList(Collections.<Integer>emptyList());
             } else {
                 List<Integer> cardList = new ArrayList<>(jsonArray.size());
@@ -190,12 +206,16 @@ public class Socket extends WebSocketClient implements Runnable {
                     cardList.add((Integer) o);
                 }
                 client.setCueCardList(cardList);
-                System.out.println(client.getPlayerId() + ":cueCardList:" + cardValue(cardList)
-                        + "  index:" + cardList);
+                if (isPrintLog){
+                    System.out.println(client.getPlayerId() + ":cueCardList:" + cardValue(cardList)
+                            + "  index:" + cardList);
+                }
             }
         } else if (msgType == 24) {
             client.setGameOver(true);
-            System.out.println(jsonObject);
+            if (isPrintLog){
+                System.out.println(jsonObject);
+            }
         }
     }
 

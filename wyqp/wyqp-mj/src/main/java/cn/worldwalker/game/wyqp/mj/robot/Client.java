@@ -25,6 +25,8 @@ public class Client {
     private List<Integer> cueCardList;
     private List<String> pengList;
 
+
+    private boolean isPrintLog = false;
     private Boolean gameOver;
     private Integer position;
     private Random random;
@@ -54,10 +56,12 @@ public class Client {
         socket = new Socket(new URI(WS_URL),this);
         socket.connect();
         int i=0;
-        while (!socket.getReadyState().equals(WebSocket.READYSTATE.OPEN)  && i++ < 10) {
+        while (!socket.getReadyState().equals(WebSocket.READYSTATE.OPEN)  && i++ < 50) {
             Thread.sleep(100);
         }
-        System.out.println(token.substring(0,4) + ": 连接成功");
+        if (!socket.getReadyState().equals(WebSocket.READYSTATE.OPEN)){
+            System.out.println(token.substring(0,4) + ": 失败");
+        }
         gameOver = false;
     }
 
@@ -122,7 +126,9 @@ public class Client {
         MjRequest mjRequest = createRequest(MsgTypeEnum.chuPai);
         int cardIndex = chooseCard();
         mjRequest.getMsg().setCardIndex(cardList.get(cardIndex));
-        System.out.println(position + ">>" + cardList.get(cardIndex));
+        if (isPrintLog){
+            System.out.println(position + ">>" + cardList.get(cardIndex));
+        }
         socket.sendMsg(mjRequest);
     }
 

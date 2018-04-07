@@ -7,56 +7,40 @@ public class ClientSimulator {
 
 
     public static void main(String[] args) throws Exception {
-        Client clientOwner = new Client(1);
-        clientOwner.init();
-        Thread.sleep(waitTime);
-        clientOwner.entryHall();
-        Thread.sleep(waitTime);
-        clientOwner.createRoom();
-        Thread.sleep(waitTime);
-        clientOwner.playerReady();
-        Thread.sleep(waitTime * 100);
-
-//        clientOwner.addRobot();
-
-        addRobot(clientOwner.getRoomId());
-
-//        clientOwner.close();
-//        client1.close();
-//        client2.close();
-//        client3.close();
-
-
+        for (int i=0; i<10000; i++) {
+            System.out.println("..............." +  i);
+            Client clientOwner = new Client(1);
+            clientOwner.init();
+            /*
+            Thread.sleep(waitTime);
+            clientOwner.entryHall();
+            Thread.sleep(waitTime);
+            clientOwner.createRoom();
+            while (clientOwner.getRoomId() == null){
+                Thread.sleep(100);
+            }
+            clientOwner.playerReady();
+            Thread.sleep(waitTime);
+            addRobot(clientOwner.getRoomId());
+           */
+        }
     }
 
     private static void addRobot(int roomId) throws Exception {
-        Client client1 = new Client(2);
-        client1.init();
-        Thread.sleep(waitTime);
-        client1.entryHall();
-        Thread.sleep(waitTime);
-        client1.entryRoom(roomId);
-        Thread.sleep(waitTime);
-        client1.playerReady();
 
-        Client client2 = new Client(3);
-        client2.init();
-        Thread.sleep(waitTime);
-        client2.entryHall();
-        Thread.sleep(waitTime);
-        client2.entryRoom(roomId);
-        Thread.sleep(waitTime);
-        client2.playerReady();
+        for (int i=0; i<3; i++){
+            Client client1 = new Client(i+2);
+            client1.init();
+            Thread.sleep(waitTime);
+            client1.entryHall();
+            Thread.sleep(waitTime);
+            client1.entryRoom(roomId);
+            while (client1.getRoomId() == null){
+                Thread.sleep(waitTime);
+            }
+            client1.playerReady();
+            Thread.sleep(waitTime);
 
-
-        Client client3 = new Client(4);
-        client3.init();
-        Thread.sleep(waitTime);
-        client3.entryHall();
-        Thread.sleep(waitTime);
-        client3.entryRoom(roomId);
-        Thread.sleep(waitTime);
-        client3.playerReady();
-        Thread.sleep(waitTime);
+        }
     }
 }
