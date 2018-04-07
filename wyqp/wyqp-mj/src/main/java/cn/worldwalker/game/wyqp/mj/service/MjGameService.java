@@ -341,6 +341,8 @@ public class MjGameService extends BaseGameService {
             /**给其他玩家返回出牌消息及当前说话玩家*/
             Map<String, Object> data = new HashMap<String, Object>();
             result.setData(data);
+            /**如果是别的玩家吃碰杠胡，则指针不指向*/
+            data.put("notShowPoint", 1);
             data.put("playerId", playerId);
             data.put("cardIndex", msg.getCardIndex());
             data.put("curPlayerId", curPlayerId);
@@ -555,6 +557,8 @@ public class MjGameService extends BaseGameService {
             Map<String, Object> data = new HashMap<String, Object>();
             result.setData(data);
             /**给抢杠玩家以外的玩家返回杠玩家的信息及获取操作权限的玩家*/
+            /**如果是别的玩家吃碰杠胡，则指针不指向*/
+            data.put("notShowPoint", 1);
             data.put("curPlayerId", curPlayerId);
             data.put("playerId", playerId);
             data.put("cardIndex", gangCardIndex);
