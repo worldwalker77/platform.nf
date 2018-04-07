@@ -1285,7 +1285,8 @@ public class MjGameService extends BaseGameService {
         }
         data.put("playerList", newPlayerList);
         channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
-
+        /**记录回放操作日志*/
+        addOperationLog(result.getMsgType(), null, roomInfo, MjCardRule.getPlayerInfoByPlayerId(playerList, roomInfo.getCurPlayerId()), null, null, null);
 
     }
 
@@ -1716,6 +1717,10 @@ public class MjGameService extends BaseGameService {
                     data.put("curPlayerId", roomInfo.getCurPlayerId());
                     break;
                 case curSettlement:
+                	data.put("roomBankerId", roomInfo.getRoomBankerId());
+                	data.put("isCurGameHuangZhuang", roomInfo.getIsCurGameHuangZhuang());
+                	data.put("curGame", roomInfo.getCurGame());
+                	
                     data.put("curPlayerId", oPlayer.getPlayerId());
                     data.put("huType", oPlayer.getHuType());
                     data.put("maCardList",roomInfo.getMaCardList());
@@ -1741,10 +1746,22 @@ public class MjGameService extends BaseGameService {
                         newPlayer.put("gangScore",player.getGangScore());
                         newPlayer.put("maScore",player.getMaScore());
                         newPlayer.put("huScore",player.getHuScore());
+                        
+                        newPlayer.put("playerId",player.getPlayerId());
+                        newPlayer.put("nickName",player.getNickName());
+                        newPlayer.put("headImgUrl",player.getHeadImgUrl());
+                        newPlayer.put("handCardList",player.getHandCardList());
+                        newPlayer.put("chiCardList",player.getChiCardList());
+                        newPlayer.put("pengCardList",player.getPengCardList());
+                        newPlayer.put("mingGangCardList",player.getMingGangCardList());
+                        newPlayer.put("anGangCardList",player.getAnGangCardList());
                         csPlayerList.add(newPlayer);
                     }
                     break;
                 case totalSettlement:
+                	data.put("roomBankerId", roomInfo.getRoomBankerId());
+                	data.put("isCurGameHuangZhuang", roomInfo.getIsCurGameHuangZhuang());
+                	data.put("curGame", roomInfo.getCurGame());
                     data.put("curPlayerId", oPlayer.getPlayerId());
                     data.put("huType", oPlayer.getHuType());
                     data.put("maCardList",roomInfo.getMaCardList());
@@ -1776,6 +1793,14 @@ public class MjGameService extends BaseGameService {
                         newPlayer.put("gangScore",player.getGangScore());
                         newPlayer.put("mingGangCount",player.getMinGangCount());
                         newPlayer.put("anGangCount",player.getAnGangCount());
+                        newPlayer.put("playerId",player.getPlayerId());
+                        newPlayer.put("nickName",player.getNickName());
+                        newPlayer.put("headImgUrl",player.getHeadImgUrl());
+                        newPlayer.put("handCardList",player.getHandCardList());
+                        newPlayer.put("chiCardList",player.getChiCardList());
+                        newPlayer.put("pengCardList",player.getPengCardList());
+                        newPlayer.put("mingGangCardList",player.getMingGangCardList());
+                        newPlayer.put("anGangCardList",player.getAnGangCardList());
                         newPlayerList.add(newPlayer);
                     }
                     break;

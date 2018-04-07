@@ -516,11 +516,12 @@ public abstract class BaseGameService {
 			return;
 		}
 		/**设置解散房间标志位*/
-		redisOperationService.setDissolveIpRoomIdTime(roomId, request.getGameType());
+		redisOperationService.setDissolveIpRoomIdTime(playerId, roomId, request.getGameType());
 		result.setMsgType(MsgTypeEnum.dissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", playerId);
-		data.put("playerList", GameUtil.getPList(playerList));
+		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
+		data.put("playerList", GameUtil.getPList(playerList,playerId,model.getUpdateTime()));
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 	}
 	
@@ -533,6 +534,11 @@ public abstract class BaseGameService {
 		BaseMsg msg = request.getMsg();
 		Integer roomId = msg.getRoomId();
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
+		if (roomInfo == null) {
+			log.warn("房间信息不存在");
+			channelContainer.sendTextMsgByPlayerIds(new Result(0, MsgTypeEnum.entryHall.msgType), msg.getPlayerId());
+			return;
+		}
 		List playerList = roomInfo.getPlayerList();
 		if (!GameUtil.isExistPlayerInRoom(msg.getPlayerId(), playerList)) {
 			throw new BusinessException(ExceptionEnum.PLAYER_NOT_IN_ROOM);
@@ -575,7 +581,8 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.agreeDissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", msg.getPlayerId());
-		data.put("playerList", GameUtil.getPList(playerList));
+		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
+		data.put("playerList", GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime()));
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 	}
 	
@@ -588,7 +595,9 @@ public abstract class BaseGameService {
 		Integer roomId = msg.getRoomId();
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
 		if (null == roomInfo) {
-			throw new BusinessException(ExceptionEnum.ROOM_ID_NOT_EXIST);
+			log.warn("房间信息不存在");
+			channelContainer.sendTextMsgByPlayerIds(new Result(0, MsgTypeEnum.entryHall.msgType), msg.getPlayerId());
+			return;
 		}
 		List playerList = roomInfo.getPlayerList();
 		if (!GameUtil.isExistPlayerInRoom(msg.getPlayerId(), playerList)) {
@@ -606,7 +615,8 @@ public abstract class BaseGameService {
 			}
 		}
 		roomInfo.setUpdateTime(new Date());
-		List<Map<String, Object>> disPlayerList = GameUtil.getPList(playerList);
+		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
+		List<Map<String, Object>> disPlayerList = GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime());
 		/**如果一半人不同意，则不能解散房间*/
 		if (disagreeDissolveCount >= (playerList.size()/2)) {
 			/**删除解散房间标志位*/
@@ -856,6 +866,7 @@ public abstract class BaseGameService {
 		BaseRoomInfo roomInfo = roomInfoList.get(0);
 		BaseRoomInfo returnRoomInfo = roomInfoList.get(1);
 		if (null == roomInfo) {
+			log.warn("房间信息不存在");
 			/**房间不存在，则需要删除离线用户与房间的关系标记，防止循环刷新，但是房间不存在*/
 			redisOperationService.hdelOfflinePlayerIdRoomIdGameTypeTime(playerId);
 			channelContainer.sendTextMsgByPlayerIds(new Result(0, MsgTypeEnum.entryHall.msgType), playerId);
@@ -869,8 +880,9 @@ public abstract class BaseGameService {
 		result.setGameType(roomInfo.getGameType());
 		result.setMsgType(MsgTypeEnum.refreshRoom.msgType);
 		/**设置解散玩家列表，如果有*/
-		if (redisOperationService.getDissolveIpRoomIdTime(roomId) != null) {
-			returnRoomInfo.setDisList(GameUtil.getPList(playerList));
+		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
+		if (model != null) {
+			returnRoomInfo.setDisList(GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime()));
 		}
 		result.setData(returnRoomInfo);
 		/**返回给当前玩家刷新信息*/

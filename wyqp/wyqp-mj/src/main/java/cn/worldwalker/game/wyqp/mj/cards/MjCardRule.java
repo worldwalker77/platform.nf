@@ -493,14 +493,9 @@ public class MjCardRule {
 
 		//自摸明杠才能抢杠
             if (MjCardRule.isJxNf(roomInfo) && !MjCardRule.isHandCard3n2(curPlayer)){
+            	roomInfo.setPlayerOperationMap(operations);
                 return operations;
             }
-			if (MjTypeEnum.shangHaiBaiDa.type.equals(roomInfo.getDetailType())) {
-				/**如果无百搭不能抢杠，则直接返回*/
-				if (roomInfo.getNoBaiDaCanQiangGang() < 1) {
-					return operations;
-				}
-			}
 			/**按顺序依次计算出剩余三个玩家可操作权限*/
 			for(int i = 1; i <= 3; i++){
 				MjPlayerInfo nextPlayer = list.get((curPlayerIndex + i)%4);
