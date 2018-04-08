@@ -1,5 +1,6 @@
 package cn.worldwalker.game.wyqp.mj.robot;
 
+import cn.worldwalker.game.wyqp.common.constant.Constant;
 import cn.worldwalker.game.wyqp.common.domain.base.BaseRequest;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjMsg;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRequest;
@@ -7,8 +8,10 @@ import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
 import cn.worldwalker.game.wyqp.common.utils.HttpClientUtils;
 import cn.worldwalker.game.wyqp.mj.enums.MjTypeEnum;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+
 import org.java_websocket.WebSocket;
 
 import java.net.URI;
@@ -29,8 +32,8 @@ public class Client {
     private Integer position;
     private Random random;
 
-    private static final String HTTP_URL = "http://game.nftest.worldwalker.cn";
-    private static final String WS_URL = "ws://39.107.96.117:10010";
+    private static final String HTTP_URL = "http://" + Constant.domain;
+    private static final String WS_URL = "ws://" + Constant.localIp + ":" + Constant.websocketPort;
 //    private static final String HTTP_URL = "http://localhost:8080";
 //    private static final String WS_URL = "ws://localhost:10010";
 
