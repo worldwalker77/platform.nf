@@ -53,6 +53,7 @@ import cn.worldwalker.game.wyqp.common.roomlocks.RoomLockContainer;
 import cn.worldwalker.game.wyqp.common.rpc.WeiXinRpc;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.IPUtil;
+import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
 import cn.worldwalker.game.wyqp.common.utils.SnowflakeIdGenerator;
 import cn.worldwalker.game.wyqp.common.utils.UrlImgDownLoadUtil;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.DateUtils;
@@ -828,10 +829,51 @@ public abstract class BaseGameService {
 		result.setData(data);
 		result.setGameType(request.getGameType());
 		BaseMsg msg = request.getMsg();
-		List<String> list = commonManager.getPlayBack(Long.valueOf(request.getMsg().getRecordDetailUuid()));
+		if (StringUtils.isBlank(request.getMsg().getRecordDetailUuid())) {
+			throw new BusinessException(ExceptionEnum.PARAMS_ERROR);
+		}
+		Long recordDetailUuid = null;
+		try {
+			recordDetailUuid = Long.valueOf(request.getMsg().getRecordDetailUuid());
+		} catch (NumberFormatException e) {
+			throw new BusinessException(ExceptionEnum.PLAY_BACK_CODE_ERROR);
+		}
+		/**通过detailuuid查到uuid*/
+		UserRecordModel model = new UserRecordModel();
+		model.setRecordDetailUuid(recordDetailUuid);
+		List<UserRecordModel> detailModelList = commonManager.getUserRecordDetail(model);
+		if (CollectionUtils.isEmpty(detailModelList)) {
+			throw new BusinessException(ExceptionEnum.PLAY_BACK_CODE_ERROR);
+		}
+		Long recordUuid = detailModelList.get(0).getRecordUuid();
+		Integer curGame = detailModelList.get(0).getCurGame();
+		/**再通过uuid查到房间remark*/
+		model = commonManager.getRoomRemarkByUuid(recordUuid);
+		if (model == null) {
+			throw new BusinessException(ExceptionEnum.PLAY_BACK_CODE_ERROR);
+		}
+		String remark = model.getRemark();
+		Map<String, Object> remarkMap = JsonUtil.toObject(remark, Map.class);
+		if (remarkMap == null) {
+			remarkMap = new HashMap<String, Object>();
+		}
+		remarkMap.put("roomId", model.getRoomId());
+		remarkMap.put("gameType", model.getGameType());
+		remarkMap.put("detailType", model.getDetailType());
+		remarkMap.put("payType", model.getPayType());
+		remarkMap.put("totalGames", model.getTotalGames());
+		remarkMap.put("curGame", curGame);
+		List<String> list = commonManager.getPlayBack(recordDetailUuid);
 		result.setMsgType(MsgTypeEnum.playBack.msgType);
-		result.setData(list);
+		data.put("remarkMap", remarkMap);
+		data.put("playBackList", list);
 		channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
+	}
+	
+	public static void main(String[] args) {
+		String remark = "{\"code\":0,\"msgType\":208,\"gameType\":2,\"data\":{\"roomOwnerId\":861111,\"huangFanNum\":0,\"playerList\":[{\"headImgUrl\":\"http://wx.qlogo.cn/mmopen/wibbRT31wkCR4W9XNicL2h2pgaLepmrmEsXbWKbV0v9ugtdibibDgR1ybONiaWFtVeVtYWGWhObRiaiaicMgw8zat8Y5p6YzQbjdstE2/0\",\"nickName\":\"861111\",\"playerId\":861111,\"order\":1},{\"headImgUrl\":\"http://wx.qlogo.cn/mmopen/wibbRT31wkCR4W9XNicL2h2pgaLepmrmEsXbWKbV0v9ugtdibibDgR1ybONiaWFtVeVtYWGWhObRiaiaicMgw8zat8Y5p6YzQbjdstE2/0\",\"nickName\":\"840549\",\"playerId\":840549,\"order\":2},{\"headImgUrl\":\"http://wx.qlogo.cn/mmopen/wibbRT31wkCR4W9XNicL2h2pgaLepmrmEsXbWKbV0v9ugtdibibDgR1ybONiaWFtVeVtYWGWhObRiaiaicMgw8zat8Y5p6YzQbjdstE2/0\",\"nickName\":\"160950\",\"playerId\":160950,\"order\":3},{\"headImgUrl\":\"http://wx.qlogo.cn/mmopen/wibbRT31wkCR4W9XNicL2h2pgaLepmrmEsXbWKbV0v9ugtdibibDgR1ybONiaWFtVeVtYWGWhObRiaiaicMgw8zat8Y5p6YzQbjdstE2/0\",\"nickName\":\"209599\",\"playerId\":209599,\"order\":4}],\"roomBankerId\":861111,\"isCurGameKaiBao\":0,\"dices\":[5,5]}}";
+		Map<String, Object> remarkMap = JsonUtil.toObject(remark, Map.class);
+		System.out.println(JsonUtil.toJson(remarkMap));
 	}
 
 	public void userFeedback(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
@@ -1484,10 +1526,4 @@ public abstract class BaseGameService {
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArrWithOutSelf(playerList, playerId));
 	}
 	
-	public static void main(String[] args) {
-		Integer status = null;
-		if (status == 1) {
-			
-		}
-	}
 }

@@ -214,7 +214,7 @@ public class CommonManagerImpl implements CommonManager{
 			model.setScore(player.getTotalScore());
 			model.setRecordInfo(recordInfo);
 			try {
-				model.setRemark(RoomCardConsumeEnum.getRoomCardConsumeEnum(roomInfo.getGameType(), roomInfo.getPayType(), roomInfo.getTotalGames()).desc);
+				model.setRemark(JsonUtil.toJson(roomInfo.getRemark()));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -420,5 +420,11 @@ public class CommonManagerImpl implements CommonManager{
 		model.setPlayerId(playerId);
 		model.setNickName(nickName);
 		extensionCodeBindDao.insertExtensionCodeBindLog(model);
+	}
+	@Override
+	public UserRecordModel getRoomRemarkByUuid(Long uuid) {
+		UserRecordModel model = new UserRecordModel();
+		model.setRecordUuid(uuid);
+		return userRecordDao.getRoomRemarkByUuid(model);
 	}
 }

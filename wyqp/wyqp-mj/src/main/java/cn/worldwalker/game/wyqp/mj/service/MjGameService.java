@@ -43,7 +43,7 @@ public class MjGameService extends BaseGameService {
         roomInfo.setHuScoreLimit(msg.getHuScoreLimit());
         roomInfo.setIsChiPai(msg.getIsChiPai());
         roomInfo.setMaiMaCount(msg.getMaiMaCount());
-
+        roomInfo.getRemark().put("maiMaCount", msg.getMaiMaCount());
         //创建房间的时候记录麻将类型
         roomInfo.setDetailType(request.getDetailType());
         if (MjTypeEnum.shangHaiBaiDa.type.equals(roomInfo.getDetailType())) {
