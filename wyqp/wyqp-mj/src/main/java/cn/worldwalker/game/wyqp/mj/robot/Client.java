@@ -32,7 +32,7 @@ public class Client {
     private static final String HTTP_URL = "http://game.nftest.worldwalker.cn";
     private static final String WS_URL = "ws://39.107.96.117:10010";
 //    private static final String HTTP_URL = "http://localhost:8080";
-//    private static final String WS_URL = "ws://localhost:10009";
+//    private static final String WS_URL = "ws://localhost:10010";
 
     public Client(Integer position) {
         this.position = position;
