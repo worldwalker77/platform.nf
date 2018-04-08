@@ -18,6 +18,7 @@ import cn.worldwalker.game.wyqp.mj.cards.MjCardResource;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
 import cn.worldwalker.game.wyqp.mj.enums.*;
 import io.netty.channel.ChannelHandlerContext;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -1533,6 +1534,13 @@ public class MjGameService extends BaseGameService {
         	newRoomInfo.setRemaindCardNum(roomInfo.getTableRemainderCardList().size());
 		}
         newRoomInfo.setOpMap(roomInfo.getOpMap());
+        
+        TreeMap<Integer, String> operations = MjCardRule.getPlayerHighestPriority(roomInfo, roomInfo.getCurPlayerId());
+        MjPlayerInfo mjp = MjCardRule.getPlayerInfoByPlayerId(playerList, roomInfo.getCurPlayerId());
+        /**不是curPlayerId摸牌并且他有操作权限,则不需要指示方向*/
+        if (mjp.getCurMoPaiCardIndex() == null && (operations != null && operations.size() > 0)) {
+        	roomInfo.setNotShowPoint(1);
+		}
         for (MjPlayerInfo player : playerList) {
             MjPlayerInfo newPlayer = new MjPlayerInfo();
             newRoomInfo.getPlayerList().add(newPlayer);
