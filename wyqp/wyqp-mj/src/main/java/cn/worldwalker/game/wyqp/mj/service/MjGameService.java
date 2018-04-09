@@ -1538,7 +1538,7 @@ public class MjGameService extends BaseGameService {
         TreeMap<Integer, String> operations = MjCardRule.getPlayerHighestPriority(roomInfo, roomInfo.getCurPlayerId());
         MjPlayerInfo mjp = MjCardRule.getPlayerInfoByPlayerId(playerList, roomInfo.getCurPlayerId());
         /**不是curPlayerId摸牌并且他有操作权限,则不需要指示方向*/
-        if (mjp.getCurMoPaiCardIndex() == null && (operations != null && operations.size() > 0)) {
+        if (mjp != null && mjp.getCurMoPaiCardIndex() == null && (operations != null && operations.size() > 0)) {
         	roomInfo.setNotShowPoint(1);
 		}
         for (MjPlayerInfo player : playerList) {
