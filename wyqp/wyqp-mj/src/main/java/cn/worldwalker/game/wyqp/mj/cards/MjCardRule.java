@@ -274,6 +274,7 @@ public class MjCardRule {
 				if (mingGangCardIndex.equals(player.getCurMoPaiCardIndex())) {
 					player.setCurMoPaiCardIndex(null);
 				}else{/**如果是手牌里面的牌和碰的牌组成杠*/
+					handCardList.add(player.getCurMoPaiCardIndex());
 					handCardList.remove(mingGangCardIndex);
 				}
 				player.getPengCardList().remove(mingGangCardIndex);
