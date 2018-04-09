@@ -34,7 +34,7 @@ public class Client {
 
     private static final String HTTP_URL = "http://" + Constant.domain;
     private static final String WS_URL = "ws://" + Constant.localIp + ":" + Constant.websocketPort;
-//    private static final String HTTP_URL = "http://localhost:8080";
+//    private static final String HTTP_URL = "http://localhost";
 //    private static final String WS_URL = "ws://localhost:10010";
 
     public Client(Integer position) {
