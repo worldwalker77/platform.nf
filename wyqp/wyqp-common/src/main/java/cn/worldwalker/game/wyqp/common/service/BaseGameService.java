@@ -490,19 +490,31 @@ public abstract class BaseGameService {
 			refreshRoomForAllPlayer(roomInfo);
 			return;
 		}
-		/**房间状态是最开始准备阶段，则玩家可以退出*/
+		/**房间状态是最开始准备阶段*/
 		if (roomInfo.getStatus().equals(RoomStatusEnum.justBegin.status)) {
 			
-			/**如果在游戏最开始准备阶段退出的是庄家（即房主），则需要设置一个默认的庄家（房主）,当前退出庄家的下家*/
+			/**如果在游戏最开始准备阶段退出的是庄家（即房主），则直接解散房间*/
 			if (roomInfo.getRoomBankerId().equals(playerId)) {
-				Integer tempId = GameUtil.getNextPlayerId(playerList, playerId);
-				roomInfo.setRoomOwnerId(tempId);
-				if (request.getGameType().equals(GameTypeEnum.jh.gameType)) {
-					roomInfo.setRoomBankerId(tempId);
+//				Integer tempId = GameUtil.getNextPlayerId(playerList, playerId);
+//				roomInfo.setRoomOwnerId(tempId);
+//				if (request.getGameType().equals(GameTypeEnum.jh.gameType)) {
+//					roomInfo.setRoomBankerId(tempId);
+//				}
+				/**解散房间*/
+				redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
+				if (roomInfo.getClubId() != null) {
+					redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomId);
 				}
+				/**将用户缓存信息里面的roomId设置为null*/
+				userInfo.setRoomId(null);
+				redisOperationService.setUserInfo(request.getToken(), userInfo);
+				result.setMsgType(MsgTypeEnum.successDissolveRoom.msgType);
+				data.put("roomId", roomId);
+				channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+				return;
 			}
 			
-			/**删除玩家*/
+			/**如果是非庄家玩家退出，则只是此玩家退出*/
 			GameUtil.removePlayer(playerList, playerId);
 			redisOperationService.cleanPlayerAndRoomInfoForSignout(roomId, String.valueOf(playerId));
 			redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);

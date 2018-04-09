@@ -23,7 +23,7 @@ public class LoginInterceptor  extends HandlerInterceptorAdapter {
 
 	@Override
 	public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler, ModelAndView modelAndView) throws Exception {
-	
+		RequestUtil.setUserSession(null);
 	}
 
 	@Override
