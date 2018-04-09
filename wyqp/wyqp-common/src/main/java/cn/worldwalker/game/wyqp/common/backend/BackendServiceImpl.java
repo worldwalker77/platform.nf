@@ -286,7 +286,7 @@ public class BackendServiceImpl implements BackendService{
 			if (gameQuery.getProxyId() > 0) {
 				gameDao.updateProxy(gameQuery);
 			}else{
-				gameQuery.setPassword(gameQuery.getMobilePhone());
+				gameQuery.setPassword(MD5Util1.encryptByMD5(gameQuery.getMobilePhone()));
 				gameDao.insertProxy(gameQuery);
 			}
 		} catch (Exception e) {
@@ -319,10 +319,10 @@ public class BackendServiceImpl implements BackendService{
 				result.setDesc("手机号或者老密码错误");
 				return result;
 			}
-			GameQuery tempQuery1 = new GameQuery();
-			tempQuery1.setProxyId(RequestUtil.getProxyId());
-			tempQuery1.setNewPassword(gameQuery.getNewPassword());
-			gameDao.updateProxy(gameQuery);
+			GameQuery newGameQuery= new GameQuery();
+			newGameQuery.setProxyId(RequestUtil.getProxyId());
+			newGameQuery.setNewPassword(gameQuery.getNewPassword());
+			gameDao.updateProxy(newGameQuery);
 		} catch (Exception e) {
 			log.error("doModifyPassword异常，gameQuery：" + JsonUtil.toJson(gameQuery), e);
 			result.setCode(1);
