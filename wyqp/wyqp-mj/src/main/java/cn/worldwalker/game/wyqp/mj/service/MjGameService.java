@@ -1534,9 +1534,11 @@ public class MjGameService extends BaseGameService {
         	newRoomInfo.setRemaindCardNum(roomInfo.getTableRemainderCardList().size());
 		}
         newRoomInfo.setOpMap(roomInfo.getOpMap());
-        
+        System.out.println("所有权限===============" + JsonUtil.toJson(roomInfo.getPlayerOperationMap()) );
         TreeMap<Integer, String> operations = MjCardRule.getPlayerHighestPriority(roomInfo, roomInfo.getCurPlayerId());
+        System.out.println("curPlayerId权限===============" + JsonUtil.toJson(operations) );
         MjPlayerInfo mjp = MjCardRule.getPlayerInfoByPlayerId(playerList, roomInfo.getCurPlayerId());
+        System.out.println("curPlayer信息===============" + JsonUtil.toJson(mjp) );
         /**不是curPlayerId摸牌并且他有操作权限,则不需要指示方向*/
         if (mjp != null && mjp.getCurMoPaiCardIndex() == null && (operations != null && operations.size() > 0)) {
         	roomInfo.setNotShowPoint(1);
