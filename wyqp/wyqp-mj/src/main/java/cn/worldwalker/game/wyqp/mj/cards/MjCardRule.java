@@ -1,5 +1,24 @@
 package cn.worldwalker.game.wyqp.mj.cards;
 
+import static cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum.PING_HU;
+import static cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum.SHI_SHI_SAN_LAN;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Stack;
+import java.util.TreeMap;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.common.enums.DissolveStatusEnum;
@@ -8,23 +27,14 @@ import cn.worldwalker.game.wyqp.common.exception.ExceptionEnum;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
 import cn.worldwalker.game.wyqp.common.utils.SnowflakeIdGenerator;
-import cn.worldwalker.game.wyqp.mj.enums.*;
+import cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjPlayerStatusEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjTypeEnum;
 import cn.worldwalker.game.wyqp.mj.huvalidate.Hulib;
 import cn.worldwalker.game.wyqp.mj.huvalidate.TableMgr;
-import cn.worldwalker.game.wyqp.mj.service.MjCardService;
 import cn.worldwalker.game.wyqp.mj.service.MjHuService;
 import cn.worldwalker.game.wyqp.mj.service.MjScoreService;
-
-import com.alibaba.fastjson.JSON;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
-import java.util.*;
-import java.util.Map.Entry;
-
-import static cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum.PING_HU;
-import static cn.worldwalker.game.wyqp.mj.enums.MjScoreEnum.SHI_SHI_SAN_LAN;
 
 
 public class MjCardRule {
@@ -92,8 +102,55 @@ public class MjCardRule {
 		return curTableCardList;
 	}
 	
+	public static void main(String[] args) {
+		LinkedHashMap<Integer, TreeMap<Integer, String>> allPlayerOperations = new LinkedHashMap<Integer, TreeMap<Integer,String>>();
+		/**第一个玩家吃胡**/
+		TreeMap<Integer, String> playerOperations1 = new TreeMap<Integer, String>();
+		playerOperations1.put(MjOperationEnum.chi.type, "2,3");
+		playerOperations1.put(MjOperationEnum.hu.type, "1");
+		allPlayerOperations.put(111111, playerOperations1);
+		/**第二个玩家碰胡**/
+		TreeMap<Integer, String> playerOperations2 = new TreeMap<Integer, String>();
+		playerOperations2.put(MjOperationEnum.peng.type, "1");
+		playerOperations2.put(MjOperationEnum.hu.type, "1");
+		allPlayerOperations.put(222222, playerOperations2);
+		/**第三个玩家胡**/
+		TreeMap<Integer, String> playerOperations3 = new TreeMap<Integer, String>();
+		playerOperations3.put(MjOperationEnum.hu.type, "1");
+		allPlayerOperations.put(333333, playerOperations3);
+		/**第四个玩家胡**/
+		TreeMap<Integer, String> playerOperations4 = new TreeMap<Integer, String>();
+		playerOperations4.put(MjOperationEnum.hu.type, "1");
+		allPlayerOperations.put(444444, playerOperations4);
+		MjRoomInfo roomInfo = new MjRoomInfo();
+		roomInfo.setPlayerOperationMap(allPlayerOperations);
+		Integer curPlayerId = getPlayerHighestPriorityPlayerId(roomInfo);
+		TreeMap<Integer, String> hi = getPlayerHighestPriority(roomInfo, curPlayerId);
+		System.out.println(JsonUtil.toJson(hi));
+		
+		TreeMap<Integer, String> del = delPlayerOperationByPlayerId(roomInfo, 111111);
+		System.out.println(JsonUtil.toJson(del));
+		System.out.println(JsonUtil.toJson(roomInfo.getPlayerOperationMap()));
+	}
+	
 	public static TreeMap<Integer, String> delPlayerOperationByPlayerId(MjRoomInfo roomInfo, Integer playerId){
-		return roomInfo.getPlayerOperationMap().remove(playerId);
+		Integer nextPri = getHighestPriorityWithOutCurPlayer(roomInfo, playerId);
+		LinkedHashMap<Integer, TreeMap<Integer, String>> allPlayerOperations = roomInfo.getPlayerOperationMap();
+		if (nextPri == null ) {
+			return allPlayerOperations.remove(playerId);
+		}
+		TreeMap<Integer, String> delCurOperations = new TreeMap<Integer, String>();
+		TreeMap<Integer, String> curOperations = allPlayerOperations.get(playerId);
+		Iterator<Map.Entry<Integer, String>> it = curOperations.entrySet().iterator();  
+        while(it.hasNext()){  
+            Map.Entry<Integer, String> entry = it.next();  
+            /**删除比其他玩家最高操作权限要高的权限*/
+            if(entry.getKey() >= nextPri){
+            	it.remove();
+                delCurOperations.put(entry.getKey(), entry.getValue());
+            }
+        }  
+		return delCurOperations;
 	}
 	
 	/**
@@ -126,7 +183,61 @@ public class MjCardRule {
 		if (allPlayerOperations == null || allPlayerOperations.size() == 0) {
 			return null;
 		}
-		return allPlayerOperations.get(playerId);
+		int allSize = allPlayerOperations.size();
+		TreeMap<Integer, String> curPlayerOperations = allPlayerOperations.get(playerId);
+		/**当前玩家的可操作权限*/
+		TreeMap<Integer, String> resultMap = new TreeMap<Integer, String>();
+		resultMap.putAll(curPlayerOperations);
+		int curSize = resultMap.size();
+		/**如果只有这一个玩家有权限或者此玩家的可操作权限数量只有一个，则返回所有权限*/
+		if (allSize == 1 || curSize == 1) {
+			return resultMap;
+		}
+		/**如果有多个玩家有操作权限，并且当前玩家有多个操作权限，并且当前玩家的操作权限并不都是最高的*/
+		Integer nextHightPri = getHighestPriorityWithOutCurPlayer(roomInfo, playerId);
+		if (nextHightPri != null) {
+			Set<Entry<Integer, String>> set = curPlayerOperations.entrySet();
+			for(Entry<Integer, String> entry : set){
+				/**如果当前玩家的操作权限中有小于其他玩家最高操作权限的则过滤掉*/
+				if (entry.getKey() < nextHightPri) {
+					resultMap.remove(entry.getKey());
+				}
+			}
+		}
+		return resultMap;
+	}
+	/**
+	 * 获取除了当前玩家操作权限之外，按照顺序往后的其他玩家的最高操作权限
+	 * @param roomInfo
+	 * @param playerId
+	 * @return
+	 */
+	public static Integer getHighestPriorityWithOutCurPlayer(MjRoomInfo roomInfo, Integer playerId){
+		MjRoomInfo newRoomInfo = new MjRoomInfo();
+		LinkedHashMap<Integer, TreeMap<Integer, String>> newAllPlayerOperations = new LinkedHashMap<Integer, TreeMap<Integer,String>>();
+		newAllPlayerOperations.putAll(roomInfo.getPlayerOperationMap());
+		/**删除当前玩家操作权限*/
+		newAllPlayerOperations.remove(playerId);
+		if (newAllPlayerOperations == null || newAllPlayerOperations.size() == 0) {
+			return null;
+		}
+		newRoomInfo.setPlayerOperationMap(newAllPlayerOperations);
+		Integer nextPlayerId = getPlayerHighestPriorityPlayerId(newRoomInfo);
+		if (nextPlayerId == null) {
+			return null;
+		}
+		TreeMap<Integer, String> nextOperations = newAllPlayerOperations.get(nextPlayerId);
+		if (nextOperations == null || nextOperations.size() == 0) {
+			return null;
+		}
+		Integer higestPri = MjOperationEnum.chi.type;
+		Set<Entry<Integer, String>> set = nextOperations.entrySet();
+		for(Entry<Integer, String> entry : set){
+			if (entry.getKey() > higestPri) {
+				higestPri = entry.getKey();
+			}
+		}
+		return higestPri;
 	}
 	
 	public static boolean checkCurOperationValid(MjRoomInfo roomInfo, Integer playerId, Integer operationType, String operationStr){
@@ -274,7 +385,9 @@ public class MjCardRule {
 				if (mingGangCardIndex.equals(player.getCurMoPaiCardIndex())) {
 					player.setCurMoPaiCardIndex(null);
 				}else{/**如果是手牌里面的牌和碰的牌组成杠*/
-					handCardList.add(player.getCurMoPaiCardIndex());
+					if (player.getCurMoPaiCardIndex() != null) {
+						handCardList.add(player.getCurMoPaiCardIndex());
+					}
 					handCardList.remove(mingGangCardIndex);
 				}
 				player.getPengCardList().remove(mingGangCardIndex);
@@ -598,6 +711,7 @@ public class MjCardRule {
 		roomInfo.setPlayerOperationMap(operations);
 		return operations;
 	}
+	
 	/**
 	 * 校验手牌列表牌补花情况
 	 * @param player
@@ -1197,16 +1311,6 @@ public class MjCardRule {
 			Hulib.getInstance().get_hu_info(handCardList, notContainIndex, roomInfo.getBaiDaCardIndex(), roomInfo.getIndexLine());
 		}
 		return false;
-		
-	}
-	public static void main(String[] args) {
-		TableMgr.getInstance().load();
-		MjPlayerInfo player = new MjPlayerInfo();
-		List<Integer> list = Arrays.asList(4,5,5,15,15,15,24,25,25,25);
-		player.setHandCardList(list);
-		Map<Integer, List<String>> chuCardIndexHuCardListMap = new HashMap<Integer, List<String>>();
-		checkTingHu1(null, player, 24, chuCardIndexHuCardListMap);
-		System.out.println(JsonUtil.toJson(chuCardIndexHuCardListMap));
 		
 	}
 	
