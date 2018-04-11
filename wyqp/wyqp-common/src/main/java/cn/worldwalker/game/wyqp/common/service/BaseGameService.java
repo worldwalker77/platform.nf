@@ -115,8 +115,14 @@ public abstract class BaseGameService {
 		userInfo.setNickName(weixinUserInfo.getName());
 		userInfo.setSex(weixinUserInfo.getSex());
 		userInfo.setLevel(userModel.getUserLevel() == null ? 1 : userModel.getUserLevel());
-		userInfo.setServerIp(Constant.localIp);
-		userInfo.setPort(String.valueOf(Constant.websocketPort));
+        //noinspection Duplicates
+        if ("true".equals(Constant.useWss)){
+            userInfo.setServerIp(Constant.wssDomain);
+            userInfo.setPort(String.valueOf(Constant.wssPort));
+        } else {
+            userInfo.setServerIp(Constant.localIp);
+            userInfo.setPort(String.valueOf(Constant.websocketPort));
+        }
 		userInfo.setRemoteIp(IPUtil.getRemoteIp(request));
 		String loginToken = GameUtil.genToken(userModel.getPlayerId());
 		userInfo.setHeadImgUrl(UrlImgDownLoadUtil.getLocalImgUrl(weixinUserInfo.getHeadImgUrl(), userModel.getPlayerId()));
@@ -161,8 +167,14 @@ public abstract class BaseGameService {
 		userInfo.setNickName(String.valueOf(playerId));
 		userInfo.setSex(0);
 		userInfo.setLevel(1);
-		userInfo.setServerIp(Constant.localIp);
-		userInfo.setPort(String.valueOf(Constant.websocketPort));
+        //noinspection Duplicates
+        if ("true".equals(Constant.useWss)){
+            userInfo.setServerIp(Constant.wssDomain);
+            userInfo.setPort(String.valueOf(Constant.wssPort));
+        } else {
+            userInfo.setServerIp(Constant.localIp);
+            userInfo.setPort(String.valueOf(Constant.websocketPort));
+        }
 		userInfo.setRemoteIp(IPUtil.getRemoteIp(request));
 		String loginToken =GameUtil.genToken(playerId);
 		userInfo.setToken(loginToken);
