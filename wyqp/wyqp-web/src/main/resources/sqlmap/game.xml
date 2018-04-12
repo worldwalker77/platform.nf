@@ -363,6 +363,32 @@
 	    where proxy_id = #{proxyId} and club_id = #{clubId} and player_id = #{playerId}
 	</delete>
 	
+	
+	
+	<select id="getRoomInfos"  parameterType = "gameQuery" resultMap="gameModelResultMap">
+	    select a.proxy_id,a.club_id,a.player_id,a.nick_name,a.status,a.create_time,b.head_img_url
+	    from t_club_user a left join t_user b on a.player_id = b.player_id
+	    where  1=1
+	    <if test="roomId !=null ">  
+	       and room_id = #{roomId}
+	    </if>
+	    <if test="clubId !=null ">  
+	       and club_id = #{clubId}
+	    </if>
+	    order by a.create_time desc
+	    limit #{offset}, #{limit}
+	</select>
+	<select id="getRoomInfoCount"  parameterType = "gameQuery" resultType="Long">
+	    select count(1)
+	    from t_user_record_detail
+	    where  1=1
+	    <if test="roomId !=null ">  
+	       and room_id = #{roomId}
+	    </if>
+	    <if test="clubId !=null ">  
+	       and club_id = #{clubId}
+	    </if>
+	</select>
 </mapper>
 
 

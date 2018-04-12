@@ -1356,7 +1356,11 @@ public class MjGameService extends BaseGameService {
             }
         }
         /**记录每一局得分*/
-        commonManager.addUserRecordDetail(roomInfo);
+        try {
+			commonManager.addUserRecordDetail(roomInfo);
+		} catch (Exception e1) {
+			log.error(JsonUtil.toJson(roomInfo), e1);
+		}
         /**如果是第一局结束，则扣除房卡;扣除房卡异常不影响游戏进行，会将异常数据放入redis中，由定时任务进行补偿扣除*/
         if (roomInfo.getCurGame() == 1) {
             if (redisOperationService.isLoginFuseOpen()) {

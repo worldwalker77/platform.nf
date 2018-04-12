@@ -208,6 +208,11 @@ public class CommonManagerImpl implements CommonManager{
 			model.setGameType(roomInfo.getGameType());
 			model.setDetailType(roomInfo.getDetailType());
 			model.setRoomId(roomInfo.getRoomId());
+			if (roomInfo.getClubId() == null) {
+				model.setClubId(0);
+			}else{
+				model.setClubId(roomInfo.getClubId());
+			}
 			model.setPayType(roomInfo.getPayType());
 			model.setTotalGames(roomInfo.getTotalGames());
 			model.setPlayerId(player.getPlayerId());
@@ -246,6 +251,13 @@ public class CommonManagerImpl implements CommonManager{
 		
 		UserRecordModel model = new UserRecordModel();
 		model.setRecordUuid(roomInfo.getRoomUuid());
+		model.setRoomId(roomInfo.getRoomId());
+		if (roomInfo.getClubId() == null) {
+			model.setClubId(0);
+		}else{
+			model.setClubId(roomInfo.getClubId());
+		}
+		
 		model.setRecordDetailUuid(roomInfo.getCurGameUuid());
 		model.setCurGame(roomInfo.getCurGame());
 		model.setRecordInfo(recordInfo);
