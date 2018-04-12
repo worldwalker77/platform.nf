@@ -200,6 +200,10 @@ public abstract class BaseGameService {
 	}
 	
 	public void createRoom(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		/**校验创建房间的开关是否打开，如果没打开，就提示用户；此时可能是需要升级，暂停服务*/
+		if (!redisOperationService.isCreateRoomFuseOpen()) {
+			throw new BusinessException(ExceptionEnum.SYSTEM_UPGRADE);
+		}
 		Result result = null;
 		BaseMsg msg = request.getMsg();
 		

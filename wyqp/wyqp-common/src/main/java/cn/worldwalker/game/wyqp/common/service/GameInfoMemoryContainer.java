@@ -12,6 +12,7 @@ public class GameInfoMemoryContainer {
 	
 	public static String logFuse = Constant.logFuseValue;
 	public static String loginFuse = Constant.loginFuseValue;
+	public static String createRoomFuse = Constant.createRoomFuseValue;
 	public static Map<String, String> tokenUserInfoMap = new ConcurrentHashMap<String, String>();
 	public static Map<String, Long> tokenTimeMap = new ConcurrentHashMap<String, Long>();
 	public static Map<String, String> roomIdGameTypeUpdateTimeMap = new ConcurrentHashMap<String, String>();
