@@ -2,14 +2,9 @@ package cn.worldwalker.game.wyqp.web.backend;
 
 import cn.worldwalker.game.wyqp.common.backend.BackendService;
 import cn.worldwalker.game.wyqp.common.backend.GameQuery;
-import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
-import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.common.result.Result;
 import cn.worldwalker.game.wyqp.common.service.RedisOperationService;
-import cn.worldwalker.game.wyqp.mj.mock.MockRoom;
 import cn.worldwalker.game.wyqp.mj.mock.MockService;
-import cn.worldwalker.game.wyqp.mj.robot.Client;
-import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +13,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.List;
 
 @Controller
 public class LoginController {
@@ -53,6 +46,7 @@ public class LoginController {
 	}
 
 
+	/*
     @RequestMapping("addRobot")
     @ResponseBody
     public String addRobot(Integer roomId, Integer cnt) throws Exception {
@@ -180,7 +174,6 @@ public class LoginController {
         redisOperationService.setRoomIdRoomInfo(roomId,roomInfo);
         return "OK";
     }
-
-
+*/
 }
 
