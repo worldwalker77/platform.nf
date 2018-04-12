@@ -129,4 +129,11 @@ public class Constant {
 	public static final String logFuseValue = CustomizedPropertyConfigurer.getContextProperty("log.fuse.value");
 	
 	public static final String loginFuseValue = CustomizedPropertyConfigurer.getContextProperty("login.fuse.value");
+
+	public static final String useWss = CustomizedPropertyConfigurer.getContextProperty("wss.use");
+    public static final String wssDomain = CustomizedPropertyConfigurer.getContextProperty("wss.domain");
+    public static final String wssPort = CustomizedPropertyConfigurer.getContextProperty("wss.port");
+
 }
+
+
