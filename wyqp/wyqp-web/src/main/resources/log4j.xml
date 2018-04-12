@@ -14,7 +14,7 @@
         class="org.apache.log4j.DailyRollingFileAppender">  
         <param name="Threshold" value="info"></param>  
         <param name="ImmediateFlush" value="true"></param>  
-        <!--<param name="File" value="/Users/zhangmin/nf/logs/dailyRollingFile.log"></param>-->
+        <!--<param name="File" value="C:/Users/jinfeng.liu/Desktop/game-nf/logs/dailyRollingFile.log"></param>-->
         <param name="File" value="/home/tomcat/nf/logs/dailyRollingFile.log"></param>
         <param name="DatePattern" value="'.'yyyy-MM-dd'.log'"></param>
         <layout class="org.apache.log4j.PatternLayout">
@@ -25,7 +25,7 @@
       <!-- 输出日志到文件  文件大小到达指定尺寸的时候产生一个新的文件 -->  
     <appender name="railyFile"   
         class="org.apache.log4j.RollingFileAppender">  
-        <!--<param name="File" value="/Users/zhangmin/nf/logs/railyFile.log"></param>-->
+        <!--<param name="File" value="C:/Users/jinfeng.liu/Desktop/game-nf/logs/railyFile.log"></param>-->
         <param name="File" value="/home/tomcat/nf/logs/railyFile.log"></param>
         <param name="ImmediateFlush" value="true"/>
         <param name="Threshold" value="info"></param>  

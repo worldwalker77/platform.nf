@@ -115,8 +115,14 @@ public abstract class BaseGameService {
 		userInfo.setNickName(weixinUserInfo.getName());
 		userInfo.setSex(weixinUserInfo.getSex());
 		userInfo.setLevel(userModel.getUserLevel() == null ? 1 : userModel.getUserLevel());
-		userInfo.setServerIp(Constant.localIp);
-		userInfo.setPort(String.valueOf(Constant.websocketPort));
+        //noinspection Duplicates
+        if ("true".equals(Constant.useWss)){
+            userInfo.setServerIp(Constant.wssDomain);
+            userInfo.setPort(String.valueOf(Constant.wssPort));
+        } else {
+            userInfo.setServerIp(Constant.localIp);
+            userInfo.setPort(String.valueOf(Constant.websocketPort));
+        }
 		userInfo.setRemoteIp(IPUtil.getRemoteIp(request));
 		String loginToken = GameUtil.genToken(userModel.getPlayerId());
 		userInfo.setHeadImgUrl(UrlImgDownLoadUtil.getLocalImgUrl(weixinUserInfo.getHeadImgUrl(), userModel.getPlayerId()));
@@ -161,8 +167,14 @@ public abstract class BaseGameService {
 		userInfo.setNickName(String.valueOf(playerId));
 		userInfo.setSex(0);
 		userInfo.setLevel(1);
-		userInfo.setServerIp(Constant.localIp);
-		userInfo.setPort(String.valueOf(Constant.websocketPort));
+        //noinspection Duplicates
+        if ("true".equals(Constant.useWss)){
+            userInfo.setServerIp(Constant.wssDomain);
+            userInfo.setPort(String.valueOf(Constant.wssPort));
+        } else {
+            userInfo.setServerIp(Constant.localIp);
+            userInfo.setPort(String.valueOf(Constant.websocketPort));
+        }
 		userInfo.setRemoteIp(IPUtil.getRemoteIp(request));
 		String loginToken =GameUtil.genToken(playerId);
 		userInfo.setToken(loginToken);
@@ -188,6 +200,10 @@ public abstract class BaseGameService {
 	}
 	
 	public void createRoom(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		/**校验创建房间的开关是否打开，如果没打开，就提示用户；此时可能是需要升级，暂停服务*/
+		if (!redisOperationService.isCreateRoomFuseOpen()) {
+			throw new BusinessException(ExceptionEnum.SYSTEM_UPGRADE);
+		}
 		Result result = null;
 		BaseMsg msg = request.getMsg();
 		

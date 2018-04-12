@@ -694,4 +694,17 @@ public class RedisOperationService {
 		return false;
 	}
 	
+	public boolean isCreateRoomFuseOpen(){
+		String createRoomFuseValue = "0";
+		if (gameInfoStorageType == 0 ) {
+			createRoomFuseValue = jedisTemplate.get(Constant.createRoomFuse);
+		}else{
+			createRoomFuseValue = GameInfoMemoryContainer.createRoomFuse;
+		}
+		if ("1".equals(createRoomFuseValue)) {
+			return true;
+		}
+		return false;
+	}
+	
 }

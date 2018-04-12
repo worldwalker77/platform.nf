@@ -57,6 +57,7 @@ public class MjGameService extends BaseGameService {
 
         if ( MjCardRule.isJxNf(roomInfo)){
             roomInfo.setIsChiPai(0);
+            roomInfo.setIndexLine(34);
         }
 
         List<MjPlayerInfo> playerList = roomInfo.getPlayerList();

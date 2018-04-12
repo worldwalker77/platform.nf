@@ -25,6 +25,9 @@ public class Constant {
 	/**登录切换开关*/
 	public final static String loginFuse = curCompany + "_login_fuse";
 	
+	/**创建房间切换开关，主要是为了升级的时候，先停止玩家创建房间，再升级*/
+	public final static String createRoomFuse = curCompany + "_create_room_fuse";
+	
 	/**本机ip地址*/
 	public final static String localIp = CustomizedPropertyConfigurer.getContextProperty("local.ip");
 	
@@ -129,4 +132,13 @@ public class Constant {
 	public static final String logFuseValue = CustomizedPropertyConfigurer.getContextProperty("log.fuse.value");
 	
 	public static final String loginFuseValue = CustomizedPropertyConfigurer.getContextProperty("login.fuse.value");
+	
+	public static final String createRoomFuseValue = CustomizedPropertyConfigurer.getContextProperty("create.room.fuse.value");
+
+	public static final String useWss = CustomizedPropertyConfigurer.getContextProperty("wss.use");
+    public static final String wssDomain = CustomizedPropertyConfigurer.getContextProperty("wss.domain");
+    public static final String wssPort = CustomizedPropertyConfigurer.getContextProperty("wss.port");
+
 }
+
+
