@@ -93,8 +93,6 @@ public class Constant {
 	
 	public final static int gameInfoStorageType = Integer.valueOf(CustomizedPropertyConfigurer.getContextProperty("game.info.storage.type"));
 	
-	public final static String[] adminMobile = CustomizedPropertyConfigurer.getContextProperty("admin.mobile").split(",");
-	
 	public final static String clientFileUploadFolder = CustomizedPropertyConfigurer.getContextProperty("client.file.upload.folder");
 	
 	public final static String clientFileUnrarFolder = CustomizedPropertyConfigurer.getContextProperty("client.file.unrar.folder");
@@ -134,7 +132,9 @@ public class Constant {
 	public static final String loginFuseValue = CustomizedPropertyConfigurer.getContextProperty("login.fuse.value");
 	
 	public static final String createRoomFuseValue = CustomizedPropertyConfigurer.getContextProperty("create.room.fuse.value");
-
+	
+	public static final String apiSecret = CustomizedPropertyConfigurer.getContextProperty("api.secret");
+	
 	public static final String useWss = CustomizedPropertyConfigurer.getContextProperty("wss.use");
     public static final String wssDomain = CustomizedPropertyConfigurer.getContextProperty("wss.domain");
     public static final String wssPort = CustomizedPropertyConfigurer.getContextProperty("wss.port");

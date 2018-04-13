@@ -27,18 +27,13 @@ public class BackendServiceImpl implements BackendService{
 	@Autowired
 	private BackendManager gameManager;
 	
-	private static Map<String, String> adminPhoneMap = new HashMap<String, String>();
-	static{
-		for(int i = 0,size = Constant.adminMobile.length; i < size ; i++){
-			adminPhoneMap.put(Constant.adminMobile[i], Constant.adminMobile[i]);
-		}
-		
-//		adminPhoneMap.put("13006339022", "13006339022");
-	}
 	@Override
 	public boolean isAdmin(){
-		String mobile = RequestUtil.getUserSession().getMobilePhone();
-		return adminPhoneMap.containsKey(mobile);
+		Integer isAdmin = RequestUtil.getUserSession().getIsAdmin();
+		if (isAdmin == 1) {
+			return true;
+		}
+		return false;
 	}
 	@Override
 	public Result doLogin(GameQuery gameQuery) {
@@ -56,6 +51,7 @@ public class BackendServiceImpl implements BackendService{
 		userSession.setRealName(gameModel.getRealName());
 		userSession.setWechatNum(gameModel.getWechatNum());
 		userSession.setMobilePhone(gameModel.getMobilePhone());
+		userSession.setIsAdmin(gameModel.getIsAdmin());
 		RequestUtil.setUserSession(genToken(gameQuery.getMobilePhone()), userSession);
 		return result;
 	}

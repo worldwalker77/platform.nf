@@ -4,12 +4,21 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class RedisRequest {
-	public String operation;
-	public String key;
-	public String field;
-	public Object value;
-	public int start;
-	public int end;
+	private String operation;
+	private String key;
+	private String field;
+	private Object value;
+	private int start;
+	private int end;
+	
+	private String secret;
+	
+	public String getSecret() {
+		return secret;
+	}
+	public void setSecret(String secret) {
+		this.secret = secret;
+	}
 	public String getKey() {
 		return key;
 	}
