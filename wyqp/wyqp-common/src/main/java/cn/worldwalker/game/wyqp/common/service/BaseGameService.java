@@ -309,10 +309,28 @@ public abstract class BaseGameService {
 		if (!redisOperationService.isRoomIdExist(roomId)) {
 			throw new BusinessException(ExceptionEnum.ROOM_ID_NOT_EXIST);
 		}
-		
-		
-		BaseRoomInfo roomInfo = doEntryRoom(ctx, request, userInfo);
+		/**先获取房间信息，判断此玩家是否在房间里面，如果在房间里面就走刷新接口*/
+		userInfo.setRoomId(roomId);
+		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
 		List playerList = roomInfo.getPlayerList();
+		boolean isExist = false;
+		for(int i = 0; i < playerList.size(); i++ ){
+			BasePlayerInfo tempPlayerInfo = (BasePlayerInfo)playerList.get(i);
+			/**如果加入的玩家id已经存在*/
+			if (playerId.equals(tempPlayerInfo.getPlayerId())) {
+				isExist = true;
+				break;
+			}
+		}
+		/**如果申请加入房间的玩家已经存在房间中，则只需要走刷新接口*/
+		if (isExist) {
+			refreshRoom(ctx, request, userInfo);
+			return;
+		}
+		
+		/**如果不在房间里面就走加入房间*/
+		roomInfo = doEntryRoom(ctx, request, userInfo);
+		playerList = roomInfo.getPlayerList();
 		int size = playerList.size();
 		/**如果是麻将（金花和牛牛除外），那么游戏已经开始，则不允许再加入 add by liujinfengnew*/
 		if (roomInfo.getGameType().equals(GameTypeEnum.mj.gameType)) {
@@ -335,21 +353,7 @@ public abstract class BaseGameService {
 		}
 		userInfo.setRoomId(roomId);
 		redisOperationService.setUserInfo(request.getToken(), userInfo);
-		boolean isExist = false;
-		for(int i = 0; i < playerList.size(); i++ ){
-			BasePlayerInfo tempPlayerInfo = (BasePlayerInfo)playerList.get(i);
-			/**如果加入的玩家id已经存在*/
-			if (playerId.equals(tempPlayerInfo.getPlayerId())) {
-				isExist = true;
-				break;
-			}
-		}
-		/**如果申请加入房间的玩家已经存在房间中，则只需要走刷新接口*/
-		if (isExist) {
-			playerList.remove(playerList.size() - 1);
-			refreshRoom(ctx, request, userInfo);
-			return;
-		}
+		
 		
 		/**取list最后一个，即为本次加入的玩家，设置公共信息*/
 		BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(playerList.size() - 1);

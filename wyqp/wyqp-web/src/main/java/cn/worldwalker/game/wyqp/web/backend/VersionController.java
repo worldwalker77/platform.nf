@@ -66,7 +66,7 @@ public class VersionController {
 		
 		
 		Result result = new Result();
-		if (backendService.isAdmin()) {
+		if (!backendService.isAdmin()) {
 			result.setCode(1);
 			result.setDesc("无权限");
 			return result;

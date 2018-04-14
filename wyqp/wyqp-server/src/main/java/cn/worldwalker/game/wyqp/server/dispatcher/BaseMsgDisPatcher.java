@@ -75,6 +75,7 @@ public abstract class BaseMsgDisPatcher {
 							Result result = new Result();
 							result.setMsgType(MsgTypeEnum.entryHall.msgType);
 							channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
+							return;
 						}
 					}
 				}else{/**如果房间号存在*/
