@@ -104,6 +104,14 @@ public class RedisController {
 						}
 					}
 					break;
+				case "hget":
+					if (Constant.gameInfoStorageType == 0 ) {
+						response.setValue(jedisTemplate.hget(request.getKey(),request.getField()));
+					}else{
+						if("roomIdRoomInfoMap".equals(request.getKey())){
+							response.setValue(GameInfoMemoryContainer.roomIdRoomInfoMap.get(request.getField()));
+						}
+					}
 				case "hgetAll":
 					
 					if (Constant.gameInfoStorageType == 0 ) {
