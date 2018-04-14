@@ -822,7 +822,9 @@ public abstract class BaseGameService {
 		BaseMsg msg = request.getMsg();
 		result.setMsgType(MsgTypeEnum.getAllPlayerDistance.msgType);
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
-		result.setData(roomInfo.getDistanceMap());
+		if (roomInfo != null) {
+			result.setData(roomInfo.getDistanceMap());
+		}
 		channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
 		redisOperationService.setRoomIdGameTypeUpdateTime(msg.getRoomId(), request.getGameType(), new Date());
 	}
