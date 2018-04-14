@@ -36,6 +36,7 @@ import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel;
 import cn.worldwalker.game.wyqp.common.domain.base.WeiXinUserInfo;
+import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.common.enums.ChatTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.DissolveStatusEnum;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
@@ -956,7 +957,10 @@ public abstract class BaseGameService {
 		/**设置解散玩家列表，如果有*/
 		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
 		if (model != null) {
-			returnRoomInfo.setDisList(GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime()));
+			/**一圈结束的时候不返回解散列表*/
+			if ((roomInfo.getStatus() != 4)&&(roomInfo.getStatus() != 6)) {
+				returnRoomInfo.setDisList(GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime()));
+			}
 		}
 		result.setData(returnRoomInfo);
 		/**返回给当前玩家刷新信息*/
