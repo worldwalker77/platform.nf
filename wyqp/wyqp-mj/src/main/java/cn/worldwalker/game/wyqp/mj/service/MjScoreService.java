@@ -248,7 +248,7 @@ public class MjScoreService {
 
 
     /*
-    计算胡牌分数
+    计算胡牌分数（已经判了胡以后，才能调用此方法，否则不胡会当作平胡）
      */
 
     @SuppressWarnings("ConstantConditions")
