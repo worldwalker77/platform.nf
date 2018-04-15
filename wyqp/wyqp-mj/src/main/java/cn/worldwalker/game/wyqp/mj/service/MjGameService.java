@@ -245,9 +245,20 @@ public class MjGameService extends BaseGameService {
         if (!roomInfo.getCurPlayerId().equals(playerId)) {
             throw new BusinessException(ExceptionEnum.IS_NOT_YOUR_TURN);
         }
+        MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(playerList, playerId);
+        Integer chuPaiCardIndex = msg.getCardIndex();
+        if (chuPaiCardIndex == null) {
+        	throw new BusinessException(ExceptionEnum.PARAMS_ERROR);
+		}
+        /**如果出的牌不在玩家手牌列表中，并且出的牌也不是摸的牌，就走刷新接口*/
+        if (!player.getHandCardList().contains(chuPaiCardIndex) && !chuPaiCardIndex.equals(player.getCurMoPaiCardIndex())) {
+			refreshRoom(ctx, request, userInfo);
+			return;
+		}
+        
         roomInfo.setLastPlayerId(playerId);
         roomInfo.setLastCardIndex(msg.getCardIndex());
-        MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(playerList, playerId);
+        
         if (player.getCurMoPaiCardIndex() != null) {
             player.getHandCardList().add(player.getCurMoPaiCardIndex());
             player.setCurMoPaiCardIndex(null);

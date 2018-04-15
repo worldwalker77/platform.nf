@@ -650,7 +650,11 @@ public abstract class BaseGameService {
 		}
 		roomInfo.setUpdateTime(new Date());
 		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
-		List<Map<String, Object>> disPlayerList = GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime());
+		if (model != null) {
+			List<Map<String, Object>> disPlayerList = GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime());
+			data.put("playerList", disPlayerList);
+		}
+		
 		/**如果一半人不同意，则不能解散房间*/
 		if (disagreeDissolveCount >= (playerList.size()/2)) {
 			/**删除解散房间标志位*/
@@ -662,7 +666,7 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.disagreeDissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", msg.getPlayerId());
-		data.put("playerList", disPlayerList);
+		
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 	}
@@ -1429,6 +1433,23 @@ public abstract class BaseGameService {
 		data.put("playerList", onlineList);
 		data.put("onlineNum", onlineNum);
 		data.put("totalNum", onlineList.size());
+		result.setData(data);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	
+	public void getJoinedClubs(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.getJoinedClubs.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setPlayerId(playerId);
+		gameQuery.setStatus(1);
+		List<GameModel> list = gameDao.getJoinedClubs(gameQuery);
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("clubList", list);
 		result.setData(data);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}

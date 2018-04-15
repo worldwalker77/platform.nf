@@ -82,6 +82,9 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			case onlineNotice:
 				commonGameService.onlineNotice(ctx, request, userInfo);
 				break;
+			case getJoinedClubs:
+				commonGameService.getJoinedClubs(ctx, request, userInfo);
+				break;
 			default:
 				break;
 			}

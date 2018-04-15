@@ -49,8 +49,6 @@ public abstract class BaseMsgDisPatcher {
 		RedisRelaModel model = redisOperationService.getRoomIdGameTypeByPlayerId(userInfo.getPlayerId());
 		if (model != null) {
 			userInfo.setRoomId(model.getRoomId());
-		}else{
-			userInfo.setRoomId(null);
 		}
 		redisOperationService.setUserInfo(token, userInfo);
 		/**自动设置playerId和roomId*/
@@ -70,7 +68,14 @@ public abstract class BaseMsgDisPatcher {
 		}
 		Lock lock = null;
 		try {
+			/**如果此请求是需要加锁的*/
 			if (!notNeedLockMsgTypeMap.containsKey(request.getMsgType())) {
+				if (msg.getRoomId() == null) {
+					Result result = new Result();
+					result.setMsgType(MsgTypeEnum.entryHall.msgType);
+					channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
+					return;
+				}
 				/**如果不存在房间号*/
 				if (!redisOperationService.isRoomIdExist(msg.getRoomId())) {
 					/**如果是非刷新房间的请求，则报错，提示房间号不存在*/
@@ -142,5 +147,6 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.getAllPlayerDistance.msgType, MsgTypeEnum.getAllPlayerDistance);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.offlineNotice.msgType, MsgTypeEnum.offlineNotice);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.onlineNotice.msgType, MsgTypeEnum.onlineNotice);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.getJoinedClubs.msgType, MsgTypeEnum.getJoinedClubs);
 	}
 }
