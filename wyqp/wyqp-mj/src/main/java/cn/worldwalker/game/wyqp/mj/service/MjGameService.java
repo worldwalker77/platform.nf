@@ -252,7 +252,8 @@ public class MjGameService extends BaseGameService {
 		}
         /**如果出的牌不在玩家手牌列表中，并且出的牌也不是摸的牌，就走刷新接口*/
         if (!player.getHandCardList().contains(chuPaiCardIndex) && !chuPaiCardIndex.equals(player.getCurMoPaiCardIndex())) {
-			refreshRoom(ctx, request, userInfo);
+			log.info("===玩家出牌有问题，走刷新逻辑" + JsonUtil.toJson(request));
+        	refreshRoom(ctx, request, userInfo);
 			return;
 		}
         

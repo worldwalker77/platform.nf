@@ -325,8 +325,15 @@ public abstract class BaseGameService {
 		}
 		/**如果申请加入房间的玩家已经存在房间中，则只需要走刷新接口*/
 		if (isExist) {
+			
 			refreshRoom(ctx, request, userInfo);
 			return;
+		}
+		/**房间里面是否有clubId，如果有则需要校验此玩家是否属于此俱乐部*/
+		if (roomInfo.getClubId() != null) {
+			if (redisOperationService.getClubIdByPlayerId(playerId) == null) {
+				throw new BusinessException(ExceptionEnum.NOT_IN_CLUB);
+			}
 		}
 		
 		/**如果不在房间里面就走加入房间*/
@@ -970,6 +977,7 @@ public abstract class BaseGameService {
 		}
 		result.setData(returnRoomInfo);
 		/**返回给当前玩家刷新信息*/
+		redisOperationService.setPlayerIdRoomIdGameType(playerId, roomId, request.getGameType());
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		
 		
@@ -1340,6 +1348,7 @@ public abstract class BaseGameService {
 		}
 		
 		gameQuery.setPlayerId(playerId);
+		gameQuery.setStatus(1);
 		list = gameDao.getClubUsers(gameQuery);
 		/**如果当前玩家已经在俱乐部中,则直接进入俱乐部*/
 		if (!CollectionUtils.isEmpty(list)) {
@@ -1418,7 +1427,7 @@ public abstract class BaseGameService {
 			tempModel = new GameModel();
 			tempModel.setPlayerId(playerId);
 			tempModel.setNickName(modle.getNickName());
-			tempModel.setHeadImgUrl(modle.getHeadImgUrl() == null?userInfo.getHeadImgUrl() : modle.getHeadImgUrl());
+			tempModel.setHeadImgUrl(modle.getHeadImgUrl());
 			if (channelContainer.isPlayIdActive(modle.getPlayerId())) {
 				tempModel.setOnlineStatus(1);
 				onlineList.add(tempModel);

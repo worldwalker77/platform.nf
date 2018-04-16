@@ -36,6 +36,7 @@ public enum ExceptionEnum {
     USER_NOT_IN_CLUB(30, "玩家不在俱乐部中"),
     PLAY_BACK_CODE_ERROR(31, "回访码有误"),
     SYSTEM_UPGRADE(32, "系统正在升级，开放时间请听代理通知"),
+    NOT_IN_CLUB(33, "您不属于此俱乐部，请先加入俱乐部"),
     /**斗牛100-199*/
     
     /**麻将200-299*/
