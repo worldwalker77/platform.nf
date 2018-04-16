@@ -26,7 +26,14 @@ public class GameQuery {
 	private Integer type;
 	private String clubName;
 	private String clubOwnerWord;
+	private String headImgUrl;
 	
+	public String getHeadImgUrl() {
+		return headImgUrl;
+	}
+	public void setHeadImgUrl(String headImgUrl) {
+		this.headImgUrl = headImgUrl;
+	}
 	public Long getId() {
 		return id;
 	}

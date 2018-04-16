@@ -245,9 +245,20 @@ public class MjGameService extends BaseGameService {
         if (!roomInfo.getCurPlayerId().equals(playerId)) {
             throw new BusinessException(ExceptionEnum.IS_NOT_YOUR_TURN);
         }
+        MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(playerList, playerId);
+        Integer chuPaiCardIndex = msg.getCardIndex();
+        if (chuPaiCardIndex == null) {
+        	throw new BusinessException(ExceptionEnum.PARAMS_ERROR);
+		}
+        /**如果出的牌不在玩家手牌列表中，并且出的牌也不是摸的牌，就走刷新接口*/
+        if (!player.getHandCardList().contains(chuPaiCardIndex) && !chuPaiCardIndex.equals(player.getCurMoPaiCardIndex())) {
+			refreshRoom(ctx, request, userInfo);
+			return;
+		}
+        
         roomInfo.setLastPlayerId(playerId);
         roomInfo.setLastCardIndex(msg.getCardIndex());
-        MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(playerList, playerId);
+        
         if (player.getCurMoPaiCardIndex() != null) {
             player.getHandCardList().add(player.getCurMoPaiCardIndex());
             player.setCurMoPaiCardIndex(null);
@@ -849,7 +860,7 @@ public class MjGameService extends BaseGameService {
         /**设置状态为听牌*/
         player.setIsTingHu(1);
         /**将当前玩家的可操作性权限删除*/
-        MjCardRule.delPlayerOperationByPlayerId(roomInfo, playerId);
+        MjCardRule.delPlayerOperationByPlayerId(roomInfo, playerId, false);
         /**听牌后操作权限还在自己*/
         roomInfo.setCurPlayerId(playerId);
         roomInfo.setUpdateTime(new Date());
@@ -885,7 +896,7 @@ public class MjGameService extends BaseGameService {
         redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
         MjPlayerInfo player = MjCardRule.getPlayerInfoByPlayerId(roomInfo.getPlayerList(), playerId);
         /**将当前玩家的可操作性权限删除*/
-        TreeMap<Integer, String> delOperation = MjCardRule.delPlayerOperationByPlayerId(roomInfo, playerId);
+        TreeMap<Integer, String> delOperation = MjCardRule.delPlayerOperationByPlayerId(roomInfo, playerId, true);
         Map<String, Object> data = new HashMap<String, Object>();
         result.setData(data);
         /**如果是pass摸牌、吃、碰、杠后的可操作性权限，则当前说话的玩家还是当前玩家*/
@@ -904,6 +915,8 @@ public class MjGameService extends BaseGameService {
                 if (StringUtils.isNotBlank(huStr)) {
                 	/**放弃胡，则一圈内此玩家不能胡牌*/
                 	player.setCheckHuflag(false);
+                	/**设置当时放弃的胡的分数*/
+                	player.setCheckHuScore(mjScoreService.getHuScore(player, roomInfo.getLastCardIndex()));
                 	/**如果pass的胡是抢杠，则需要让杠的玩家走完剩余流程*/
                 	if (huStr.startsWith("3")) {
                 		/**走上个玩家杠没走完的逻辑*/
@@ -1019,7 +1032,7 @@ public class MjGameService extends BaseGameService {
         /**获取胡牌的类型*/
         Integer playerHuTypeInt = Integer.valueOf(MjCardRule.getPlayerHighestPriority(roomInfo, playerId).get(MjOperationEnum.hu.type));
         /**将当前玩家的可操作性权限删除*/
-        MjCardRule.delPlayerOperationByPlayerId(roomInfo, playerId);
+        MjCardRule.delPlayerOperationByPlayerId(roomInfo, playerId, false);
 
         /**获取剩余玩家最高可操作性权限*/
         Integer curPlayerId = MjCardRule.getPlayerHighestPriorityPlayerId(roomInfo);

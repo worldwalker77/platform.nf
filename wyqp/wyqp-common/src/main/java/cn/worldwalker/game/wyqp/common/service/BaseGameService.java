@@ -36,6 +36,7 @@ import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel;
 import cn.worldwalker.game.wyqp.common.domain.base.WeiXinUserInfo;
+import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.common.enums.ChatTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.DissolveStatusEnum;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
@@ -309,10 +310,28 @@ public abstract class BaseGameService {
 		if (!redisOperationService.isRoomIdExist(roomId)) {
 			throw new BusinessException(ExceptionEnum.ROOM_ID_NOT_EXIST);
 		}
-		
-		
-		BaseRoomInfo roomInfo = doEntryRoom(ctx, request, userInfo);
+		/**先获取房间信息，判断此玩家是否在房间里面，如果在房间里面就走刷新接口*/
+		userInfo.setRoomId(roomId);
+		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
 		List playerList = roomInfo.getPlayerList();
+		boolean isExist = false;
+		for(int i = 0; i < playerList.size(); i++ ){
+			BasePlayerInfo tempPlayerInfo = (BasePlayerInfo)playerList.get(i);
+			/**如果加入的玩家id已经存在*/
+			if (playerId.equals(tempPlayerInfo.getPlayerId())) {
+				isExist = true;
+				break;
+			}
+		}
+		/**如果申请加入房间的玩家已经存在房间中，则只需要走刷新接口*/
+		if (isExist) {
+			refreshRoom(ctx, request, userInfo);
+			return;
+		}
+		
+		/**如果不在房间里面就走加入房间*/
+		roomInfo = doEntryRoom(ctx, request, userInfo);
+		playerList = roomInfo.getPlayerList();
 		int size = playerList.size();
 		/**如果是麻将（金花和牛牛除外），那么游戏已经开始，则不允许再加入 add by liujinfengnew*/
 		if (roomInfo.getGameType().equals(GameTypeEnum.mj.gameType)) {
@@ -335,21 +354,7 @@ public abstract class BaseGameService {
 		}
 		userInfo.setRoomId(roomId);
 		redisOperationService.setUserInfo(request.getToken(), userInfo);
-		boolean isExist = false;
-		for(int i = 0; i < playerList.size(); i++ ){
-			BasePlayerInfo tempPlayerInfo = (BasePlayerInfo)playerList.get(i);
-			/**如果加入的玩家id已经存在*/
-			if (playerId.equals(tempPlayerInfo.getPlayerId())) {
-				isExist = true;
-				break;
-			}
-		}
-		/**如果申请加入房间的玩家已经存在房间中，则只需要走刷新接口*/
-		if (isExist) {
-			playerList.remove(playerList.size() - 1);
-			refreshRoom(ctx, request, userInfo);
-			return;
-		}
+		
 		
 		/**取list最后一个，即为本次加入的玩家，设置公共信息*/
 		BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(playerList.size() - 1);
@@ -645,7 +650,11 @@ public abstract class BaseGameService {
 		}
 		roomInfo.setUpdateTime(new Date());
 		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
-		List<Map<String, Object>> disPlayerList = GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime());
+		if (model != null) {
+			List<Map<String, Object>> disPlayerList = GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime());
+			data.put("playerList", disPlayerList);
+		}
+		
 		/**如果一半人不同意，则不能解散房间*/
 		if (disagreeDissolveCount >= (playerList.size()/2)) {
 			/**删除解散房间标志位*/
@@ -657,7 +666,7 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.disagreeDissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", msg.getPlayerId());
-		data.put("playerList", disPlayerList);
+		
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 	}
@@ -817,7 +826,9 @@ public abstract class BaseGameService {
 		BaseMsg msg = request.getMsg();
 		result.setMsgType(MsgTypeEnum.getAllPlayerDistance.msgType);
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
-		result.setData(roomInfo.getDistanceMap());
+		if (roomInfo != null) {
+			result.setData(roomInfo.getDistanceMap());
+		}
 		channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
 		redisOperationService.setRoomIdGameTypeUpdateTime(msg.getRoomId(), request.getGameType(), new Date());
 	}
@@ -952,7 +963,10 @@ public abstract class BaseGameService {
 		/**设置解散玩家列表，如果有*/
 		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
 		if (model != null) {
-			returnRoomInfo.setDisList(GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime()));
+			/**一圈结束的时候不返回解散列表*/
+			if ((roomInfo.getStatus() != 4)&&(roomInfo.getStatus() != 6)) {
+				returnRoomInfo.setDisList(GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime()));
+			}
 		}
 		result.setData(returnRoomInfo);
 		/**返回给当前玩家刷新信息*/
@@ -1419,6 +1433,23 @@ public abstract class BaseGameService {
 		data.put("playerList", onlineList);
 		data.put("onlineNum", onlineNum);
 		data.put("totalNum", onlineList.size());
+		result.setData(data);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	
+	public void getJoinedClubs(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.getJoinedClubs.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setPlayerId(playerId);
+		gameQuery.setStatus(1);
+		List<GameModel> list = gameDao.getJoinedClubs(gameQuery);
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("clubList", list);
 		result.setData(data);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}

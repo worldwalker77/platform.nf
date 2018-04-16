@@ -558,7 +558,7 @@ public class RedisOperationService {
 		}
 		return JsonUtil.toObject(failInfoStr, RoomCardOperationFailInfo.class);
 	}
-	/**playerId->teaHouseNum 映射*/
+	/**playerId->clubId 映射*/
 	public void setPlayerIdClubId(Integer playerId, Integer clubId){
 		if (gameInfoStorageType == 0 ) {
 			jedisTemplate.hset(Constant.playerIdClubIdMap, String.valueOf(playerId), String.valueOf(clubId));

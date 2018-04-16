@@ -518,6 +518,16 @@ public class MjScoreServiceTest {
         System.out.println(isHu);
         List<Integer> typeList = mjScoreService.calHuPlayer(mjPlayerInfo,16);
         System.out.println(typeList);
+
+        int score = mjScoreService.getHuScore(mjPlayerInfo,16);
+        Assert.assertEquals(score,8);
+        score = mjScoreService.getHuScore(mjPlayerInfo,12);
+        Assert.assertEquals(score,4);
+        score = mjScoreService.getHuScore(mjPlayerInfo,33);
+        Assert.assertEquals(score,1);
+        mjPlayerInfo.setHandCardList(Arrays.asList(9,10,11,14,15,16,16,16));
+        score = mjScoreService.getHuScore(mjPlayerInfo,null);
+        Assert.assertEquals(score,8);
     }
 
     @Test

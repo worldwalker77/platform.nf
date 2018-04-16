@@ -38,7 +38,7 @@ import cn.worldwalker.game.wyqp.mj.service.MjScoreService;
 
 
 public class MjCardRule {
-
+	
     private static final Logger log = Logger.getLogger(MjCardRule.class);
 
 	private static Map<Integer, List<Integer>> map = new HashMap<Integer, List<Integer>>();
@@ -103,54 +103,92 @@ public class MjCardRule {
 	}
 	
 	public static void main(String[] args) {
-		LinkedHashMap<Integer, TreeMap<Integer, String>> allPlayerOperations = new LinkedHashMap<Integer, TreeMap<Integer,String>>();
-		/**第一个玩家吃胡**/
-		TreeMap<Integer, String> playerOperations1 = new TreeMap<Integer, String>();
-		playerOperations1.put(MjOperationEnum.chi.type, "2,3");
-		playerOperations1.put(MjOperationEnum.hu.type, "1");
-		allPlayerOperations.put(111111, playerOperations1);
-		/**第二个玩家碰胡**/
-		TreeMap<Integer, String> playerOperations2 = new TreeMap<Integer, String>();
-		playerOperations2.put(MjOperationEnum.peng.type, "1");
-		playerOperations2.put(MjOperationEnum.hu.type, "1");
-		allPlayerOperations.put(222222, playerOperations2);
-		/**第三个玩家胡**/
-		TreeMap<Integer, String> playerOperations3 = new TreeMap<Integer, String>();
-		playerOperations3.put(MjOperationEnum.hu.type, "1");
-		allPlayerOperations.put(333333, playerOperations3);
-		/**第四个玩家胡**/
-		TreeMap<Integer, String> playerOperations4 = new TreeMap<Integer, String>();
-		playerOperations4.put(MjOperationEnum.hu.type, "1");
-		allPlayerOperations.put(444444, playerOperations4);
-		MjRoomInfo roomInfo = new MjRoomInfo();
-		roomInfo.setPlayerOperationMap(allPlayerOperations);
-		Integer curPlayerId = getPlayerHighestPriorityPlayerId(roomInfo);
-		TreeMap<Integer, String> hi = getPlayerHighestPriority(roomInfo, curPlayerId);
-		System.out.println(JsonUtil.toJson(hi));
 		
-		TreeMap<Integer, String> del = delPlayerOperationByPlayerId(roomInfo, 111111);
-		System.out.println(JsonUtil.toJson(del));
-		System.out.println(JsonUtil.toJson(roomInfo.getPlayerOperationMap()));
+		 MjRoomInfo mjRoomInfo = new MjRoomInfo();
+		 mjRoomInfo.setDetailType(6);
+		 mjRoomInfo.setGameType(2);
+		 MjPlayerInfo player1 = new MjPlayerInfo();
+		 player1.setHandCardList(Arrays.asList(3));
+		 player1.setPlayerId(111111);
+		 mjRoomInfo.getPlayerList().add(player1);
+		 
+		 MjPlayerInfo player2 = new MjPlayerInfo();
+		 player2.setHandCardList(Arrays.asList(3,8,10,13,16,21,25,27,29,30,31,32,33));
+		 player2.setPlayerId(222222);
+		 mjRoomInfo.getPlayerList().add(player2);
+		 
+		 MjPlayerInfo player3 = new MjPlayerInfo();
+		 player3.setHandCardList(Arrays.asList(1));
+		 player3.setPlayerId(222222);
+		 mjRoomInfo.getPlayerList().add(player3);
+		 
+		 MjPlayerInfo player4 = new MjPlayerInfo();
+		 player4.setHandCardList(Arrays.asList(2));
+		 player4.setPlayerId(222222);
+		 mjRoomInfo.getPlayerList().add(player4);
+		 
+		 
+        mjRoomInfo.setLastPlayerId(111111);
+        mjRoomInfo.setLastCardIndex(28);
+        MjCardRule.calculateAllPlayerOperations(mjRoomInfo, 28, 111111,2);
+        System.out.println(JsonUtil.toJson(mjRoomInfo.getPlayerOperationMap()));
+        MjCardRule.delPlayerOperationByPlayerId(mjRoomInfo, 222222, true);
+       Integer playerId =  MjCardRule.getPlayerHighestPriorityPlayerId(mjRoomInfo);
+       System.out.println(MjCardRule.getPlayerHighestPriority(mjRoomInfo, playerId));
+    
+	        
+//		LinkedHashMap<Integer, TreeMap<Integer, String>> allPlayerOperations = new LinkedHashMap<Integer, TreeMap<Integer,String>>();
+//		/**第一个玩家吃胡**/
+//		TreeMap<Integer, String> playerOperations1 = new TreeMap<Integer, String>();
+//		playerOperations1.put(MjOperationEnum.chi.type, "2,3");
+//		playerOperations1.put(MjOperationEnum.hu.type, "1");
+//		allPlayerOperations.put(111111, playerOperations1);
+//		/**第二个玩家碰胡**/
+//		TreeMap<Integer, String> playerOperations2 = new TreeMap<Integer, String>();
+//		playerOperations2.put(MjOperationEnum.peng.type, "1");
+//		playerOperations2.put(MjOperationEnum.hu.type, "1");
+//		allPlayerOperations.put(222222, playerOperations2);
+//		/**第三个玩家胡**/
+//		TreeMap<Integer, String> playerOperations3 = new TreeMap<Integer, String>();
+//		playerOperations3.put(MjOperationEnum.hu.type, "1");
+//		allPlayerOperations.put(333333, playerOperations3);
+//		/**第四个玩家胡**/
+//		TreeMap<Integer, String> playerOperations4 = new TreeMap<Integer, String>();
+//		playerOperations4.put(MjOperationEnum.hu.type, "1");
+//		allPlayerOperations.put(444444, playerOperations4);
+//		MjRoomInfo roomInfo = new MjRoomInfo();
+//		roomInfo.setPlayerOperationMap(allPlayerOperations);
+//		Integer curPlayerId = getPlayerHighestPriorityPlayerId(roomInfo);
+//		TreeMap<Integer, String> hi = getPlayerHighestPriority(roomInfo, curPlayerId);
+//		System.out.println(JsonUtil.toJson(hi));
+//		
+//		TreeMap<Integer, String> del = delPlayerOperationByPlayerId(roomInfo, 111111);
+//		System.out.println(JsonUtil.toJson(del));
+//		System.out.println(JsonUtil.toJson(roomInfo.getPlayerOperationMap()));
 	}
 	
-	public static TreeMap<Integer, String> delPlayerOperationByPlayerId(MjRoomInfo roomInfo, Integer playerId){
-		Integer nextPri = getHighestPriorityWithOutCurPlayer(roomInfo, playerId);
+	public static TreeMap<Integer, String> delPlayerOperationByPlayerId(MjRoomInfo roomInfo, Integer playerId, boolean isPass){
 		LinkedHashMap<Integer, TreeMap<Integer, String>> allPlayerOperations = roomInfo.getPlayerOperationMap();
-		if (nextPri == null ) {
+		if (isPass) {
+			Integer nextPri = getHighestPriorityWithOutCurPlayer(roomInfo, playerId);
+			if (nextPri == null ) {
+				return allPlayerOperations.remove(playerId);
+			}
+			TreeMap<Integer, String> delCurOperations = new TreeMap<Integer, String>();
+			TreeMap<Integer, String> curOperations = allPlayerOperations.get(playerId);
+			Iterator<Map.Entry<Integer, String>> it = curOperations.entrySet().iterator();  
+	        while(it.hasNext()){  
+	            Map.Entry<Integer, String> entry = it.next();  
+	            /**删除比其他玩家最高操作权限要高的权限*/
+	            if(entry.getKey() >= nextPri){
+	            	it.remove();
+	                delCurOperations.put(entry.getKey(), entry.getValue());
+	            }
+	        }  
+			return delCurOperations;
+		}else{
 			return allPlayerOperations.remove(playerId);
 		}
-		TreeMap<Integer, String> delCurOperations = new TreeMap<Integer, String>();
-		TreeMap<Integer, String> curOperations = allPlayerOperations.get(playerId);
-		Iterator<Map.Entry<Integer, String>> it = curOperations.entrySet().iterator();  
-        while(it.hasNext()){  
-            Map.Entry<Integer, String> entry = it.next();  
-            /**删除比其他玩家最高操作权限要高的权限*/
-            if(entry.getKey() >= nextPri){
-            	it.remove();
-                delCurOperations.put(entry.getKey(), entry.getValue());
-            }
-        }  
-		return delCurOperations;
 	}
 	
 	/**
@@ -169,6 +207,9 @@ public class MjCardRule {
 		for(Entry<Integer, TreeMap<Integer, String>> entry : set){
 			Integer playerId = entry.getKey();
 			Map<Integer, String> curPlayerOperations = entry.getValue();
+			if (curPlayerOperations == null || curPlayerOperations.isEmpty()) {
+				continue;
+			}
 			Set<Integer> keySet = curPlayerOperations.keySet();
 			Integer operationType = Collections.max(keySet);
 			if (operationType > maxPriorityOperationType) {
@@ -1371,10 +1412,7 @@ public class MjCardRule {
 		}
 
 		if (isJxNf(roomInfo)){
-			/**可胡牌标志为false，则不能胡牌*/
-			if (!player.getCheckHuflag()) {
-				return false;
-			}
+			
             List<Integer> allCardList = new ArrayList<>(16);
             allCardList.addAll(handCardList);
 		    if (cardIndex != null){
@@ -1397,6 +1435,20 @@ public class MjCardRule {
 		        allCardList.addAll(player.getAnGangCardList());
 		        isHu = MjHuService.getInstance().isQingYiSe(allCardList);
             }
+            
+            /**如果牌型可以胡则,*/
+            if (isHu) {
+            	/**可胡牌标志为false，则不能胡牌*/
+    			if (!player.getCheckHuflag()) {
+    				/**再判断下此时胡的分数是否大于当时放弃胡时的分数，如果大于则可以胡，如果小于或者等于则不能胡*/
+    				Integer huScore = MjScoreService.getInstance().getHuScore(player, cardIndex);
+    				if (huScore > player.getCheckHuScore()) {
+    					isHu = true;
+					}else{
+						isHu = false;
+					}
+    			}
+			}
         } else {
             if (handCardList.size() == 14) {
                 isHu = Hulib.getInstance().get_hu_info(handCardList, Hulib.invalidCardInex, gui_index,roomInfo.getIndexLine());
