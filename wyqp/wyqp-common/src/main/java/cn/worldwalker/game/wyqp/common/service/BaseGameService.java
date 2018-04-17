@@ -623,7 +623,9 @@ public abstract class BaseGameService {
 		data.put("roomId", roomId);
 		data.put("playerId", msg.getPlayerId());
 		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
-		data.put("playerList", GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime()));
+		if (model != null) {
+			data.put("playerList", GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime()));
+		}
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 	}
 	
