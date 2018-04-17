@@ -312,8 +312,6 @@ public class MjScoreService {
      */
     public void calTotalWin(MjRoomInfo roomInfo){
         //计算每个玩家总得分及设置房间的总赢家
-        Integer totalWinnerId = roomInfo.getPlayerList().get(0).getPlayerId();
-        Integer maxTotalScore = roomInfo.getPlayerList().get(0).getTotalScore();
         for (MjPlayerInfo player : roomInfo.getPlayerList()) {
             //算上胡分
             player.setCurScore(player.getCurScore() + player.getHuScore());
@@ -323,6 +321,11 @@ public class MjScoreService {
             player.setCurScore(player.getCurScore() + player.getMaScore());
             //更新总分
             player.setTotalScore(player.getTotalScore() + player.getCurScore());
+        }
+
+        Integer totalWinnerId = roomInfo.getPlayerList().get(0).getPlayerId();
+        Integer maxTotalScore = roomInfo.getPlayerList().get(0).getTotalScore();
+        for (MjPlayerInfo player : roomInfo.getPlayerList()) {
             if (player.getTotalScore() > maxTotalScore) {
                 maxTotalScore = player.getTotalScore();
                 totalWinnerId = player.getPlayerId();

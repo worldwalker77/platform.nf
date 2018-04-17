@@ -543,6 +543,40 @@ public class MjScoreServiceTest {
         mjRoomInfo.setMaCardList(Arrays.asList(3,3,3));
     }
 
+
+    @Test
+    void testCalTotalWin() throws Exception{
+        MjRoomInfo mjRoomInfo = new MjRoomInfo();
+        for (int i=0; i<4; i++){
+            MjPlayerInfo mjPlayerInfo = new MjPlayerInfo();
+            mjPlayerInfo.setPlayerId(1000 + i);
+            mjRoomInfo.getPlayerList().add(mjPlayerInfo);
+        }
+        mjRoomInfo.getPlayerList().get(0).setTotalScore(12);
+        mjRoomInfo.getPlayerList().get(0).setHuScore(-4);
+        mjRoomInfo.getPlayerList().get(0).setMaScore(-8);
+        mjRoomInfo.getPlayerList().get(0).setGangScore(-3);
+        mjRoomInfo.getPlayerList().get(1).setTotalScore(8);
+        mjRoomInfo.getPlayerList().get(1).setHuScore(-4);
+        mjRoomInfo.getPlayerList().get(1).setMaScore(0);
+        mjRoomInfo.getPlayerList().get(1).setGangScore(-1);
+        mjRoomInfo.getPlayerList().get(2).setTotalScore(-12);
+        mjRoomInfo.getPlayerList().get(2).setHuScore(12);
+        mjRoomInfo.getPlayerList().get(2).setMaScore(8);
+        mjRoomInfo.getPlayerList().get(2).setGangScore(-1);
+        mjRoomInfo.getPlayerList().get(3).setTotalScore(-8);
+        mjRoomInfo.getPlayerList().get(3).setHuScore(-4);
+        mjRoomInfo.getPlayerList().get(3).setMaScore(0);
+        mjRoomInfo.getPlayerList().get(3).setGangScore(5);
+        mjScoreService.calTotalWin(mjRoomInfo);
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(0).getTotalScore(), Integer.valueOf(-3));
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(1).getTotalScore(), Integer.valueOf(3));
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(2).getTotalScore(), Integer.valueOf(7));
+        Assert.assertEquals(mjRoomInfo.getPlayerList().get(3).getTotalScore(), Integer.valueOf(-7));
+        Assert.assertEquals(mjRoomInfo.getTotalWinnerId(), mjRoomInfo.getPlayerList().get(2).getPlayerId());
+
+
+    }
     @Test
     public void testTemp() throws Exception{
 //        System.out.println(new HashSet<>(Arrays.asList(1,1,1,2,2,3,3,3,3)));
