@@ -183,6 +183,9 @@ public class CommonManagerImpl implements CommonManager{
 	
 	@Override
 	public void addUserRecord(BaseRoomInfo roomInfo) {
+		if (roomInfo.getCurGame() < 2) {
+			return;
+		}
 		List playerList = roomInfo.getPlayerList();
 		if (CollectionUtils.isEmpty(playerList)) {
 			return;

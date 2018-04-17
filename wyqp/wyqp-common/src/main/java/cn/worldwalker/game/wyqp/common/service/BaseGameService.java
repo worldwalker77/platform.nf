@@ -325,8 +325,15 @@ public abstract class BaseGameService {
 		}
 		/**如果申请加入房间的玩家已经存在房间中，则只需要走刷新接口*/
 		if (isExist) {
+			
 			refreshRoom(ctx, request, userInfo);
 			return;
+		}
+		/**房间里面是否有clubId，如果有则需要校验此玩家是否属于此俱乐部*/
+		if (roomInfo.getClubId() != null) {
+			if (redisOperationService.getClubIdByPlayerId(playerId) == null) {
+				throw new BusinessException(ExceptionEnum.NOT_IN_CLUB);
+			}
 		}
 		
 		/**如果不在房间里面就走加入房间*/
@@ -650,7 +657,11 @@ public abstract class BaseGameService {
 		}
 		roomInfo.setUpdateTime(new Date());
 		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
-		List<Map<String, Object>> disPlayerList = GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime());
+		if (model != null) {
+			List<Map<String, Object>> disPlayerList = GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime());
+			data.put("playerList", disPlayerList);
+		}
+		
 		/**如果一半人不同意，则不能解散房间*/
 		if (disagreeDissolveCount >= (playerList.size()/2)) {
 			/**删除解散房间标志位*/
@@ -662,7 +673,7 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.disagreeDissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", msg.getPlayerId());
-		data.put("playerList", disPlayerList);
+		
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 	}
@@ -966,6 +977,7 @@ public abstract class BaseGameService {
 		}
 		result.setData(returnRoomInfo);
 		/**返回给当前玩家刷新信息*/
+		redisOperationService.setPlayerIdRoomIdGameType(playerId, roomId, request.getGameType());
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		
 		
@@ -1336,6 +1348,7 @@ public abstract class BaseGameService {
 		}
 		
 		gameQuery.setPlayerId(playerId);
+		gameQuery.setStatus(1);
 		list = gameDao.getClubUsers(gameQuery);
 		/**如果当前玩家已经在俱乐部中,则直接进入俱乐部*/
 		if (!CollectionUtils.isEmpty(list)) {
@@ -1414,7 +1427,7 @@ public abstract class BaseGameService {
 			tempModel = new GameModel();
 			tempModel.setPlayerId(playerId);
 			tempModel.setNickName(modle.getNickName());
-			tempModel.setHeadImgUrl(modle.getHeadImgUrl() == null?userInfo.getHeadImgUrl() : modle.getHeadImgUrl());
+			tempModel.setHeadImgUrl(modle.getHeadImgUrl());
 			if (channelContainer.isPlayIdActive(modle.getPlayerId())) {
 				tempModel.setOnlineStatus(1);
 				onlineList.add(tempModel);
@@ -1429,6 +1442,23 @@ public abstract class BaseGameService {
 		data.put("playerList", onlineList);
 		data.put("onlineNum", onlineNum);
 		data.put("totalNum", onlineList.size());
+		result.setData(data);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	
+	public void getJoinedClubs(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.getJoinedClubs.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setPlayerId(playerId);
+		gameQuery.setStatus(1);
+		List<GameModel> list = gameDao.getJoinedClubs(gameQuery);
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("clubList", list);
 		result.setData(data);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}

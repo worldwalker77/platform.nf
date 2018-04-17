@@ -390,6 +390,30 @@
 	       and club_id = #{clubId}
 	    </if>
 	</select>
+	
+	
+	<select id="getJoinedClubs"  parameterType = "gameQuery" resultMap="gameModelResultMap">
+	    select a.club_id,b.club_name,c.nick_name,c.player_id
+	    from t_club_user a 
+	    left join t_proxy_club b on a.club_id = b.club_id
+	    left join t_proxy c on b.proxy_id = c.proxy_id
+	    
+	    where  1=1 
+	    <if test="proxyId !=null ">  
+	       and a.proxy_id = #{proxyId}
+	    </if>
+	    <if test="playerId !=null ">  
+	       and a.player_id = #{playerId}
+	    </if>
+	    <if test="clubId !=null ">  
+	       and a.club_id = #{clubId}
+	    </if>
+	    <if test="status !=null ">  
+	       and a.status = #{status}
+	    </if>
+	    order by a.create_time desc
+	    limit 100
+	</select>
 </mapper>
 
 
