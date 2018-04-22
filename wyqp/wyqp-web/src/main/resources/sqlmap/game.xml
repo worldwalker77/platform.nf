@@ -27,6 +27,7 @@
 		<result column="type" property="type"/>
 		<result column="club_name" property="clubName"/>
 		<result column="club_owner_word" property="clubOwnerWord"/>
+		<result column="is_admin" property="isAdmin"/>
 	</resultMap>
 	
 	
@@ -195,7 +196,7 @@
 	</select>
 	
 	<select id="getProxyByPhoneAndPassword"  parameterType = "gameQuery" resultMap="gameModelResultMap">
-	    select proxy_id,player_id,nick_name,mobile_phone,wechat_num,real_name
+	    select proxy_id,player_id,nick_name,mobile_phone,wechat_num,real_name,is_admin
 	    from t_proxy
 	    where mobile_phone = #{mobilePhone} and password = #{password}
 	    <if test="proxyId !=null ">  
@@ -363,6 +364,56 @@
 	    where proxy_id = #{proxyId} and club_id = #{clubId} and player_id = #{playerId}
 	</delete>
 	
+	
+	
+	<select id="getRoomInfos"  parameterType = "gameQuery" resultMap="gameModelResultMap">
+	    select a.proxy_id,a.club_id,a.player_id,a.nick_name,a.status,a.create_time,b.head_img_url
+	    from t_club_user a left join t_user b on a.player_id = b.player_id
+	    where  1=1
+	    <if test="roomId !=null ">  
+	       and room_id = #{roomId}
+	    </if>
+	    <if test="clubId !=null ">  
+	       and club_id = #{clubId}
+	    </if>
+	    order by a.create_time desc
+	    limit #{offset}, #{limit}
+	</select>
+	<select id="getRoomInfoCount"  parameterType = "gameQuery" resultType="Long">
+	    select count(1)
+	    from t_user_record_detail
+	    where  1=1
+	    <if test="roomId !=null ">  
+	       and room_id = #{roomId}
+	    </if>
+	    <if test="clubId !=null ">  
+	       and club_id = #{clubId}
+	    </if>
+	</select>
+	
+	
+	<select id="getJoinedClubs"  parameterType = "gameQuery" resultMap="gameModelResultMap">
+	    select a.club_id,b.club_name,c.nick_name,c.player_id
+	    from t_club_user a 
+	    left join t_proxy_club b on a.club_id = b.club_id
+	    left join t_proxy c on b.proxy_id = c.proxy_id
+	    
+	    where  1=1 
+	    <if test="proxyId !=null ">  
+	       and a.proxy_id = #{proxyId}
+	    </if>
+	    <if test="playerId !=null ">  
+	       and a.player_id = #{playerId}
+	    </if>
+	    <if test="clubId !=null ">  
+	       and a.club_id = #{clubId}
+	    </if>
+	    <if test="status !=null ">  
+	       and a.status = #{status}
+	    </if>
+	    order by a.create_time desc
+	    limit 100
+	</select>
 </mapper>
 
 

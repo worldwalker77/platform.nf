@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import cn.worldwalker.game.wyqp.common.backend.BackendService;
 import cn.worldwalker.game.wyqp.common.backend.VersionModel;
 import cn.worldwalker.game.wyqp.common.backend.VersionService;
 import cn.worldwalker.game.wyqp.common.constant.Constant;
@@ -36,15 +37,18 @@ public class VersionController {
 	private static final Logger log = Logger.getLogger(VersionController.class);
 	@Autowired
 	private VersionService versionService;
+	
+	@Autowired
+	private BackendService backendService;
 	@Autowired
 	private RedisOperationService redisOperationService;
 	
 	@RequestMapping(value="/versioncontroll")
 	public ModelAndView versionControll(){
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("backend/version/versioncontroll");
-//		String a = null;
-//		a.split("a");
+		if (backendService.isAdmin()) {
+			mv.setViewName("backend/version/versioncontroll");
+		}
 		return mv;
 	}
 	
@@ -59,7 +63,14 @@ public class VersionController {
 	@RequestMapping("/uploadClientfile")  
 	@ResponseBody  
 	public Result uploadFile(@RequestParam("multipartFiles") MultipartFile[] multipartFiles, String clientVersion, String changeLog, HttpServletRequest request, HttpServletResponse response) { 
+		
+		
 		Result result = new Result();
+		if (!backendService.isAdmin()) {
+			result.setCode(1);
+			result.setDesc("无权限");
+			return result;
+		}
 		if ( multipartFiles == null || multipartFiles.length == 0) {
 			result.setCode(1);
 			result.setDesc("异常");
@@ -97,9 +108,9 @@ public class VersionController {
 	@ResponseBody
     public Result upload(@RequestParam("file") MultipartFile file, String token, Model model,HttpServletRequest request, HttpServletResponse response) throws IOException {
 		if (file == null) {
-			log.error("请求, 上传语音文件， file:"+ ", token:" + token);
+			log.info("请求, 上传语音文件， file:"+ ", token:" + token);
 		}else{
-			log.error("请求, 上传语音文件， file:"+ file.toString() + ", token:" + token);
+			log.info("请求, 上传语音文件， file:"+ file.toString() + ", token:" + token);
 		}
 		if (StringUtils.isEmpty(token)) {
 			token = request.getHeader("token");

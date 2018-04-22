@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import cn.worldwalker.game.wyqp.common.channel.ChannelContainer;
 import cn.worldwalker.game.wyqp.common.domain.base.BaseMsg;
 import cn.worldwalker.game.wyqp.common.domain.base.BaseRequest;
+import cn.worldwalker.game.wyqp.common.domain.base.RedisRelaModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
 import cn.worldwalker.game.wyqp.common.exception.BusinessException;
@@ -45,7 +46,11 @@ public abstract class BaseMsgDisPatcher {
 		if (userInfo == null) {
 			throw new BusinessException(ExceptionEnum.NEED_LOGIN);
 		}
-		redisOperationService.expireUserInfo(token);
+		RedisRelaModel model = redisOperationService.getRoomIdGameTypeByPlayerId(userInfo.getPlayerId());
+		if (model != null) {
+			userInfo.setRoomId(model.getRoomId());
+		}
+		redisOperationService.setUserInfo(token, userInfo);
 		/**自动设置playerId和roomId*/
 		BaseMsg msg = request.getMsg();
 		if (msg == null) {
@@ -63,18 +68,26 @@ public abstract class BaseMsgDisPatcher {
 		}
 		Lock lock = null;
 		try {
+			/**如果此请求是需要加锁的*/
 			if (!notNeedLockMsgTypeMap.containsKey(request.getMsgType())) {
+				if (msg.getRoomId() == null) {
+					Result result = new Result();
+					result.setMsgType(MsgTypeEnum.entryHall.msgType);
+					channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
+					return;
+				}
 				/**如果不存在房间号*/
 				if (!redisOperationService.isRoomIdExist(msg.getRoomId())) {
 					/**如果是非刷新房间的请求，则报错，提示房间号不存在*/
 					if (MsgTypeEnum.refreshRoom.msgType != request.getMsgType()) {
-						if (MsgTypeEnum.entryHall.msgType == request.getMsgType()) {
+						if (MsgTypeEnum.entryRoom.msgType == request.getMsgType()) {
 							throw new BusinessException(ExceptionEnum.ROOM_ID_NOT_EXIST);
 						}else{
 							log.error(ExceptionEnum.ROOM_ID_NOT_EXIST.description);
 							Result result = new Result();
 							result.setMsgType(MsgTypeEnum.entryHall.msgType);
 							channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
+							return;
 						}
 					}
 				}else{/**如果房间号存在*/
@@ -134,5 +147,6 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.getAllPlayerDistance.msgType, MsgTypeEnum.getAllPlayerDistance);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.offlineNotice.msgType, MsgTypeEnum.offlineNotice);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.onlineNotice.msgType, MsgTypeEnum.onlineNotice);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.getJoinedClubs.msgType, MsgTypeEnum.getJoinedClubs);
 	}
 }

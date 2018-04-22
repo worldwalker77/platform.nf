@@ -20,6 +20,8 @@ public class UserRecordModel {
 	
 	private Integer roomId;
 	
+	private Integer clubId = 0;
+	
 	private Integer payType;
 	
 	private Integer totalGames;
@@ -37,6 +39,14 @@ public class UserRecordModel {
 	private Date createTime;
 	
 	private List<RecordModel> recordList;
+
+	public Integer getClubId() {
+		return clubId;
+	}
+
+	public void setClubId(Integer clubId) {
+		this.clubId = clubId;
+	}
 
 	public Integer getPlayerId() {
 		return playerId;

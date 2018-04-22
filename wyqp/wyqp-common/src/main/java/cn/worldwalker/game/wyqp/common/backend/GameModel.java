@@ -55,6 +55,14 @@ public class GameModel {
 	
 	private String headImgUrl;
 	
+	private Integer isAdmin;
+	
+	public Integer getIsAdmin() {
+		return isAdmin;
+	}
+	public void setIsAdmin(Integer isAdmin) {
+		this.isAdmin = isAdmin;
+	}
 	public Integer getTotalRoomCardNum() {
 		return totalRoomCardNum;
 	}

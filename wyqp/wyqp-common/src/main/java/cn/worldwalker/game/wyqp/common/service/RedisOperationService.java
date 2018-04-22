@@ -558,7 +558,7 @@ public class RedisOperationService {
 		}
 		return JsonUtil.toObject(failInfoStr, RoomCardOperationFailInfo.class);
 	}
-	/**playerId->teaHouseNum 映射*/
+	/**playerId->clubId 映射*/
 	public void setPlayerIdClubId(Integer playerId, Integer clubId){
 		if (gameInfoStorageType == 0 ) {
 			jedisTemplate.hset(Constant.playerIdClubIdMap, String.valueOf(playerId), String.valueOf(clubId));
@@ -689,6 +689,19 @@ public class RedisOperationService {
 			loginFuseValue = GameInfoMemoryContainer.loginFuse;
 		}
 		if ("1".equals(loginFuseValue)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isCreateRoomFuseOpen(){
+		String createRoomFuseValue = "0";
+		if (gameInfoStorageType == 0 ) {
+			createRoomFuseValue = jedisTemplate.get(Constant.createRoomFuse);
+		}else{
+			createRoomFuseValue = GameInfoMemoryContainer.createRoomFuse;
+		}
+		if ("1".equals(createRoomFuseValue)) {
 			return true;
 		}
 		return false;

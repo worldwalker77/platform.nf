@@ -183,6 +183,9 @@ public class CommonManagerImpl implements CommonManager{
 	
 	@Override
 	public void addUserRecord(BaseRoomInfo roomInfo) {
+		if (roomInfo.getCurGame() < 2) {
+			return;
+		}
 		List playerList = roomInfo.getPlayerList();
 		if (CollectionUtils.isEmpty(playerList)) {
 			return;
@@ -208,13 +211,18 @@ public class CommonManagerImpl implements CommonManager{
 			model.setGameType(roomInfo.getGameType());
 			model.setDetailType(roomInfo.getDetailType());
 			model.setRoomId(roomInfo.getRoomId());
+			if (roomInfo.getClubId() == null) {
+				model.setClubId(0);
+			}else{
+				model.setClubId(roomInfo.getClubId());
+			}
 			model.setPayType(roomInfo.getPayType());
 			model.setTotalGames(roomInfo.getTotalGames());
 			model.setPlayerId(player.getPlayerId());
 			model.setScore(player.getTotalScore());
 			model.setRecordInfo(recordInfo);
 			try {
-				model.setRemark(RoomCardConsumeEnum.getRoomCardConsumeEnum(roomInfo.getGameType(), roomInfo.getPayType(), roomInfo.getTotalGames()).desc);
+				model.setRemark(JsonUtil.toJson(roomInfo.getRemark()));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -246,6 +254,13 @@ public class CommonManagerImpl implements CommonManager{
 		
 		UserRecordModel model = new UserRecordModel();
 		model.setRecordUuid(roomInfo.getRoomUuid());
+		model.setRoomId(roomInfo.getRoomId());
+		if (roomInfo.getClubId() == null) {
+			model.setClubId(0);
+		}else{
+			model.setClubId(roomInfo.getClubId());
+		}
+		
 		model.setRecordDetailUuid(roomInfo.getCurGameUuid());
 		model.setCurGame(roomInfo.getCurGame());
 		model.setRecordInfo(recordInfo);
@@ -420,5 +435,11 @@ public class CommonManagerImpl implements CommonManager{
 		model.setPlayerId(playerId);
 		model.setNickName(nickName);
 		extensionCodeBindDao.insertExtensionCodeBindLog(model);
+	}
+	@Override
+	public UserRecordModel getRoomRemarkByUuid(Long uuid) {
+		UserRecordModel model = new UserRecordModel();
+		model.setRecordUuid(uuid);
+		return userRecordDao.getRoomRemarkByUuid(model);
 	}
 }

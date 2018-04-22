@@ -184,6 +184,7 @@ public class MjScoreService {
 
     }
 
+
     /*
     为输和赢的玩家算分
      */
@@ -245,6 +246,22 @@ public class MjScoreService {
         }
     }
 
+
+    /*
+    计算胡牌分数（已经判了胡以后，才能调用此方法，否则不胡会当作平胡）
+     */
+
+    @SuppressWarnings("ConstantConditions")
+    public int getHuScore(MjPlayerInfo mjPlayerInfo, Integer card){
+        List<Integer> typeList = MjScoreService.getInstance().calHuPlayer(mjPlayerInfo,card);
+        int score = 0;
+        for (Integer type : typeList){
+            score = score + MjScoreEnum.getByType(type).score;
+        }
+        score = score > 8 ? 8 : score;
+        return score;
+    }
+
     /*
     计算整个房间玩家的牌面得分
      */
@@ -295,8 +312,6 @@ public class MjScoreService {
      */
     public void calTotalWin(MjRoomInfo roomInfo){
         //计算每个玩家总得分及设置房间的总赢家
-        Integer totalWinnerId = roomInfo.getPlayerList().get(0).getPlayerId();
-        Integer maxTotalScore = roomInfo.getPlayerList().get(0).getTotalScore();
         for (MjPlayerInfo player : roomInfo.getPlayerList()) {
             //算上胡分
             player.setCurScore(player.getCurScore() + player.getHuScore());
@@ -306,6 +321,11 @@ public class MjScoreService {
             player.setCurScore(player.getCurScore() + player.getMaScore());
             //更新总分
             player.setTotalScore(player.getTotalScore() + player.getCurScore());
+        }
+
+        Integer totalWinnerId = roomInfo.getPlayerList().get(0).getPlayerId();
+        Integer maxTotalScore = roomInfo.getPlayerList().get(0).getTotalScore();
+        for (MjPlayerInfo player : roomInfo.getPlayerList()) {
             if (player.getTotalScore() > maxTotalScore) {
                 maxTotalScore = player.getTotalScore();
                 totalWinnerId = player.getPlayerId();

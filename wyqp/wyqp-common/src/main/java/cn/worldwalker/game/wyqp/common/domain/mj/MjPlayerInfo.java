@@ -64,7 +64,15 @@ public class MjPlayerInfo extends BasePlayerInfo{
     private Integer huScore = 0;
     /**是否可以胡的标记*/
     private boolean checkHuflag = true;
-
+    
+    private Integer checkHuScore;
+    
+	public Integer getCheckHuScore() {
+		return checkHuScore;
+	}
+	public void setCheckHuScore(Integer checkHuScore) {
+		this.checkHuScore = checkHuScore;
+	}
 	public boolean getCheckHuflag() {
 		return checkHuflag;
 	}

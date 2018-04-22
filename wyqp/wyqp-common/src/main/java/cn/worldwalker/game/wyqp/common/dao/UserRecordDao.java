@@ -12,4 +12,6 @@ public interface UserRecordDao {
 	
 	public List<UserRecordModel> getUserRecord(UserRecordModel model);
 	
+	public UserRecordModel getRoomRemarkByUuid(UserRecordModel model);
+	
 }

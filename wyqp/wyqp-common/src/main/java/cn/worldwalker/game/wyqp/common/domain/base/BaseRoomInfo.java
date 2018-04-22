@@ -54,7 +54,17 @@ public class BaseRoomInfo {
 	private Map<String, String> distanceMap = new HashMap<String, String>();
 	/**解散玩家列表*/
 	private List<Map<String, Object>> disList = null;
+	/**房间信息备注*/
+	private Map<String, Object> remark = new HashMap<String, Object>();
 	
+	public Map<String, Object> getRemark() {
+		return remark;
+	}
+
+	public void setRemark(Map<String, Object> remark) {
+		this.remark = remark;
+	}
+
 	public List<Map<String, Object>> getDisList() {
 		return disList;
 	}

@@ -23,7 +23,7 @@ public interface CommonManager {
 	public void insertFeedback(UserFeedbackModel model);
 	
 	public List<UserRecordModel> getUserRecord(UserRecordModel model);
-	
+	public UserRecordModel getRoomRemarkByUuid(Long uuid);
 	public List<UserRecordModel> getUserRecordDetail(UserRecordModel model);
 	
 	public List<Integer> deductRoomCard(BaseRoomInfo roomInfo, RoomCardOperationEnum operationEnum);

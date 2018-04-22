@@ -76,6 +76,13 @@
 		order by create_time DESC
 		limit 20
 	</select>
+	
+	<select id="getRoomRemarkByUuid"  parameterType = "cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel" resultMap="userRecordResultMap">
+	    SELECT room_id,pay_type,total_games,game_type,detail_type,remark
+		from t_user_record
+		where record_uuid = #{recordUuid}
+		limit 1
+	</select>
 </mapper>
 
 

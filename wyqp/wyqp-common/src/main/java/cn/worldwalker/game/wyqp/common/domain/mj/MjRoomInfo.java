@@ -65,6 +65,15 @@ public class MjRoomInfo extends BaseRoomInfo{
     
     private Map<Integer, String> opMap = new HashMap<Integer, String>();
     
+    private Integer notShowPoint;
+    
+    
+	public Integer getNotShowPoint() {
+		return notShowPoint;
+	}
+	public void setNotShowPoint(Integer notShowPoint) {
+		this.notShowPoint = notShowPoint;
+	}
 	public Map<Integer, String> getOpMap() {
 		return opMap;
 	}

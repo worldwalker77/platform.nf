@@ -1,9 +1,9 @@
 package cn.worldwalker.game.wyqp.common.dao;
 
-import java.util.List;
-
 import cn.worldwalker.game.wyqp.common.backend.GameModel;
 import cn.worldwalker.game.wyqp.common.backend.GameQuery;
+
+import java.util.List;
 
 public interface GameDao {
 	
@@ -45,6 +45,9 @@ public interface GameDao {
 	public Long getClubUsersCount(GameQuery gameQuery);
 	public Integer updateClubUser(GameQuery gameQuery);
 	public Integer delClubUser(GameQuery gameQuery);
+	
+	public List<GameModel> getJoinedClubs(GameQuery gameQuery);
+	
 	
 	
 }

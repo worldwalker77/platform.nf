@@ -57,6 +57,7 @@ public class RequestUtil {
 		}
 		return us.getProxyId();
 	}
+	
 	public static Integer getPlayerId(){
 		UserSession us = sessionThreadLocal.get();
 		if (us == null) {

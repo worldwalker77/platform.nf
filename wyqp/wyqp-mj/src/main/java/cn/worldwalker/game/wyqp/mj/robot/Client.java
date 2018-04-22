@@ -1,5 +1,6 @@
 package cn.worldwalker.game.wyqp.mj.robot;
 
+import cn.worldwalker.game.wyqp.common.constant.Constant;
 import cn.worldwalker.game.wyqp.common.domain.base.BaseRequest;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjMsg;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRequest;
@@ -7,8 +8,10 @@ import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
 import cn.worldwalker.game.wyqp.common.utils.HttpClientUtils;
 import cn.worldwalker.game.wyqp.mj.enums.MjTypeEnum;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+
 import org.java_websocket.WebSocket;
 
 import java.net.URI;
@@ -25,16 +28,14 @@ public class Client {
     private List<Integer> cueCardList;
     private List<String> pengList;
 
-
-    private boolean isPrintLog = false;
     private Boolean gameOver;
     private Integer position;
     private Random random;
 
-    private static final String HTTP_URL = "http://game.nf.worldwalker.cn";
-    private static final String WS_URL = "ws://39.107.96.117:10009";
-//    private static final String HTTP_URL = "http://localhost:8080";
-//    private static final String WS_URL = "ws://localhost:10009";
+    private static final String HTTP_URL = "http://" + Constant.domain;
+    private static final String WS_URL = "ws://" + Constant.localIp + ":" + Constant.websocketPort;
+//    private static final String HTTP_URL = "http://localhost";
+//    private static final String WS_URL = "ws://localhost:10010";
 
     public Client(Integer position) {
         this.position = position;
@@ -56,12 +57,10 @@ public class Client {
         socket = new Socket(new URI(WS_URL),this);
         socket.connect();
         int i=0;
-        while (!socket.getReadyState().equals(WebSocket.READYSTATE.OPEN)  && i++ < 50) {
+        while (!socket.getReadyState().equals(WebSocket.READYSTATE.OPEN)  && i++ < 10) {
             Thread.sleep(100);
         }
-        if (!socket.getReadyState().equals(WebSocket.READYSTATE.OPEN)){
-            System.out.println(token.substring(0,4) + ": 失败");
-        }
+        System.out.println(token.substring(0,4) + ": 连接成功");
         gameOver = false;
     }
 
@@ -126,9 +125,7 @@ public class Client {
         MjRequest mjRequest = createRequest(MsgTypeEnum.chuPai);
         int cardIndex = chooseCard();
         mjRequest.getMsg().setCardIndex(cardList.get(cardIndex));
-        if (isPrintLog){
-            System.out.println(position + ">>" + cardList.get(cardIndex));
-        }
+        System.out.println(position + ">>" + cardList.get(cardIndex));
         socket.sendMsg(mjRequest);
     }
 

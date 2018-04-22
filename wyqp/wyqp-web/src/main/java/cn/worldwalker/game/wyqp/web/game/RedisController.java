@@ -1,5 +1,6 @@
 package cn.worldwalker.game.wyqp.web.game;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,14 @@ public class RedisController {
     @ResponseBody
     public RedisResponse redisOperation(@RequestBody RedisRequest request) {
 		RedisResponse response = new RedisResponse();
+		if (StringUtils.isBlank(request.getSecret())) {
+			response.setDes("无权限");
+			return response;
+		}
+		if (!Constant.apiSecret.equals(request.getSecret())) {
+			response.setDes("无权限");
+			return response;
+		}
 		String operation = request.getOperation();
 		try {
 			switch (operation) {
@@ -34,6 +43,8 @@ public class RedisController {
 							response.setValue(GameInfoMemoryContainer.logFuse);
 						}else if("loginFuse".equals(request.getKey())){
 							response.setValue(GameInfoMemoryContainer.loginFuse);
+						}else if("createRoomFuse".equals(request.getKey())){
+							response.setValue(GameInfoMemoryContainer.createRoomFuse);
 						}else{
 							response.setDes("no such operation");
 						}
@@ -50,6 +61,9 @@ public class RedisController {
 						}else if("loginFuse".equals(request.getKey())){
 							GameInfoMemoryContainer.loginFuse = String.valueOf(request.getValue());
 							response.setValue(GameInfoMemoryContainer.loginFuse);
+						}else if("createRoomFuse".equals(request.getKey())){
+							GameInfoMemoryContainer.createRoomFuse = String.valueOf(request.getValue());
+							response.setValue(GameInfoMemoryContainer.createRoomFuse);
 						}else{
 							response.setDes("no such operation");
 						}
@@ -90,6 +104,14 @@ public class RedisController {
 						}
 					}
 					break;
+				case "hget":
+					if (Constant.gameInfoStorageType == 0 ) {
+						response.setValue(jedisTemplate.hget(request.getKey(),request.getField()));
+					}else{
+						if("roomIdRoomInfoMap".equals(request.getKey())){
+							response.setValue(GameInfoMemoryContainer.roomIdRoomInfoMap.get(request.getField()));
+						}
+					}
 				case "hgetAll":
 					
 					if (Constant.gameInfoStorageType == 0 ) {

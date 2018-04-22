@@ -36,6 +36,7 @@ import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel;
 import cn.worldwalker.game.wyqp.common.domain.base.WeiXinUserInfo;
+import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
 import cn.worldwalker.game.wyqp.common.enums.ChatTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.DissolveStatusEnum;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
@@ -53,6 +54,7 @@ import cn.worldwalker.game.wyqp.common.roomlocks.RoomLockContainer;
 import cn.worldwalker.game.wyqp.common.rpc.WeiXinRpc;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.IPUtil;
+import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
 import cn.worldwalker.game.wyqp.common.utils.SnowflakeIdGenerator;
 import cn.worldwalker.game.wyqp.common.utils.UrlImgDownLoadUtil;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.DateUtils;
@@ -114,8 +116,14 @@ public abstract class BaseGameService {
 		userInfo.setNickName(weixinUserInfo.getName());
 		userInfo.setSex(weixinUserInfo.getSex());
 		userInfo.setLevel(userModel.getUserLevel() == null ? 1 : userModel.getUserLevel());
-		userInfo.setServerIp(Constant.localIp);
-		userInfo.setPort(String.valueOf(Constant.websocketPort));
+        //noinspection Duplicates
+        if ("true".equals(Constant.useWss)){
+            userInfo.setServerIp(Constant.wssDomain);
+            userInfo.setPort(String.valueOf(Constant.wssPort));
+        } else {
+            userInfo.setServerIp(Constant.localIp);
+            userInfo.setPort(String.valueOf(Constant.websocketPort));
+        }
 		userInfo.setRemoteIp(IPUtil.getRemoteIp(request));
 		String loginToken = GameUtil.genToken(userModel.getPlayerId());
 		userInfo.setHeadImgUrl(UrlImgDownLoadUtil.getLocalImgUrl(weixinUserInfo.getHeadImgUrl(), userModel.getPlayerId()));
@@ -127,6 +135,8 @@ public abstract class BaseGameService {
 		redisOperationService.setUserInfo(loginToken, userInfo);
 		/****-------*/
 //		redisOperationService.hdelOfflinePlayerIdRoomIdGameTypeTime(userModel.getPlayerId());
+		Integer clubId = redisOperationService.getClubIdByPlayerId(userModel.getPlayerId());
+		userInfo.setClubId(clubId);
 		result.setData(userInfo);
 		return result;
 	}
@@ -160,8 +170,14 @@ public abstract class BaseGameService {
 		userInfo.setNickName(String.valueOf(playerId));
 		userInfo.setSex(0);
 		userInfo.setLevel(1);
-		userInfo.setServerIp(Constant.localIp);
-		userInfo.setPort(String.valueOf(Constant.websocketPort));
+        //noinspection Duplicates
+        if ("true".equals(Constant.useWss)){
+            userInfo.setServerIp(Constant.wssDomain);
+            userInfo.setPort(String.valueOf(Constant.wssPort));
+        } else {
+            userInfo.setServerIp(Constant.localIp);
+            userInfo.setPort(String.valueOf(Constant.websocketPort));
+        }
 		userInfo.setRemoteIp(IPUtil.getRemoteIp(request));
 		String loginToken =GameUtil.genToken(playerId);
 		userInfo.setToken(loginToken);
@@ -187,6 +203,10 @@ public abstract class BaseGameService {
 	}
 	
 	public void createRoom(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		/**校验创建房间的开关是否打开，如果没打开，就提示用户；此时可能是需要升级，暂停服务*/
+		if (!redisOperationService.isCreateRoomFuseOpen()) {
+			throw new BusinessException(ExceptionEnum.SYSTEM_UPGRADE);
+		}
 		Result result = null;
 		BaseMsg msg = request.getMsg();
 		
@@ -292,10 +312,35 @@ public abstract class BaseGameService {
 		if (!redisOperationService.isRoomIdExist(roomId)) {
 			throw new BusinessException(ExceptionEnum.ROOM_ID_NOT_EXIST);
 		}
-		
-		
-		BaseRoomInfo roomInfo = doEntryRoom(ctx, request, userInfo);
+		/**先获取房间信息，判断此玩家是否在房间里面，如果在房间里面就走刷新接口*/
+		userInfo.setRoomId(roomId);
+		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
 		List playerList = roomInfo.getPlayerList();
+		boolean isExist = false;
+		for(int i = 0; i < playerList.size(); i++ ){
+			BasePlayerInfo tempPlayerInfo = (BasePlayerInfo)playerList.get(i);
+			/**如果加入的玩家id已经存在*/
+			if (playerId.equals(tempPlayerInfo.getPlayerId())) {
+				isExist = true;
+				break;
+			}
+		}
+		/**如果申请加入房间的玩家已经存在房间中，则只需要走刷新接口*/
+		if (isExist) {
+			
+			refreshRoom(ctx, request, userInfo);
+			return;
+		}
+		/**房间里面是否有clubId，如果有则需要校验此玩家是否属于此俱乐部*/
+		if (roomInfo.getClubId() != null) {
+			if (redisOperationService.getClubIdByPlayerId(playerId) == null) {
+				throw new BusinessException(ExceptionEnum.NOT_IN_CLUB);
+			}
+		}
+		
+		/**如果不在房间里面就走加入房间*/
+		roomInfo = doEntryRoom(ctx, request, userInfo);
+		playerList = roomInfo.getPlayerList();
 		int size = playerList.size();
 		/**如果是麻将（金花和牛牛除外），那么游戏已经开始，则不允许再加入 add by liujinfengnew*/
 		if (roomInfo.getGameType().equals(GameTypeEnum.mj.gameType)) {
@@ -318,21 +363,7 @@ public abstract class BaseGameService {
 		}
 		userInfo.setRoomId(roomId);
 		redisOperationService.setUserInfo(request.getToken(), userInfo);
-		boolean isExist = false;
-		for(int i = 0; i < playerList.size(); i++ ){
-			BasePlayerInfo tempPlayerInfo = (BasePlayerInfo)playerList.get(i);
-			/**如果加入的玩家id已经存在*/
-			if (playerId.equals(tempPlayerInfo.getPlayerId())) {
-				isExist = true;
-				break;
-			}
-		}
-		/**如果申请加入房间的玩家已经存在房间中，则只需要走刷新接口*/
-		if (isExist) {
-			playerList.remove(playerList.size() - 1);
-			refreshRoom(ctx, request, userInfo);
-			return;
-		}
+		
 		
 		/**取list最后一个，即为本次加入的玩家，设置公共信息*/
 		BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(playerList.size() - 1);
@@ -489,19 +520,31 @@ public abstract class BaseGameService {
 			refreshRoomForAllPlayer(roomInfo);
 			return;
 		}
-		/**房间状态是最开始准备阶段，则玩家可以退出*/
+		/**房间状态是最开始准备阶段*/
 		if (roomInfo.getStatus().equals(RoomStatusEnum.justBegin.status)) {
 			
-			/**如果在游戏最开始准备阶段退出的是庄家（即房主），则需要设置一个默认的庄家（房主）,当前退出庄家的下家*/
+			/**如果在游戏最开始准备阶段退出的是庄家（即房主），则直接解散房间*/
 			if (roomInfo.getRoomBankerId().equals(playerId)) {
-				Integer tempId = GameUtil.getNextPlayerId(playerList, playerId);
-				roomInfo.setRoomOwnerId(tempId);
-				if (request.getGameType().equals(GameTypeEnum.jh.gameType)) {
-					roomInfo.setRoomBankerId(tempId);
+//				Integer tempId = GameUtil.getNextPlayerId(playerList, playerId);
+//				roomInfo.setRoomOwnerId(tempId);
+//				if (request.getGameType().equals(GameTypeEnum.jh.gameType)) {
+//					roomInfo.setRoomBankerId(tempId);
+//				}
+				/**解散房间*/
+				redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
+				if (roomInfo.getClubId() != null) {
+					redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomId);
 				}
+				/**将用户缓存信息里面的roomId设置为null*/
+				userInfo.setRoomId(null);
+				redisOperationService.setUserInfo(request.getToken(), userInfo);
+				result.setMsgType(MsgTypeEnum.successDissolveRoom.msgType);
+				data.put("roomId", roomId);
+				channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+				return;
 			}
 			
-			/**删除玩家*/
+			/**如果是非庄家玩家退出，则只是此玩家退出*/
 			GameUtil.removePlayer(playerList, playerId);
 			redisOperationService.cleanPlayerAndRoomInfoForSignout(roomId, String.valueOf(playerId));
 			redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
@@ -582,7 +625,9 @@ public abstract class BaseGameService {
 		data.put("roomId", roomId);
 		data.put("playerId", msg.getPlayerId());
 		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
-		data.put("playerList", GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime()));
+		if (model != null) {
+			data.put("playerList", GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime()));
+		}
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 	}
 	
@@ -616,7 +661,11 @@ public abstract class BaseGameService {
 		}
 		roomInfo.setUpdateTime(new Date());
 		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
-		List<Map<String, Object>> disPlayerList = GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime());
+		if (model != null) {
+			List<Map<String, Object>> disPlayerList = GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime());
+			data.put("playerList", disPlayerList);
+		}
+		
 		/**如果一半人不同意，则不能解散房间*/
 		if (disagreeDissolveCount >= (playerList.size()/2)) {
 			/**删除解散房间标志位*/
@@ -628,7 +677,7 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.disagreeDissolveRoom.msgType);
 		data.put("roomId", roomId);
 		data.put("playerId", msg.getPlayerId());
-		data.put("playerList", disPlayerList);
+		
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
 		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, new Date());
 	}
@@ -788,7 +837,9 @@ public abstract class BaseGameService {
 		BaseMsg msg = request.getMsg();
 		result.setMsgType(MsgTypeEnum.getAllPlayerDistance.msgType);
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
-		result.setData(roomInfo.getDistanceMap());
+		if (roomInfo != null) {
+			result.setData(roomInfo.getDistanceMap());
+		}
 		channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
 		redisOperationService.setRoomIdGameTypeUpdateTime(msg.getRoomId(), request.getGameType(), new Date());
 	}
@@ -828,10 +879,51 @@ public abstract class BaseGameService {
 		result.setData(data);
 		result.setGameType(request.getGameType());
 		BaseMsg msg = request.getMsg();
-		List<String> list = commonManager.getPlayBack(Long.valueOf(request.getMsg().getRecordDetailUuid()));
+		if (StringUtils.isBlank(request.getMsg().getRecordDetailUuid())) {
+			throw new BusinessException(ExceptionEnum.PARAMS_ERROR);
+		}
+		Long recordDetailUuid = null;
+		try {
+			recordDetailUuid = Long.valueOf(request.getMsg().getRecordDetailUuid());
+		} catch (NumberFormatException e) {
+			throw new BusinessException(ExceptionEnum.PLAY_BACK_CODE_ERROR);
+		}
+		/**通过detailuuid查到uuid*/
+		UserRecordModel model = new UserRecordModel();
+		model.setRecordDetailUuid(recordDetailUuid);
+		List<UserRecordModel> detailModelList = commonManager.getUserRecordDetail(model);
+		if (CollectionUtils.isEmpty(detailModelList)) {
+			throw new BusinessException(ExceptionEnum.PLAY_BACK_CODE_ERROR);
+		}
+		Long recordUuid = detailModelList.get(0).getRecordUuid();
+		Integer curGame = detailModelList.get(0).getCurGame();
+		/**再通过uuid查到房间remark*/
+		model = commonManager.getRoomRemarkByUuid(recordUuid);
+		if (model == null) {
+			throw new BusinessException(ExceptionEnum.PLAY_BACK_CODE_ERROR);
+		}
+		String remark = model.getRemark();
+		Map<String, Object> remarkMap = JsonUtil.toObject(remark, Map.class);
+		if (remarkMap == null) {
+			remarkMap = new HashMap<String, Object>();
+		}
+		remarkMap.put("roomId", model.getRoomId());
+		remarkMap.put("gameType", model.getGameType());
+		remarkMap.put("detailType", model.getDetailType());
+		remarkMap.put("payType", model.getPayType());
+		remarkMap.put("totalGames", model.getTotalGames());
+		remarkMap.put("curGame", curGame);
+		List<String> list = commonManager.getPlayBack(recordDetailUuid);
 		result.setMsgType(MsgTypeEnum.playBack.msgType);
-		result.setData(list);
+		data.put("remarkMap", remarkMap);
+		data.put("playBackList", list);
 		channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
+	}
+	
+	public static void main(String[] args) {
+		String remark = "{\"code\":0,\"msgType\":208,\"gameType\":2,\"data\":{\"roomOwnerId\":861111,\"huangFanNum\":0,\"playerList\":[{\"headImgUrl\":\"http://wx.qlogo.cn/mmopen/wibbRT31wkCR4W9XNicL2h2pgaLepmrmEsXbWKbV0v9ugtdibibDgR1ybONiaWFtVeVtYWGWhObRiaiaicMgw8zat8Y5p6YzQbjdstE2/0\",\"nickName\":\"861111\",\"playerId\":861111,\"order\":1},{\"headImgUrl\":\"http://wx.qlogo.cn/mmopen/wibbRT31wkCR4W9XNicL2h2pgaLepmrmEsXbWKbV0v9ugtdibibDgR1ybONiaWFtVeVtYWGWhObRiaiaicMgw8zat8Y5p6YzQbjdstE2/0\",\"nickName\":\"840549\",\"playerId\":840549,\"order\":2},{\"headImgUrl\":\"http://wx.qlogo.cn/mmopen/wibbRT31wkCR4W9XNicL2h2pgaLepmrmEsXbWKbV0v9ugtdibibDgR1ybONiaWFtVeVtYWGWhObRiaiaicMgw8zat8Y5p6YzQbjdstE2/0\",\"nickName\":\"160950\",\"playerId\":160950,\"order\":3},{\"headImgUrl\":\"http://wx.qlogo.cn/mmopen/wibbRT31wkCR4W9XNicL2h2pgaLepmrmEsXbWKbV0v9ugtdibibDgR1ybONiaWFtVeVtYWGWhObRiaiaicMgw8zat8Y5p6YzQbjdstE2/0\",\"nickName\":\"209599\",\"playerId\":209599,\"order\":4}],\"roomBankerId\":861111,\"isCurGameKaiBao\":0,\"dices\":[5,5]}}";
+		Map<String, Object> remarkMap = JsonUtil.toObject(remark, Map.class);
+		System.out.println(JsonUtil.toJson(remarkMap));
 	}
 
 	public void userFeedback(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
@@ -882,10 +974,14 @@ public abstract class BaseGameService {
 		/**设置解散玩家列表，如果有*/
 		RedisRelaModel model = redisOperationService.getDissolveIpRoomIdTime(roomId);
 		if (model != null) {
-			returnRoomInfo.setDisList(GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime()));
+			/**一圈结束的时候不返回解散列表*/
+			if ((roomInfo.getStatus() != 4)&&(roomInfo.getStatus() != 6)) {
+				returnRoomInfo.setDisList(GameUtil.getPList(playerList,model.getPlayerId(),model.getUpdateTime()));
+			}
 		}
 		result.setData(returnRoomInfo);
 		/**返回给当前玩家刷新信息*/
+		redisOperationService.setPlayerIdRoomIdGameType(playerId, roomId, request.getGameType());
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		
 		
@@ -1256,6 +1352,7 @@ public abstract class BaseGameService {
 		}
 		
 		gameQuery.setPlayerId(playerId);
+		gameQuery.setStatus(1);
 		list = gameDao.getClubUsers(gameQuery);
 		/**如果当前玩家已经在俱乐部中,则直接进入俱乐部*/
 		if (!CollectionUtils.isEmpty(list)) {
@@ -1334,7 +1431,7 @@ public abstract class BaseGameService {
 			tempModel = new GameModel();
 			tempModel.setPlayerId(playerId);
 			tempModel.setNickName(modle.getNickName());
-			tempModel.setHeadImgUrl(modle.getHeadImgUrl() == null?userInfo.getHeadImgUrl() : modle.getHeadImgUrl());
+			tempModel.setHeadImgUrl(modle.getHeadImgUrl());
 			if (channelContainer.isPlayIdActive(modle.getPlayerId())) {
 				tempModel.setOnlineStatus(1);
 				onlineList.add(tempModel);
@@ -1349,6 +1446,23 @@ public abstract class BaseGameService {
 		data.put("playerList", onlineList);
 		data.put("onlineNum", onlineNum);
 		data.put("totalNum", onlineList.size());
+		result.setData(data);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	
+	public void getJoinedClubs(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.getJoinedClubs.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setPlayerId(playerId);
+		gameQuery.setStatus(1);
+		List<GameModel> list = gameDao.getJoinedClubs(gameQuery);
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("clubList", list);
 		result.setData(data);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
@@ -1484,10 +1598,4 @@ public abstract class BaseGameService {
 		channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArrWithOutSelf(playerList, playerId));
 	}
 	
-	public static void main(String[] args) {
-		Integer status = null;
-		if (status == 1) {
-			
-		}
-	}
 }
