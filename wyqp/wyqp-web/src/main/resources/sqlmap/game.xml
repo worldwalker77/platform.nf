@@ -110,6 +110,30 @@
 		     				)    
     </insert>
     
+    <insert id="insertClubForm" parameterType="gameQuery">  
+	     <selectKey keyProperty="id" resultType="Long">  
+	         select LAST_INSERT_ID()  
+	     </selectKey>  
+	     insert into t_club_form( 
+		     					club_id, 
+		     					game_type,
+		     					detail_type,
+		     					pay_type,
+		     					total_games,
+		     					remark,
+		     					create_time
+	     					) 
+	     			values(  
+		     					#{clubId},
+		     					#{gameType},
+		     					#{detailType},
+		     					#{payType},
+		     					#{totalGames},
+		     					#{remark},
+		     					now()
+		     				)    
+    </insert>
+    
     <update id="updateProxy"  parameterType="gameQuery">
 		 UPDATE t_proxy
 		 <trim prefix="set" suffixOverrides=",">

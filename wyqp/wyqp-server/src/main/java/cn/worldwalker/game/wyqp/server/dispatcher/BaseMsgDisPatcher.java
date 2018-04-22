@@ -139,6 +139,7 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.unifiedOrder.msgType, MsgTypeEnum.unifiedOrder);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.notice.msgType, MsgTypeEnum.notice);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.playBack.msgType, MsgTypeEnum.playBack);
+		
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.joinClub.msgType, MsgTypeEnum.joinClub);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.entryClub.msgType, MsgTypeEnum.entryClub);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.exitClub.msgType, MsgTypeEnum.exitClub);

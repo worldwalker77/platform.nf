@@ -27,7 +27,41 @@ public class GameQuery {
 	private String clubName;
 	private String clubOwnerWord;
 	private String headImgUrl;
-	
+	private Integer gameType;
+	private Integer detailType;
+	private Integer payType;
+	private Integer totalGames;
+	private String remark;
+	public Integer getGameType() {
+		return gameType;
+	}
+	public void setGameType(Integer gameType) {
+		this.gameType = gameType;
+	}
+	public Integer getDetailType() {
+		return detailType;
+	}
+	public void setDetailType(Integer detailType) {
+		this.detailType = detailType;
+	}
+	public Integer getPayType() {
+		return payType;
+	}
+	public void setPayType(Integer payType) {
+		this.payType = payType;
+	}
+	public Integer getTotalGames() {
+		return totalGames;
+	}
+	public void setTotalGames(Integer totalGames) {
+		this.totalGames = totalGames;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
 	public String getHeadImgUrl() {
 		return headImgUrl;
 	}

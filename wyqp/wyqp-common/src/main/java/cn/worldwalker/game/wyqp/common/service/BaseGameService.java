@@ -1295,6 +1295,8 @@ public abstract class BaseGameService {
 		data.put("clubId", clubId);
 		data.put("clubName", msg.getClubName());
 		data.put("clubOwnerWord", msg.getClubOwnerWord());
+		data.put("nickName", userInfo.getNickName());
+		result.setMsgType(MsgTypeEnum.entryClub.msgType);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		/**设置玩家id与俱乐部id的关系，记忆下次直接进入俱乐部*/
 		redisOperationService.setPlayerIdClubId(playerId, clubId);
@@ -1338,6 +1340,7 @@ public abstract class BaseGameService {
 		data.put("clubId", clubId);
 		data.put("clubName", gameModel.getClubName());
 		data.put("clubOwnerWord", gameModel.getClubOwnerWord());
+		data.put("nickName", gameModel.getNickName());
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		/**设置玩家id与俱乐部id的关系，记忆下次直接进入俱乐部*/
 		redisOperationService.setPlayerIdClubId(playerId, clubId);
@@ -1365,6 +1368,7 @@ public abstract class BaseGameService {
 		}
 		GameModel gameModel = list.get(0);
 		data.put("roomCardNum", gameModel.getRoomCardNum());
+		data.put("nickName", gameModel.getNickName());
 		/**如果进入俱乐部的是主人本人，则直接进入*/
 		if (playerId.equals(gameModel.getPlayerId())) {
 			result.setMsgType(MsgTypeEnum.entryClub.msgType);
@@ -1728,7 +1732,8 @@ public abstract class BaseGameService {
 		clubList.addAll(createdList);
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("clubList", clubList);
-		data.put("num", clubList.size());
+		data.put("createdNum", createdList.size());
+		data.put("joinedNum", joinedList.size());
 		result.setData(data);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}

@@ -49,6 +49,8 @@ public interface GameDao {
 	public List<GameModel> getJoinedClubs(GameQuery gameQuery);
 	public List<GameModel> getCreatedClubs(GameQuery gameQuery);
 	
+	public Integer insertClubForm(GameQuery gameQuery);
+	
 	
 	
 }
