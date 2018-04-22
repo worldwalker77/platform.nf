@@ -7,8 +7,8 @@ public enum RoomCardConsumeEnum {
 	nn_AAPay_10_Games(1, 2, 10, 1, "AA制付费,10局每人1张房卡"),
 	nn_AAPay_20_Games(1, 2, 20, 2, "AA制付费,20局每人2张房卡"),
 	
-	mj_roomOwnerPay_8_Games(2, 1, 8, 4, "房主付费8局需4张房卡"),
-	mj_roomOwnerPay_16_Games(2, 1, 16, 7, "房主付费16局需7张房卡"),
+	mj_roomOwnerPay_8_Games(2, 1, 8, 2, "房主付费8局需2张房卡"),
+	mj_roomOwnerPay_16_Games(2, 1, 16, 4, "房主付费16局需4张房卡"),
 	mj_roomOwnerPay_24_Games(2, 1, 24, 10, "房主付费24局需10张房卡"),
 	mj_AAPay_8_Games(2, 2, 8, 1, "AA制付费10局每人需1张房卡"),
 	mj_AAPay_16_Games(2, 2, 16, 2, "AA制付费16局每人需2张房卡"),

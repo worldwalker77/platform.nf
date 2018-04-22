@@ -43,6 +43,16 @@ public class UserInfo {
 
 	private Integer sex = 0;
 	
+	private Integer clubId;
+	
+	public Integer getClubId() {
+		return clubId;
+	}
+
+	public void setClubId(Integer clubId) {
+		this.clubId = clubId;
+	}
+
 	public Integer getHasClub() {
 		return hasClub;
 	}

@@ -135,6 +135,8 @@ public abstract class BaseGameService {
 		redisOperationService.setUserInfo(loginToken, userInfo);
 		/****-------*/
 //		redisOperationService.hdelOfflinePlayerIdRoomIdGameTypeTime(userModel.getPlayerId());
+		Integer clubId = redisOperationService.getClubIdByPlayerId(userModel.getPlayerId());
+		userInfo.setClubId(clubId);
 		result.setData(userInfo);
 		return result;
 	}
