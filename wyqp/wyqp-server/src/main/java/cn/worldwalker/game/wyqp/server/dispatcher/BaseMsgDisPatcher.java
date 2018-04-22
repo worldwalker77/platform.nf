@@ -148,5 +148,15 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.offlineNotice.msgType, MsgTypeEnum.offlineNotice);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.onlineNotice.msgType, MsgTypeEnum.onlineNotice);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.getJoinedClubs.msgType, MsgTypeEnum.getJoinedClubs);
+		
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.createClub.msgType, MsgTypeEnum.createClub);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.getCreatedClubs.msgType, MsgTypeEnum.getCreatedClubs);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.getUnAuditClubMembers.msgType, MsgTypeEnum.getUnAuditClubMembers);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.delClubUser.msgType, MsgTypeEnum.delClubUser);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.exitAndDelClubUser.msgType, MsgTypeEnum.exitAndDelClubUser);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.auditClubMember.msgType, MsgTypeEnum.auditClubMember);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.delClub.msgType, MsgTypeEnum.delClub);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.getClubs.msgType, MsgTypeEnum.getClubs);
+		
 	}
 }

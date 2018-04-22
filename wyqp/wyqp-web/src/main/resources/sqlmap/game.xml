@@ -28,6 +28,7 @@
 		<result column="club_name" property="clubName"/>
 		<result column="club_owner_word" property="clubOwnerWord"/>
 		<result column="is_admin" property="isAdmin"/>
+		<result column="head_img_url" property="headImgUrl"/>
 	</resultMap>
 	
 	
@@ -63,6 +64,7 @@
 		     					proxy_id, 
 		     					player_id,
 		     					nick_name,
+		     					head_img_url,
 		     					type,
 		     					status,
 		     					create_time,
@@ -74,6 +76,7 @@
 		     					#{proxyId},
 		     					#{playerId},
 		     					#{nickName},
+		     					#{headImgUrl},
 		     					#{type},
 		     					#{status},
 		     					now(),
@@ -90,6 +93,7 @@
 		     					club_id, 
 		     					player_id,
 		     					nick_name,
+		     					head_img_url,
 		     					status,
 		     					create_time,
 		     					update_time
@@ -99,6 +103,7 @@
 		     					#{clubId},
 		     					#{playerId},
 		     					#{nickName},
+		     					#{headImgUrl},
 		     					#{status},
 		     					now(),
 		     					now()
@@ -271,7 +276,7 @@
 	
 	
 	<select id="getProxyClubs"  parameterType = "gameQuery" resultMap="gameModelResultMap">
-	    select club_id,club_name,club_owner_word, proxy_id,player_id,nick_name,status,create_time
+	    select club_id,club_name,club_owner_word, proxy_id,player_id,nick_name,status,room_card_num,create_time
 	    from t_proxy_club
 	    where  1=1
 	    <if test="proxyId !=null ">  
@@ -318,8 +323,8 @@
 	</delete>
 	
 	<select id="getClubUsers"  parameterType = "gameQuery" resultMap="gameModelResultMap">
-	    select a.proxy_id,a.club_id,a.player_id,a.nick_name,a.status,a.create_time,b.head_img_url
-	    from t_club_user a left join t_user b on a.player_id = b.player_id
+	    select a.proxy_id,a.club_id,a.player_id,a.nick_name,a.status,a.create_time,a.head_img_url
+	    from t_club_user a
 	    where  1=1
 	    <if test="proxyId !=null ">  
 	       and a.proxy_id = #{proxyId}
@@ -356,12 +361,12 @@
 	<update id="updateClubUser"  parameterType = "gameQuery">
 	    update t_club_user
 	    set status = #{status}
-	    where proxy_id = #{proxyId} and club_id = #{clubId} and player_id = #{playerId}
+	    where club_id = #{clubId} and player_id = #{playerId}
 	</update>
 	
 	<delete id="delClubUser"  parameterType = "gameQuery">
 	    delete from  t_club_user
-	    where proxy_id = #{proxyId} and club_id = #{clubId} and player_id = #{playerId}
+	    where club_id = #{clubId} and player_id = #{playerId}
 	</delete>
 	
 	
@@ -393,11 +398,9 @@
 	
 	
 	<select id="getJoinedClubs"  parameterType = "gameQuery" resultMap="gameModelResultMap">
-	    select a.club_id,b.club_name,c.nick_name,c.player_id
+	    select a.club_id,b.club_name,b.nick_name,b.player_id
 	    from t_club_user a 
 	    left join t_proxy_club b on a.club_id = b.club_id
-	    left join t_proxy c on b.proxy_id = c.proxy_id
-	    
 	    where  1=1 
 	    <if test="proxyId !=null ">  
 	       and a.proxy_id = #{proxyId}
@@ -412,6 +415,26 @@
 	       and a.status = #{status}
 	    </if>
 	    order by a.create_time desc
+	    limit 100
+	</select>
+	
+	<select id="getCreatedClubs"  parameterType = "gameQuery" resultMap="gameModelResultMap">
+	    select club_id,club_name,nick_name,player_id
+	    from t_proxy_club 
+	    where  1=1 
+	    <if test="proxyId !=null ">  
+	       and proxy_id = #{proxyId}
+	    </if>
+	    <if test="playerId !=null ">  
+	       and player_id = #{playerId}
+	    </if>
+	    <if test="clubId !=null ">  
+	       and club_id = #{clubId}
+	    </if>
+	    <if test="status !=null ">  
+	       and status = #{status}
+	    </if>
+	    order by create_time desc
 	    limit 100
 	</select>
 </mapper>

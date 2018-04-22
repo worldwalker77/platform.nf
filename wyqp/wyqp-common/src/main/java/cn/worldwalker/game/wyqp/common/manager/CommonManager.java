@@ -72,4 +72,7 @@ public interface CommonManager {
 	
 	public void insertExtensionCodeBindLog(Integer extensionCode, Integer playerId, String nickName);
 	
+	public Integer createClub(String clubName, String clubOwnerWord, Integer status,Integer playerId, String nickName, String headImgUrl);
+	
+	public void delClub(Integer clubId);
 }

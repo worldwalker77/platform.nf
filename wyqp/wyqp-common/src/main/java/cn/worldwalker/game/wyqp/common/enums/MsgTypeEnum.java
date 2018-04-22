@@ -37,11 +37,20 @@ public enum MsgTypeEnum {
 	playBack(32, "回放"),
 	joinClub(33, "申请加入俱乐部"),
 	entryClub(34, "进入俱乐部"),
-	exitClub(35, "退出进入的俱乐部"),
+	exitClub(35, "退出俱乐部到大厅"),
 	getClubMembers(36, "查询俱乐部玩家列表"),
 	getClubRooms(37, "查询俱乐部房间列表"),
 	getAllPlayerDistance(38, "获取所有玩家相互之间的距离"),
 	getJoinedClubs(39, "获取加入的俱乐部列表"),
+	
+	createClub(40, "创建俱乐部"),
+	getCreatedClubs(41, "查询创建的俱乐部列表"),
+	getUnAuditClubMembers(42, "查询待审核的俱乐部玩家列表"),
+	delClubUser(43, "创始人移除俱乐部玩家"),
+	exitAndDelClubUser(44, "玩家自己退出俱乐部并删除表数据"),
+	auditClubMember(45, "审核俱乐部玩家"),
+	delClub(46, "创始人删除俱乐部"),
+	getClubs(47, "获取创建的和加入的俱乐部列表"),
 	
 	
 	/**斗牛特有100-199*/

@@ -47,6 +47,7 @@ public interface GameDao {
 	public Integer delClubUser(GameQuery gameQuery);
 	
 	public List<GameModel> getJoinedClubs(GameQuery gameQuery);
+	public List<GameModel> getCreatedClubs(GameQuery gameQuery);
 	
 	
 	

@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.worldwalker.game.wyqp.common.backend.GameQuery;
 import cn.worldwalker.game.wyqp.common.dao.ExtensionCodeBindDao;
+import cn.worldwalker.game.wyqp.common.dao.GameDao;
 import cn.worldwalker.game.wyqp.common.dao.OrderDao;
 import cn.worldwalker.game.wyqp.common.dao.ProductDao;
 import cn.worldwalker.game.wyqp.common.dao.ProxyDao;
@@ -69,6 +71,8 @@ public class CommonManagerImpl implements CommonManager{
 	private RecordPlayBackDao recordPlayBackDao;
 	@Autowired
 	private ExtensionCodeBindDao extensionCodeBindDao;
+	@Autowired
+	private GameDao gameDao;
 	
 	@Override
 	public UserModel getUserByWxOpenId(String openId){
@@ -441,5 +445,40 @@ public class CommonManagerImpl implements CommonManager{
 		UserRecordModel model = new UserRecordModel();
 		model.setRecordUuid(uuid);
 		return userRecordDao.getRoomRemarkByUuid(model);
+	}
+	
+	@Override
+	public Integer createClub(String clubName, String clubOwnerWord,
+			Integer status, Integer playerId, String nickName, String headImgUrl) {
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setClubName(clubName);
+		gameQuery.setClubOwnerWord(clubOwnerWord);
+		/**俱乐部是否需要审核，1：需要 0：不需要*/
+		gameQuery.setStatus(status);
+		gameQuery.setPlayerId(playerId);
+		gameQuery.setNickName(nickName);
+		gameQuery.setHeadImgUrl(headImgUrl);
+		/**俱乐部剩余房卡数*/
+		gameQuery.setRoomCardNum(0);
+		/**创建俱乐部*/
+		gameDao.insertProxyClub(gameQuery);
+		GameQuery gameQuery1 = new GameQuery();
+		gameQuery1.setClubId(gameQuery.getClubId());
+		gameQuery1.setPlayerId(playerId);
+		gameQuery1.setNickName(nickName);
+		gameQuery1.setHeadImgUrl(headImgUrl);
+		gameQuery1.setStatus(1);
+		/**默认创始人也加入俱乐部，并且不需要审核*/
+		gameDao.insertClubUser(gameQuery);
+		return gameQuery.getClubId();
+	}
+	@Override
+	public void delClub(Integer clubId) {
+		/**删除俱乐部玩家*/
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setClubId(clubId);
+		gameQuery.setPlayerId(null);
+		gameDao.delClubUser(gameQuery);
+		gameDao.delProxyClub(gameQuery);
 	}
 }

@@ -30,7 +30,21 @@ public class BaseMsg {
 	private String recordDetailUuid;
 	private Integer clubId;
 	private Integer status;
+	private String clubOwnerWord;
+	private String clubName;
 	
+	public String getClubName() {
+		return clubName;
+	}
+	public void setClubName(String clubName) {
+		this.clubName = clubName;
+	}
+	public String getClubOwnerWord() {
+		return clubOwnerWord;
+	}
+	public void setClubOwnerWord(String clubOwnerWord) {
+		this.clubOwnerWord = clubOwnerWord;
+	}
 	public Integer getStatus() {
 		return status;
 	}

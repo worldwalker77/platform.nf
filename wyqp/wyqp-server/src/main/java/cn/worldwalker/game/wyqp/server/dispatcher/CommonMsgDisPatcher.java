@@ -85,6 +85,33 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			case getJoinedClubs:
 				commonGameService.getJoinedClubs(ctx, request, userInfo);
 				break;
+				
+				
+				
+			case createClub:
+				commonGameService.createClub(ctx, request, userInfo);
+				break;
+			case getCreatedClubs:
+				commonGameService.getCreatedClubs(ctx, request, userInfo);
+				break;
+			case getUnAuditClubMembers:
+				commonGameService.getUnAuditClubMembers(ctx, request, userInfo);
+				break;
+			case delClubUser:
+				commonGameService.delClubUser(ctx, request, userInfo);
+				break;
+			case exitAndDelClubUser:
+				commonGameService.exitAndDelClubUser(ctx, request, userInfo);
+				break;
+			case auditClubMember:
+				commonGameService.auditClubMember(ctx, request, userInfo);
+				break;
+			case delClub:
+				commonGameService.delClub(ctx, request, userInfo);
+				break;
+			case getClubs:
+				commonGameService.getClubs(ctx, request, userInfo);
+				break;
 			default:
 				break;
 			}

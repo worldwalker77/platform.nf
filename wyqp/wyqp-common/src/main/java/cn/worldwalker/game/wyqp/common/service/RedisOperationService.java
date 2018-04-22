@@ -587,8 +587,8 @@ public class RedisOperationService {
 		}else{
 			GameInfoMemoryContainer.playerIdClubIdMap.remove(String.valueOf(playerId));
 		}
-		
 	}
+	
 	public static Lock lock = new ReentrantLock();
 	/**俱乐部与房间号列表关系*/
 	public void setClubIdRoomId(Integer clubId, Integer roomId){
