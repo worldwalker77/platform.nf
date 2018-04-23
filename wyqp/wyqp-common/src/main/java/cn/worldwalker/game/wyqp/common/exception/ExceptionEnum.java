@@ -38,6 +38,8 @@ public enum ExceptionEnum {
     SYSTEM_UPGRADE(32, "系统正在升级，开放时间请听代理通知"),
     NOT_IN_CLUB(33, "您不属于此俱乐部，请先加入俱乐部"),
     NO_PERMISSION(34, "无权限"),
+    CREATE_CLUB_LIMIT_ERROR(35, "每个玩家只能创建5个俱乐部"),
+    JOIN_CLUB_LIMIT_ERROR(36, "每个玩家只能加入10个俱乐部"),
     /**斗牛100-199*/
     
     /**麻将200-299*/

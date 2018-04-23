@@ -63,6 +63,7 @@
 	     						club_owner_word,
 		     					proxy_id, 
 		     					player_id,
+		     					wechat_num,
 		     					nick_name,
 		     					head_img_url,
 		     					type,
@@ -75,6 +76,7 @@
 	     						#{clubOwnerWord},
 		     					#{proxyId},
 		     					#{playerId},
+		     					#{wechatNum},
 		     					#{nickName},
 		     					#{headImgUrl},
 		     					#{type},
@@ -300,7 +302,7 @@
 	
 	
 	<select id="getProxyClubs"  parameterType = "gameQuery" resultMap="gameModelResultMap">
-	    select club_id,club_name,club_owner_word, proxy_id,player_id,nick_name,status,room_card_num,create_time
+	    select club_id,club_name,club_owner_word, proxy_id,player_id,wechat_num,nick_name,status,room_card_num,create_time
 	    from t_proxy_club
 	    where  1=1
 	    <if test="proxyId !=null ">  

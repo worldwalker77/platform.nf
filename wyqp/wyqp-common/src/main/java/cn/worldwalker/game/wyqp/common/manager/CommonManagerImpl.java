@@ -457,6 +457,7 @@ public class CommonManagerImpl implements CommonManager{
 		gameQuery.setStatus(status);
 		gameQuery.setPlayerId(playerId);
 		gameQuery.setNickName(nickName);
+		gameQuery.setWechatNum(nickName);
 		gameQuery.setHeadImgUrl(headImgUrl);
 		/**俱乐部剩余房卡数*/
 		gameQuery.setRoomCardNum(0);

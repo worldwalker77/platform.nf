@@ -1287,6 +1287,15 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.createClub.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
+		if (msg.getStatus() == null) {
+			msg.setStatus(1);
+		}
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setPlayerId(playerId);
+		Long clubCount = gameDao.getProxyClubsCount(gameQuery);
+		if (clubCount >= 5) {
+			throw new BusinessException(ExceptionEnum.CREATE_CLUB_LIMIT_ERROR);
+		}
 		Integer clubId = commonManager.createClub(msg.getClubName(), msg.getClubOwnerWord(), msg.getStatus(), 
 				playerId, userInfo.getNickName(), userInfo.getHeadImgUrl());
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -1296,6 +1305,7 @@ public abstract class BaseGameService {
 		data.put("clubName", msg.getClubName());
 		data.put("clubOwnerWord", msg.getClubOwnerWord());
 		data.put("nickName", userInfo.getNickName());
+		data.put("wechatNum", userInfo.getNickName());
 		result.setMsgType(MsgTypeEnum.entryClub.msgType);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		/**设置玩家id与俱乐部id的关系，记忆下次直接进入俱乐部*/
@@ -1341,6 +1351,7 @@ public abstract class BaseGameService {
 		data.put("clubName", gameModel.getClubName());
 		data.put("clubOwnerWord", gameModel.getClubOwnerWord());
 		data.put("nickName", gameModel.getNickName());
+		data.put("wechatNum", gameModel.getNickName());
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		/**设置玩家id与俱乐部id的关系，记忆下次直接进入俱乐部*/
 		redisOperationService.setPlayerIdClubId(playerId, clubId);
@@ -1359,7 +1370,14 @@ public abstract class BaseGameService {
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
 		Integer clubId = msg.getClubId();
-		
+		/**每个玩家只能加入不超过10个俱乐部*/
+		GameQuery tempQuery = new GameQuery();
+		tempQuery.setPlayerId(playerId);
+		tempQuery.setStatus(1);
+		Long joinCount = gameDao.getClubUsersCount(tempQuery);
+		if (joinCount >= 10) {
+			throw new BusinessException(ExceptionEnum.JOIN_CLUB_LIMIT_ERROR);
+		}	
 		GameQuery gameQuery = new GameQuery();
 		gameQuery.setClubId(clubId);
 		List<GameModel> list = gameDao.getProxyClubs(gameQuery);
@@ -1369,6 +1387,7 @@ public abstract class BaseGameService {
 		GameModel gameModel = list.get(0);
 		data.put("roomCardNum", gameModel.getRoomCardNum());
 		data.put("nickName", gameModel.getNickName());
+		data.put("wechatNum", gameModel.getNickName());
 		/**如果进入俱乐部的是主人本人，则直接进入*/
 		if (playerId.equals(gameModel.getPlayerId())) {
 			result.setMsgType(MsgTypeEnum.entryClub.msgType);
