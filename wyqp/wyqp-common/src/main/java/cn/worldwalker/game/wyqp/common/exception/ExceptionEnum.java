@@ -40,6 +40,7 @@ public enum ExceptionEnum {
     NO_PERMISSION(34, "无权限"),
     CREATE_CLUB_LIMIT_ERROR(35, "每个玩家只能创建5个俱乐部"),
     JOIN_CLUB_LIMIT_ERROR(36, "每个玩家只能加入10个俱乐部"),
+    HAS_APPLY(37, "你已经申请加入此俱乐部，等待俱乐部创始人审核"),
     /**斗牛100-199*/
     
     /**麻将200-299*/

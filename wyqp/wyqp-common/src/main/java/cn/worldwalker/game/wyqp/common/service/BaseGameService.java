@@ -1384,6 +1384,7 @@ public abstract class BaseGameService {
 		if (CollectionUtils.isEmpty(list)) {
 			throw new BusinessException(ExceptionEnum.CLUB_ID_NOT_EXIST);
 		}
+		
 		GameModel gameModel = list.get(0);
 		data.put("roomCardNum", gameModel.getRoomCardNum());
 		data.put("nickName", gameModel.getNickName());
@@ -1400,17 +1401,23 @@ public abstract class BaseGameService {
 		}
 		
 		gameQuery.setPlayerId(playerId);
-		gameQuery.setStatus(1);
+//		gameQuery.setStatus(1);
 		list = gameDao.getClubUsers(gameQuery);
-		/**如果当前玩家已经在俱乐部中,则直接进入俱乐部*/
+		/**如果当前玩家已经在俱乐部中*/
 		if (!CollectionUtils.isEmpty(list)) {
-			result.setMsgType(MsgTypeEnum.entryClub.msgType);
-			data.put("clubId", clubId);
-			data.put("clubName", gameModel.getClubName());
-			data.put("clubOwnerWord", gameModel.getClubOwnerWord());
-			channelContainer.sendTextMsgByPlayerIds(result, playerId);
-			redisOperationService.setPlayerIdClubId(playerId, clubId);
-			return;
+			/**如果状态是已经审核通过*/
+			if (list.get(0).getStatus() > 0) {
+				result.setMsgType(MsgTypeEnum.entryClub.msgType);
+				data.put("clubId", clubId);
+				data.put("clubName", gameModel.getClubName());
+				data.put("clubOwnerWord", gameModel.getClubOwnerWord());
+				channelContainer.sendTextMsgByPlayerIds(result, playerId);
+				redisOperationService.setPlayerIdClubId(playerId, clubId);
+				return;
+			}else{/**如果状态是未审核，则需要提醒玩家，已经提交申请，等待审核 */
+				throw new BusinessException(ExceptionEnum.HAS_APPLY);
+			}
+			
 		}
 		gameQuery.setProxyId(gameModel.getProxyId());
 		gameQuery.setNickName(userInfo.getNickName());
@@ -1550,12 +1557,15 @@ public abstract class BaseGameService {
 		if (CollectionUtils.isEmpty(list)) {
 			throw new BusinessException(ExceptionEnum.NO_PERMISSION);
 		}
+		/**如果是拒绝则物理删除记录*/
+		if (msg.getStatus() == 2) {
+			gameDao.delClubUser(gameQuery);
+		}else{
+			/**审核俱乐部玩家*/
+			gameQuery.setStatus(1);
+			gameDao.updateClubUser(gameQuery);
+		}
 		
-		/**审核俱乐部玩家*/
-		gameQuery.setClubId(clubId);
-		gameQuery.setPlayerId(otherPlayerId);
-		gameQuery.setStatus(1);
-		gameDao.updateClubUser(gameQuery);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	

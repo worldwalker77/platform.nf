@@ -345,7 +345,7 @@
 	
 	<delete id="delProxyClub"  parameterType = "gameQuery">
 	    delete from  t_proxy_club
-	    where proxy_id = #{proxyId} and club_id = #{clubId}
+	    where club_id = #{clubId}
 	</delete>
 	
 	<select id="getClubUsers"  parameterType = "gameQuery" resultMap="gameModelResultMap">
@@ -392,7 +392,10 @@
 	
 	<delete id="delClubUser"  parameterType = "gameQuery">
 	    delete from  t_club_user
-	    where club_id = #{clubId} and player_id = #{playerId}
+	    where club_id = #{clubId} 
+	    <if test="playerId !=null ">  
+	       and player_id = #{playerId}
+	    </if>
 	</delete>
 	
 	
