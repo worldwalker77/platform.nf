@@ -51,7 +51,7 @@ public enum MsgTypeEnum {
 	auditClubMember(45, "审核俱乐部玩家"),
 	delClub(46, "创始人删除俱乐部"),
 	getClubs(47, "获取创建的和加入的俱乐部列表"),
-	
+	replaceCreateRoom(48, "代开房间"),
 	
 	/**斗牛特有100-199*/
 	readyRobBanker(100, "准备抢庄"),

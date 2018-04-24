@@ -297,6 +297,82 @@ public abstract class BaseGameService {
 		
 	}
 	
+	public void replaceCreateRoom(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		/**校验创建房间的开关是否打开，如果没打开，就提示用户；此时可能是需要升级，暂停服务*/
+		if (!redisOperationService.isCreateRoomFuseOpen()) {
+			throw new BusinessException(ExceptionEnum.SYSTEM_UPGRADE);
+		}
+		Result result = null;
+		BaseMsg msg = request.getMsg();
+		
+		RedisRelaModel redisRelaModel = redisOperationService.getRoomIdGameTypeByPlayerId(msg.getPlayerId());
+		if (redisRelaModel != null) {
+			throw new BusinessException(ExceptionEnum.ALREADY_IN_ROOM.index, ExceptionEnum.ALREADY_IN_ROOM.description + ",房间号：" + redisRelaModel.getRoomId());
+		}
+		/**校验房卡数量是否足够*/
+		//TODO
+		if (redisOperationService.isLoginFuseOpen()) {
+			commonManager.roomCardCheck(userInfo.getPlayerId(), request.getGameType(), msg.getPayType(), msg.getTotalGames());
+		}
+		
+		Integer roomId = GameUtil.genRoomId();
+		int i = 0;
+		while(i < 3){
+			/**如果不存在则跳出循环，此房间号可以使用*/
+			if (!redisOperationService.isRoomIdExist(roomId)) {
+				break;
+			}
+			/**如果此房间号存在则重新生成*/
+			roomId = GameUtil.genRoomId();
+			i++;
+			if (i >= 3) {
+				throw new BusinessException(ExceptionEnum.GEN_ROOM_ID_FAIL);
+			}
+		}
+		/**将当前房间号设置到userInfo中*/
+		userInfo.setRoomId(roomId);
+		redisOperationService.setUserInfo(request.getToken(), userInfo);
+		
+		/**doCreateRoom抽象方法由具体实现类去实现*/
+		BaseRoomInfo roomInfo = doCreateRoom(ctx, request, userInfo);
+		
+		/**组装房间对象*/
+		roomInfo.setRoomId(roomId);
+		/**设置此房间唯一标示*/
+		roomInfo.setRoomUuid(SnowflakeIdGenerator.idWorker.nextId());
+		roomInfo.setRoomOwnerId(msg.getPlayerId());
+		roomInfo.setPayType(msg.getPayType());
+		roomInfo.setTotalGames(msg.getTotalGames());
+		roomInfo.setPlayerNumLimit(msg.getPlayerNumLimit()==null?12:msg.getPlayerNumLimit());
+		roomInfo.setCurGame(0);
+		roomInfo.setStatus(RoomStatusEnum.justBegin.status);
+		roomInfo.setServerIp(Constant.localIp);
+		Date date = new Date();
+		roomInfo.setCreateTime(date);
+		roomInfo.setUpdateTime(date);
+		
+		Integer clubId = redisOperationService.getClubIdByPlayerId(msg.getPlayerId());
+		/**如果玩家是从俱乐部创建的房间，则设置俱乐部id与房间id对应关系*/
+		if (clubId != null) {
+			redisOperationService.setClubIdRoomId(clubId, roomId);
+			roomInfo.setClubId(clubId);
+		}
+		
+		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, request.getGameType(), new Date());
+		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
+//		redisOperationService.setPlayerIdRoomIdGameType(userInfo.getPlayerId(), roomId, request.getGameType());
+		
+		/**设置返回信息*/
+		result = new Result();
+		result.setMsgType(MsgTypeEnum.replaceCreateRoom.msgType);
+		result.setGameType(request.getGameType());
+		result.setData(roomInfo);
+		channelContainer.sendTextMsgByPlayerIds(result, userInfo.getPlayerId());
+		/**设置房间锁，此房间的请求排队进入*/
+		RoomLockContainer.setLockByRoomId(roomId, new ReentrantLock());
+		
+	}
+	
 	public abstract BaseRoomInfo doCreateRoom(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo);
 	
 	public void entryRoom(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo) {
@@ -1559,10 +1635,12 @@ public abstract class BaseGameService {
 		}
 		/**如果是拒绝则物理删除记录*/
 		if (msg.getStatus() == 2) {
+			gameQuery.setPlayerId(otherPlayerId);
 			gameDao.delClubUser(gameQuery);
 		}else{
 			/**审核俱乐部玩家*/
 			gameQuery.setStatus(1);
+			gameQuery.setPlayerId(otherPlayerId);
 			gameDao.updateClubUser(gameQuery);
 		}
 		
