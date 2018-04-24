@@ -294,7 +294,9 @@ public abstract class BaseGameService {
 		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 		redisOperationService.setPlayerIdRoomIdGameType(userInfo.getPlayerId(), roomId, request.getGameType());
 		/**设置clubId+tableNum 与 roomId的映射关系*/
-		redisOperationService.setClubIdTableNumRoomId(clubId, msg.getTableNum(), roomId);
+		if (clubId != null) {
+			redisOperationService.setClubIdTableNumRoomId(clubId, msg.getTableNum(), roomId);
+		}
 		
 		/**设置返回信息*/
 		result = new Result();
