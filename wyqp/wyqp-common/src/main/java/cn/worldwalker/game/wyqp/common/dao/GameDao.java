@@ -49,7 +49,11 @@ public interface GameDao {
 	public List<GameModel> getJoinedClubs(GameQuery gameQuery);
 	public List<GameModel> getCreatedClubs(GameQuery gameQuery);
 	
-	public Integer insertClubForm(GameQuery gameQuery);
+	public Integer insertClubTable(GameQuery gameQuery);
+	
+	public List<GameModel> getClubTables(GameQuery gameQuery);
+	
+	public Integer getMaxClubTableNum(GameQuery gameQuery);
 	
 	
 	

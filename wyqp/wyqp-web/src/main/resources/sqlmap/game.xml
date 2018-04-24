@@ -112,12 +112,13 @@
 		     				)    
     </insert>
     
-    <insert id="insertClubForm" parameterType="gameQuery">  
+    <insert id="insertClubTable" parameterType="gameQuery">  
 	     <selectKey keyProperty="id" resultType="Long">  
 	         select LAST_INSERT_ID()  
 	     </selectKey>  
-	     insert into t_club_form( 
+	     insert into t_club_table( 
 		     					club_id, 
+		     					table_num,
 		     					game_type,
 		     					detail_type,
 		     					pay_type,
@@ -127,6 +128,7 @@
 	     					) 
 	     			values(  
 		     					#{clubId},
+		     					#{tableNum},
 		     					#{gameType},
 		     					#{detailType},
 		     					#{payType},
@@ -466,6 +468,22 @@
 	    order by create_time desc
 	    limit 100
 	</select>
+	
+	<select id="getClubTables"  parameterType = "gameQuery" resultMap="gameModelResultMap">
+	    select club_id,table_num,game_type,detail_type,pay_type,total_games,remark
+	    from t_club_table 
+	    where  club_id = #{clubId}
+	    <if test="tableNum !=null ">  
+	       and table_num = #{tableNum}
+	    </if>
+	</select>
+	
+	<select id="getMaxClubTableNum"  parameterType = "gameQuery" resultType="Integer">
+	    select max(table_num)
+	    from t_club_table 
+	    where  club_id = #{clubId}
+	</select>
+	
 </mapper>
 
 

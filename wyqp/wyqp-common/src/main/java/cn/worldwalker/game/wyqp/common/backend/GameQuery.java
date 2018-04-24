@@ -32,6 +32,14 @@ public class GameQuery {
 	private Integer payType;
 	private Integer totalGames;
 	private String remark;
+	private Integer tableNum;
+	
+	public Integer getTableNum() {
+		return tableNum;
+	}
+	public void setTableNum(Integer tableNum) {
+		this.tableNum = tableNum;
+	}
 	public Integer getGameType() {
 		return gameType;
 	}

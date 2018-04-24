@@ -214,9 +214,17 @@ public abstract class BaseGameService {
 			throw new BusinessException(ExceptionEnum.ALREADY_IN_ROOM.index, ExceptionEnum.ALREADY_IN_ROOM.description + ",房间号：" + redisRelaModel.getRoomId());
 		}
 		/**校验房卡数量是否足够*/
-		//TODO
+		Integer clubId = redisOperationService.getClubIdByPlayerId(msg.getPlayerId());
 		if (redisOperationService.isLoginFuseOpen()) {
-			commonManager.roomCardCheck(userInfo.getPlayerId(), request.getGameType(), msg.getPayType(), msg.getTotalGames());
+			Integer roomCardCheckPlayerId = userInfo.getPlayerId();
+			/**如果玩家是从俱乐部牌桌创建房间的，则只需要扣老板房卡*/
+			if (clubId != null) {
+				GameQuery gameQuery = new GameQuery();
+				gameQuery.setClubId(clubId);
+				List<GameModel> gmList = gameDao.getProxyClubs(gameQuery);
+				roomCardCheckPlayerId = gmList.get(0).getPlayerId();
+			}
+			commonManager.roomCardCheck(roomCardCheckPlayerId, request.getGameType(), msg.getPayType(), msg.getTotalGames());
 		}
 		
 		Integer roomId = GameUtil.genRoomId();
@@ -255,11 +263,11 @@ public abstract class BaseGameService {
 		roomInfo.setCreateTime(date);
 		roomInfo.setUpdateTime(date);
 		
-		Integer clubId = redisOperationService.getClubIdByPlayerId(msg.getPlayerId());
-		/**如果玩家是从俱乐部创建的房间，则设置俱乐部id与房间id对应关系*/
+		/**如果玩家是从俱乐部创建的房间，则设置俱乐部id与房间id列表对应关系*/
 		if (clubId != null) {
 			redisOperationService.setClubIdRoomId(clubId, roomId);
 			roomInfo.setClubId(clubId);
+			roomInfo.setTableNum(msg.getTableNum());
 		}
 		List playerList = roomInfo.getPlayerList();
 		BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(0);
@@ -285,6 +293,8 @@ public abstract class BaseGameService {
 		redisOperationService.setRoomIdGameTypeUpdateTime(roomId, request.getGameType(), new Date());
 		redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
 		redisOperationService.setPlayerIdRoomIdGameType(userInfo.getPlayerId(), roomId, request.getGameType());
+		/**设置clubId+tableNum 与 roomId的映射关系*/
+		redisOperationService.setClubIdTableNumRoomId(clubId, msg.getTableNum(), roomId);
 		
 		/**设置返回信息*/
 		result = new Result();

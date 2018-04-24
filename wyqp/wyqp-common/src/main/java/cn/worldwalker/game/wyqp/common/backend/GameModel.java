@@ -67,6 +67,14 @@ public class GameModel {
 	
 	private String remark;
 	
+	private Integer tableNum;
+	
+	public Integer getTableNum() {
+		return tableNum;
+	}
+	public void setTableNum(Integer tableNum) {
+		this.tableNum = tableNum;
+	}
 	public Integer getTotalGames() {
 		return totalGames;
 	}

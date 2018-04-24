@@ -32,7 +32,14 @@ public class BaseMsg {
 	private Integer status;
 	private String clubOwnerWord;
 	private String clubName;
+	private Integer tableNum;
 	
+	public Integer getTableNum() {
+		return tableNum;
+	}
+	public void setTableNum(Integer tableNum) {
+		this.tableNum = tableNum;
+	}
 	public String getClubName() {
 		return clubName;
 	}

@@ -13,8 +13,10 @@ public class Constant {
 	public final static String playerIdRoomIdGameTypeMap = curCompany + "_player_id_room_id_game_type_map";
 	/**offline playerId与roomId,gameType,time的映射关系*/
 	public final static String offlinePlayerIdRoomIdGameTypeTimeMap = curCompany + "_offline_player_id_romm_id_game_type_time_map";
-	
-	
+	/**clubId+tableNum与roomId映射关系*/
+	public final static String clubIdTableNumRoomIdMap = curCompany + "_club_id_table_num_room_id_map";
+	/**clubId与playerIdset的关系*/
+	public final static String clubIdPlayerIdSet = curCompany + "_tea_house_num_player_id_set_";
 	/**ip与此ip上连接数的映射关系*/
 	public final static String ipConnectCountMap = curCompany + "_ip_connect_count_map";
 	/**房卡操作失败数据list*/

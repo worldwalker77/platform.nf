@@ -7,12 +7,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cn.worldwalker.game.wyqp.common.backend.GameModel;
+import cn.worldwalker.game.wyqp.common.backend.GameQuery;
 import cn.worldwalker.game.wyqp.common.constant.Constant;
+import cn.worldwalker.game.wyqp.common.dao.GameDao;
+import cn.worldwalker.game.wyqp.common.domain.base.BaseMsg;
 import cn.worldwalker.game.wyqp.common.domain.base.BaseRequest;
 import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.ExtensionCodeBindModel;
@@ -20,8 +25,11 @@ import cn.worldwalker.game.wyqp.common.domain.base.RedisRelaModel;
 import cn.worldwalker.game.wyqp.common.domain.base.SmsResModel;
 import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
+import cn.worldwalker.game.wyqp.common.domain.jh.JhMsg;
 import cn.worldwalker.game.wyqp.common.domain.jh.JhRoomInfo;
+import cn.worldwalker.game.wyqp.common.domain.mj.MjMsg;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
+import cn.worldwalker.game.wyqp.common.domain.nn.NnMsg;
 import cn.worldwalker.game.wyqp.common.domain.nn.NnRoomInfo;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
@@ -48,6 +56,82 @@ public class CommonGameService extends BaseGameService{
 	
 	@Autowired
 	private JhGameService jhGameService;
+	@Autowired
+	private GameDao gameDao;
+	
+	/**
+	 * 加入俱乐部牌桌，需要先通过俱乐部号和牌桌号获取是否已经创建了房间，没有创建房间则创建房间，如果已经创建房间，则加入
+	 * @param ctx
+	 * @param request
+	 * @param userInfo
+	 */
+	public void entryClubTable(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		BaseMsg msg = request.getMsg();
+		Integer clubId = msg.getClubId();
+		Integer tableNum = msg.getTableNum();
+		/**获取俱乐部牌桌对应的roomId*/
+		Integer roomId = redisOperationService.getRoomIdByClubIdTableNum(clubId, tableNum);
+		if (roomId != null) {
+			msg.setRoomId(roomId);
+			commonEntryRoom(ctx, request, userInfo);
+		}else{
+			GameQuery gameQuery = new GameQuery();
+			gameQuery.setClubId(clubId);
+			gameQuery.setTableNum(tableNum);
+			List<GameModel> gmList = gameDao.getClubTables(gameQuery);
+			
+			if (CollectionUtils.isEmpty(gmList)) {
+				throw new BusinessException(ExceptionEnum.PARAMS_ERROR);
+			}
+			GameModel gm = gmList.get(0);
+			Map<String, Object> remark = JsonUtil.toMap(gm.getRemark());
+			Integer gameType = gm.getGameType();
+			/**这里将gameTyp转换为实际的游戏类型*/
+			request.setGameType(gameType);
+			request.setDetailType(gm.getDetailType());
+			GameTypeEnum gameTypeEnum = GameTypeEnum.getGameTypeEnumByType(gameType);
+			switch (gameTypeEnum) {
+				case nn:
+					NnMsg nnMsg = new NnMsg();
+					nnMsg.setPlayerId(msg.getPlayerId());
+					nnMsg.setClubId(clubId);
+					nnMsg.setTableNum(tableNum);
+					nnMsg.setTotalGames(gm.getTotalGames());
+					nnMsg.setRoomBankerType((Integer)remark.get("roomBankerType"));
+					nnMsg.setMultipleLimit((Integer)remark.get("multipleLimit"));
+					nnMsg.setPayType(gm.getPayType());
+					nnMsg.setButtomScoreType((Integer)remark.get("buttomScoreType"));
+					request.setMsg(nnMsg);
+					nnGameService.createRoom(ctx, request, userInfo);
+					break;
+				case mj:
+					MjMsg mjMsg = new MjMsg();
+					request.setMsg(mjMsg);
+					mjMsg.setPlayerId(msg.getPlayerId());
+					mjMsg.setPayType(gm.getPayType());
+					mjMsg.setTotalGames(gm.getTotalGames());
+					mjMsg.setMaiMaCount((Integer)remark.get("maiMaCount"));
+					mjMsg.setClubId(clubId);
+					mjMsg.setTableNum(tableNum);
+					mjGameService.createRoom(ctx, request, userInfo);
+					break;
+				case jh:
+					JhMsg jhMsg = new JhMsg();
+					jhMsg.setPlayerId(msg.getPlayerId());
+					jhMsg.setClubId(clubId);
+					jhMsg.setTableNum(tableNum);
+					jhMsg.setTotalGames(gm.getTotalGames());
+					jhMsg.setPayType(gm.getPayType());
+					request.setMsg(jhMsg);
+					jhGameService.createRoom(ctx, request, userInfo);
+					break;
+				default:
+					break;
+				}
+			
+		}
+		
+	}
 	
 	public void commonEntryRoom(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Integer roomId = request.getMsg().getRoomId();

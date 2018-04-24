@@ -29,5 +29,7 @@ public class GameInfoMemoryContainer {
 	public static Map<String, String> smsValidCodeMap = new HashMap<String, String>();
 	public static Map<String, String> playerIdClubIdMap = new ConcurrentHashMap<String, String>();
 	public static Map<Integer, Vector<Integer>> clubIdRoomIdVectorMap = new ConcurrentHashMap<Integer, Vector<Integer>>();
-//	public static Map<String, String> playerIdTimeMap = new ConcurrentHashMap<String, String>();
+	public static Map<String, String> clubIdTableNumRoomIdMap = new ConcurrentHashMap<String, String>();
+	public static Map<Integer, Vector<Integer>> clubIdPlayerIdVectorMap = new ConcurrentHashMap<Integer, Vector<Integer>>();
+
 }

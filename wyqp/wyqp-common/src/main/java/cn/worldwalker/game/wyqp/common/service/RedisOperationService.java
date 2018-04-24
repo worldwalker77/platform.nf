@@ -707,4 +707,87 @@ public class RedisOperationService {
 		return false;
 	}
 	
+	/**clubId+tableNum->roomId 映射*/
+	public void setClubIdTableNumRoomId(Integer clubId, Integer tableNum, Integer roomId){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.hset(Constant.clubIdTableNumRoomIdMap, clubId + "" + tableNum, String.valueOf(roomId));
+		}else{
+			GameInfoMemoryContainer.clubIdTableNumRoomIdMap.put(clubId + "" + tableNum, String.valueOf(roomId));
+		}
+		
+	}
+	
+	public void delRoomIdByClubIdTableNum(Integer clubId, Integer tableNum){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.hdel(Constant.clubIdTableNumRoomIdMap, clubId + "" + tableNum);
+		}else{
+			GameInfoMemoryContainer.clubIdTableNumRoomIdMap.remove(clubId + "" + tableNum);
+		}
+	}
+	
+	public Integer getRoomIdByClubIdTableNum(Integer clubId, Integer tableNum){
+		String roomIdStr = null;
+		if (gameInfoStorageType == 0 ) {
+			roomIdStr = jedisTemplate.hget(Constant.clubIdTableNumRoomIdMap, clubId + "" + tableNum);
+		}else{
+			roomIdStr = GameInfoMemoryContainer.clubIdTableNumRoomIdMap.get(clubId + "" + tableNum);
+		}
+		if (StringUtils.isNotBlank(roomIdStr)) {
+			return Integer.valueOf(roomIdStr);
+		}
+		return null;
+	}
+	
+	/**clubId与进入俱乐部玩家playerId列表关系*/
+	public static Lock lock1 = new ReentrantLock();
+	public void setClubIdPlayerId(Integer clubId, Integer playerId){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.sadd(Constant.clubIdPlayerIdSet + clubId, String.valueOf(playerId));
+		}else{
+			Vector<Integer> ve = GameInfoMemoryContainer.clubIdPlayerIdVectorMap.get(clubId);
+			if (ve == null) {
+				lock1.lock();
+				try {
+					ve = new Vector<Integer>();
+					GameInfoMemoryContainer.clubIdPlayerIdVectorMap.put(clubId, ve);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}finally{
+					lock1.unlock();
+				}
+			}
+			ve.add(playerId);
+		}
+	}
+	
+	public List<Integer> getPlayerIdsByClubId(Integer clubId){
+		List<Integer> list = new ArrayList<Integer>();
+		if (gameInfoStorageType == 0 ) {
+			Set<String> set = jedisTemplate.smembers(Constant.clubIdPlayerIdSet + clubId);
+			if (!CollectionUtils.isEmpty(set)) {
+				for(String temp : set){
+					list.add(Integer.valueOf(temp));
+				}
+			}
+		}else{
+			Vector<Integer> vec = GameInfoMemoryContainer.clubIdPlayerIdVectorMap.get(clubId);
+			if (!CollectionUtils.isEmpty(vec)) {
+				list.addAll(vec);
+			}
+		}
+		return list;
+	}
+	
+	public void delClubIdPlayerId(Integer clubId, Integer playerId){
+		if (gameInfoStorageType == 0 ) {
+			jedisTemplate.srem(Constant.clubIdPlayerIdSet + clubId, String.valueOf(playerId));
+		}else{
+			Vector<Integer> vec = GameInfoMemoryContainer.clubIdPlayerIdVectorMap.get(clubId);
+			if (!CollectionUtils.isEmpty(vec)) {
+				vec.remove(playerId);
+			}
+		}
+	}
+	
+	
 }
