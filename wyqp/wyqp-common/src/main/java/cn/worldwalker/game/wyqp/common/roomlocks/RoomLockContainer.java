@@ -10,17 +10,35 @@ import java.util.concurrent.locks.Lock;
  *
  */
 public class RoomLockContainer {
-	private static final Map<Integer, Lock> lockMap = new ConcurrentHashMap<Integer, Lock>();
+	private static final Map<Integer, Lock> roomLockMap = new ConcurrentHashMap<Integer, Lock>();
+	
+	private static final Map<Integer, Lock> clubLockMap = new ConcurrentHashMap<Integer, Lock>();
 	
 	public static Lock getLockByRoomId(Integer roomId){
-		return lockMap.get(roomId);
+		return roomLockMap.get(roomId);
 	}
 	
 	public static void setLockByRoomId(Integer roomId, Lock lock){
-		lockMap.put(roomId, lock);
+		roomLockMap.put(roomId, lock);
 	}
 	
 	public static void delLockByRoomId(Integer roomId){
-		lockMap.remove(roomId);
+		roomLockMap.remove(roomId);
 	}
+
+	public static Lock getLockByClubId(Integer clubId){
+		return clubLockMap.get(clubId);
+	}
+	
+	public static void setLockByClubId(Integer clubId, Lock lock){
+		if (!clubLockMap.containsKey(clubId)) {
+			clubLockMap.put(clubId, lock);
+		}
+	}
+	
+	public static void delLockByClubId(Integer clubId){
+		clubLockMap.remove(clubId);
+	}
+	
+	
 }

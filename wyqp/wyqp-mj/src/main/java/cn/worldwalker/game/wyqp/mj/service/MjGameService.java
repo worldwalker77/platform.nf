@@ -1,5 +1,6 @@
 package cn.worldwalker.game.wyqp.mj.service;
 
+import cn.worldwalker.game.wyqp.common.backend.GameQuery;
 import cn.worldwalker.game.wyqp.common.constant.Constant;
 import cn.worldwalker.game.wyqp.common.domain.base.*;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjMsg;
@@ -1842,6 +1843,18 @@ public class MjGameService extends BaseGameService {
             log.error("记录回放日志异常, msgType:" + msgType + ",msg:" + JsonUtil.toJson(msg) + ",oPlayer:" + JsonUtil.toJson(oPlayer) + ",roomInf:" + JsonUtil.toJson(roomInfo), e);
         }
     }
+
+	@Override
+	public GameQuery doCreateGameQuery(ChannelHandlerContext ctx,
+			BaseRequest request, UserInfo userInfo) {
+		
+		MjMsg msg = (MjMsg)request.getMsg();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("maiMaCount", msg.getMaiMaCount());
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setRemark(JsonUtil.toJson(map));
+		return gameQuery;
+	}
 
 
 }

@@ -60,6 +60,8 @@ public class NnMsgDispatcher extends BaseMsgDisPatcher {
 			case userRecordDetail:
 				nnGameService.userRecordDetail(ctx, request, userInfo);
 				break;
+			case createClubTable:
+				nnGameService.createClubTable(ctx, request, userInfo);
 			default:
 				break;
 		}

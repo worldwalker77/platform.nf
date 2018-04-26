@@ -11,6 +11,7 @@ import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
 import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
 import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
 import cn.worldwalker.game.wyqp.common.result.Result;
+import cn.worldwalker.game.wyqp.common.roomlocks.RoomLockContainer;
 import cn.worldwalker.game.wyqp.server.service.CommonGameService;
 
 @Service(value="commonMsgDispatcher")
@@ -73,9 +74,7 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			case getClubMembers:
 				commonGameService.getClubMembers(ctx, request, userInfo);
 				break;
-			case getClubRooms:
-				commonGameService.getClubRooms(ctx, request, userInfo);
-				break;
+			
 			case offlineNotice:
 				commonGameService.offlineNotice(ctx, request, userInfo);
 				break;
@@ -111,6 +110,14 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 				break;
 			case getClubs:
 				commonGameService.getClubs(ctx, request, userInfo);
+			case createClubTable:
+				commonGameService.createClubTable(ctx, request, userInfo);
+				break;
+			case getClubTables:
+				commonGameService.getClubTables(ctx, request, userInfo);
+				break;
+			case entryClubTable:
+				commonGameService.entryClubTable(ctx, request, userInfo);
 				break;
 			default:
 				break;

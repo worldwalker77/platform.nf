@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import cn.worldwalker.game.wyqp.common.backend.GameQuery;
 import cn.worldwalker.game.wyqp.common.domain.base.BaseMsg;
 import cn.worldwalker.game.wyqp.common.domain.base.BaseRequest;
 import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
@@ -776,6 +777,13 @@ public class NnGameService extends BaseGameService{
 		Integer roomId = userInfo.getRoomId();
 		NnRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, NnRoomInfo.class);
 		return roomInfo;
+	}
+
+	@Override
+	public GameQuery doCreateGameQuery(ChannelHandlerContext ctx,
+			BaseRequest request, UserInfo userInfo) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

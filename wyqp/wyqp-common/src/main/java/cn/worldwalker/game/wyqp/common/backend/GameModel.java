@@ -69,6 +69,15 @@ public class GameModel {
 	
 	private Integer tableNum;
 	
+	private Integer playerNum;
+	
+	
+	public Integer getPlayerNum() {
+		return playerNum;
+	}
+	public void setPlayerNum(Integer playerNum) {
+		this.playerNum = playerNum;
+	}
 	public Integer getTableNum() {
 		return tableNum;
 	}

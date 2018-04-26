@@ -78,6 +78,8 @@ public class MjMsgDispatcher extends BaseMsgDisPatcher {
 		case getAllPlayerDistance:
 			mjGameService.getAllPlayerDistance(ctx, request, userInfo);
 			break;
+		case createClubTable:
+			mjGameService.createClubTable(ctx, request, userInfo);
 		default:
 			break;
 		}

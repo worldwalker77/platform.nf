@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import cn.worldwalker.game.wyqp.common.backend.GameQuery;
 import cn.worldwalker.game.wyqp.common.constant.Constant;
 import cn.worldwalker.game.wyqp.common.domain.base.BaseMsg;
 import cn.worldwalker.game.wyqp.common.domain.base.BasePlayerInfo;
@@ -769,6 +770,13 @@ public class JhGameService extends BaseGameService{
 			}
 		}
 		return alivePlayerList;
+	}
+
+	@Override
+	public GameQuery doCreateGameQuery(ChannelHandlerContext ctx,
+			BaseRequest request, UserInfo userInfo) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +38,7 @@ import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
 import cn.worldwalker.game.wyqp.common.exception.BusinessException;
 import cn.worldwalker.game.wyqp.common.exception.ExceptionEnum;
 import cn.worldwalker.game.wyqp.common.result.Result;
+import cn.worldwalker.game.wyqp.common.roomlocks.RoomLockContainer;
 import cn.worldwalker.game.wyqp.common.service.BaseGameService;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.HttpClientUtils;
@@ -66,69 +69,82 @@ public class CommonGameService extends BaseGameService{
 	 * @param userInfo
 	 */
 	public void entryClubTable(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		
 		BaseMsg msg = request.getMsg();
 		Integer clubId = msg.getClubId();
 		Integer tableNum = msg.getTableNum();
-		/**获取俱乐部牌桌对应的roomId*/
-		Integer roomId = redisOperationService.getRoomIdByClubIdTableNum(clubId, tableNum);
-		if (roomId != null) {
-			msg.setRoomId(roomId);
-			commonEntryRoom(ctx, request, userInfo);
-		}else{
-			GameQuery gameQuery = new GameQuery();
-			gameQuery.setClubId(clubId);
-			gameQuery.setTableNum(tableNum);
-			List<GameModel> gmList = gameDao.getClubTables(gameQuery);
-			
-			if (CollectionUtils.isEmpty(gmList)) {
-				throw new BusinessException(ExceptionEnum.PARAMS_ERROR);
-			}
-			GameModel gm = gmList.get(0);
-			Map<String, Object> remark = JsonUtil.toMap(gm.getRemark());
-			Integer gameType = gm.getGameType();
-			/**这里将gameTyp转换为实际的游戏类型*/
-			request.setGameType(gameType);
-			request.setDetailType(gm.getDetailType());
-			GameTypeEnum gameTypeEnum = GameTypeEnum.getGameTypeEnumByType(gameType);
-			switch (gameTypeEnum) {
-				case nn:
-					NnMsg nnMsg = new NnMsg();
-					nnMsg.setPlayerId(msg.getPlayerId());
-					nnMsg.setClubId(clubId);
-					nnMsg.setTableNum(tableNum);
-					nnMsg.setTotalGames(gm.getTotalGames());
-					nnMsg.setRoomBankerType((Integer)remark.get("roomBankerType"));
-					nnMsg.setMultipleLimit((Integer)remark.get("multipleLimit"));
-					nnMsg.setPayType(gm.getPayType());
-					nnMsg.setButtomScoreType((Integer)remark.get("buttomScoreType"));
-					request.setMsg(nnMsg);
-					nnGameService.createRoom(ctx, request, userInfo);
-					break;
-				case mj:
-					MjMsg mjMsg = new MjMsg();
-					request.setMsg(mjMsg);
-					mjMsg.setPlayerId(msg.getPlayerId());
-					mjMsg.setPayType(gm.getPayType());
-					mjMsg.setTotalGames(gm.getTotalGames());
-					mjMsg.setMaiMaCount((Integer)remark.get("maiMaCount"));
-					mjMsg.setClubId(clubId);
-					mjMsg.setTableNum(tableNum);
-					mjGameService.createRoom(ctx, request, userInfo);
-					break;
-				case jh:
-					JhMsg jhMsg = new JhMsg();
-					jhMsg.setPlayerId(msg.getPlayerId());
-					jhMsg.setClubId(clubId);
-					jhMsg.setTableNum(tableNum);
-					jhMsg.setTotalGames(gm.getTotalGames());
-					jhMsg.setPayType(gm.getPayType());
-					request.setMsg(jhMsg);
-					jhGameService.createRoom(ctx, request, userInfo);
-					break;
-				default:
-					break;
+		Lock lock = RoomLockContainer.getLockByClubId(clubId);
+		if (lock == null) {
+			RoomLockContainer.setLockByClubId(clubId, new ReentrantLock());
+			lock = RoomLockContainer.getLockByClubId(clubId);
+		}
+		lock.lock();
+		try {
+			/**获取俱乐部牌桌对应的roomId*/
+			Integer roomId = redisOperationService.getRoomIdByClubIdTableNum(clubId, tableNum);
+			if (roomId != null) {
+				msg.setRoomId(roomId);
+				commonEntryRoom(ctx, request, userInfo);
+			}else{
+				GameQuery gameQuery = new GameQuery();
+				gameQuery.setClubId(clubId);
+				gameQuery.setTableNum(tableNum);
+				List<GameModel> gmList = gameDao.getClubTables(gameQuery);
+				
+				if (CollectionUtils.isEmpty(gmList)) {
+					throw new BusinessException(ExceptionEnum.PARAMS_ERROR);
 				}
-			
+				GameModel gm = gmList.get(0);
+				Map<String, Object> remark = JsonUtil.toMap(gm.getRemark());
+				Integer gameType = gm.getGameType();
+				/**这里将gameTyp转换为实际的游戏类型*/
+				request.setGameType(gameType);
+				request.setDetailType(gm.getDetailType());
+				GameTypeEnum gameTypeEnum = GameTypeEnum.getGameTypeEnumByType(gameType);
+				switch (gameTypeEnum) {
+					case nn:
+						NnMsg nnMsg = new NnMsg();
+						nnMsg.setPlayerId(msg.getPlayerId());
+						nnMsg.setClubId(clubId);
+						nnMsg.setTableNum(tableNum);
+						nnMsg.setTotalGames(gm.getTotalGames());
+						nnMsg.setRoomBankerType((Integer)remark.get("roomBankerType"));
+						nnMsg.setMultipleLimit((Integer)remark.get("multipleLimit"));
+						nnMsg.setPayType(gm.getPayType());
+						nnMsg.setButtomScoreType((Integer)remark.get("buttomScoreType"));
+						request.setMsg(nnMsg);
+						nnGameService.createRoom(ctx, request, userInfo);
+						break;
+					case mj:
+						MjMsg mjMsg = new MjMsg();
+						request.setMsg(mjMsg);
+						mjMsg.setPlayerId(msg.getPlayerId());
+						mjMsg.setPayType(gm.getPayType());
+						mjMsg.setTotalGames(gm.getTotalGames());
+						mjMsg.setMaiMaCount((Integer)remark.get("maiMaCount"));
+						mjMsg.setClubId(clubId);
+						mjMsg.setTableNum(tableNum);
+						mjGameService.createRoom(ctx, request, userInfo);
+						break;
+					case jh:
+						JhMsg jhMsg = new JhMsg();
+						jhMsg.setPlayerId(msg.getPlayerId());
+						jhMsg.setClubId(clubId);
+						jhMsg.setTableNum(tableNum);
+						jhMsg.setTotalGames(gm.getTotalGames());
+						jhMsg.setPayType(gm.getPayType());
+						request.setMsg(jhMsg);
+						jhGameService.createRoom(ctx, request, userInfo);
+						break;
+					default:
+						break;
+					}
+				
+			}
+		} finally{
+			if (lock != null) {
+				lock.unlock();
+			}
 		}
 		
 	}
@@ -396,6 +412,12 @@ public class CommonGameService extends BaseGameService{
 		data.put("roomCardNum", userInfo.getRoomCardNum() + 1);
 		result.setData(data);
 		return result;
+	}
+
+	@Override
+	public GameQuery doCreateGameQuery(ChannelHandlerContext ctx,
+			BaseRequest request, UserInfo userInfo) {
+		return null;
 	}
 	
 }

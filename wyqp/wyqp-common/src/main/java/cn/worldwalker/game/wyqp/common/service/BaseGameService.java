@@ -306,6 +306,52 @@ public abstract class BaseGameService {
 		channelContainer.sendTextMsgByPlayerIds(result, userInfo.getPlayerId());
 		/**设置房间锁，此房间的请求排队进入*/
 		RoomLockContainer.setLockByRoomId(roomId, new ReentrantLock());
+		/**如果是从俱乐部创建的房间,通知其他进入俱乐部的玩家刷新牌桌列表*/
+		noticeAllClubPlayerTablePlayerNum(null, clubId);
+		
+	}
+	
+	private void noticeAllClubPlayerTablePlayerNum(Integer playerId, Integer clubId){
+		if (clubId == null) {
+			return;
+		}
+		Result result = new Result();
+		result.setGameType(GameTypeEnum.common.gameType);
+		result.setMsgType(MsgTypeEnum.getClubTables.msgType);
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setClubId(clubId);
+		List<GameModel> tableList = gameDao.getClubTables(gameQuery);
+		if (CollectionUtils.isEmpty(tableList)) {
+			return;
+		}
+		for(GameModel model : tableList){
+			Integer roomId = redisOperationService.getRoomIdByClubIdTableNum(clubId, model.getTableNum());
+			if (roomId != null) {
+				UserInfo userInfo = new UserInfo();
+				userInfo.setRoomId(roomId);
+				BaseRoomInfo roomInfo = getRoomInfo(null, null, userInfo);
+				List playerList = roomInfo.getPlayerList();
+				int size = playerList.size();
+				int num = 0;
+				for(int i = 0; i < size; i++){
+					BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(i);
+					if (redisOperationService.getRoomIdGameTypeByPlayerId(playerInfo.getPlayerId()) != null) {
+						num++;
+					}
+				}
+				model.setPlayerNum(num);
+			}else{
+				model.setPlayerNum(0);
+			}
+		}
+		result.setData(tableList);
+		if (playerId != null) {
+			channelContainer.sendTextMsgByPlayerIds(result, playerId);
+			return;
+		}
+		List<Integer> playerIds = redisOperationService.getPlayerIdsByClubId(clubId);
+		log.info("桌牌人数更新的玩家列表：" + JsonUtil.toJson(playerIds));
+		channelContainer.sendTextMsgByPlayerIds(result, playerIds);
 		
 	}
 	
@@ -533,6 +579,8 @@ public abstract class BaseGameService {
 			refreshRoomForAllPlayer(roomInfo);
 		}
 		
+		noticeAllClubPlayerTablePlayerNum(null, roomInfo.getClubId());
+		
 	}
 	
 	public void refreshRoomForAllPlayer(BaseRoomInfo roomInfo){
@@ -588,6 +636,7 @@ public abstract class BaseGameService {
 			result.setMsgType(MsgTypeEnum.successDissolveRoom.msgType);
 			data.put("roomId", roomId);
 			channelContainer.sendTextMsgByPlayerIds(result, playerId);
+			noticeAllClubPlayerTablePlayerNum(null, roomInfo.getClubId());
 			return;
 		}
 		
@@ -629,6 +678,7 @@ public abstract class BaseGameService {
 				result.setMsgType(MsgTypeEnum.successDissolveRoom.msgType);
 				data.put("roomId", roomId);
 				channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+				noticeAllClubPlayerTablePlayerNum(null, roomInfo.getClubId());
 				return;
 			}
 			
@@ -644,6 +694,7 @@ public abstract class BaseGameService {
 			channelContainer.sendTextMsgByPlayerIds(result, playerId);
 			/**其他玩家通知刷新*/
 			refreshRoomForAllPlayer(roomInfo);
+			noticeAllClubPlayerTablePlayerNum(null, roomInfo.getClubId());
 			return;
 		}
 		/**设置解散房间标志位*/
@@ -702,6 +753,8 @@ public abstract class BaseGameService {
 			data.put("roomInfo", roomInfo);
 			result.setMsgType(MsgTypeEnum.successDissolveRoom.msgType);
 			channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+			
+			noticeAllClubPlayerTablePlayerNum(null, roomInfo.getClubId());
 			try {
 				commonManager.addUserRecord(roomInfo);
 			} catch (Exception e) {
@@ -806,9 +859,11 @@ public abstract class BaseGameService {
 			if (roomInfo.getClubId() != null) {
 				redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomId);
 			}
+			noticeAllClubPlayerTablePlayerNum(null, roomInfo.getClubId());
 		}else{/**如果只有部分人确认，则只删除当前玩家的标记*/
 			redisOperationService.hdelOfflinePlayerIdRoomIdGameTypeTime(msg.getPlayerId());
 			redisOperationService.hdelPlayerIdRoomIdGameType(msg.getPlayerId());
+			noticeAllClubPlayerTablePlayerNum(msg.getPlayerId(), roomInfo.getClubId());
 		}
 		/**通知玩家返回大厅*/
 		result.setMsgType(MsgTypeEnum.delRoomConfirmBeforeReturnHall.msgType);
@@ -1443,6 +1498,8 @@ public abstract class BaseGameService {
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		/**设置玩家id与俱乐部id的关系，记忆下次直接进入俱乐部*/
 		redisOperationService.setPlayerIdClubId(playerId, clubId);
+		/**设置俱乐部锁，只要俱乐部不解散，这个锁一直存在*/
+		RoomLockContainer.setLockByClubId(clubId, new ReentrantLock());
 	}
 	/**
 	 * 从大厅输入俱乐部号码加入俱乐部
@@ -1856,30 +1913,74 @@ public abstract class BaseGameService {
 		result.setData(data);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
+	public void createClubTable(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.createClubTable.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		Integer clubId = redisOperationService.getClubIdByPlayerId(playerId);
+		
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setClubId(clubId);
+		
+		Integer tableNum = gameDao.getMaxClubTableNum(gameQuery);
+		if (tableNum == null) {
+			tableNum = 0;
+		}else{
+			tableNum++;
+		}
+		gameQuery = doCreateGameQuery(ctx, request, userInfo);
+		gameQuery.setClubId(clubId);
+		gameQuery.setTableNum(tableNum);
+		gameQuery.setGameType(request.getGameType());
+		gameQuery.setDetailType(request.getDetailType());
+		gameQuery.setPayType(msg.getPayType());
+		gameQuery.setTotalGames(msg.getTotalGames());
+		gameDao.insertClubTable(gameQuery);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
 	
+	public abstract GameQuery doCreateGameQuery(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo);
 	/**
 	 * 查询俱乐部房间列表
 	 * @param ctx
 	 * @param request
 	 * @param userInfo
 	 */
-	public void getClubRooms(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+	public void getClubTables(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
 		Result result = new Result();
 		result.setGameType(request.getGameType());
-		result.setMsgType(MsgTypeEnum.getClubRooms.msgType);
+		result.setMsgType(MsgTypeEnum.getClubTables.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
-		Integer status = msg.getStatus() == null?0:msg.getStatus();
 		Integer clubId = redisOperationService.getClubIdByPlayerId(playerId);
-		if (clubId == null) {
-			log.warn("玩家没有进入俱乐部");
-			result.setMsgType(MsgTypeEnum.exitClub.msgType);
-			channelContainer.sendTextMsgByPlayerIds(result, playerId);
-			return;
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setClubId(clubId);
+		List<GameModel> tableList = gameDao.getClubTables(gameQuery);
+		for(GameModel model : tableList){
+			Integer roomId = redisOperationService.getRoomIdByClubIdTableNum(clubId, model.getTableNum());
+			if (roomId != null) {
+				userInfo.setRoomId(roomId);
+				BaseRoomInfo roomInfo = getRoomInfo(null, null, userInfo);
+				List playerList = roomInfo.getPlayerList();
+				int size = playerList.size();
+				int num = 0;
+				for(int i = 0; i < size; i++){
+					BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(i);
+					if (redisOperationService.getRoomIdGameTypeByPlayerId(playerInfo.getPlayerId()) != null) {
+						num++;
+					}
+				}
+				model.setPlayerNum(num);
+			}else{
+				model.setPlayerNum(0);
+			}
 		}
-		result.setData(getClubRoomList(clubId, status));
+		result.setData(tableList);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
+	
 	private List<Map<String, Object>> getClubRoomList(Integer clubId, Integer status){
 		List<Map<String, Object>> newRoomList = new ArrayList<Map<String,Object>>();
 		List<Integer> roomIdList = redisOperationService.getRoomIdsByClubId(clubId);

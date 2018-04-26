@@ -39,7 +39,7 @@ public enum MsgTypeEnum {
 	entryClub(34, "进入俱乐部"),
 	exitClub(35, "退出俱乐部到大厅"),
 	getClubMembers(36, "查询俱乐部玩家列表"),
-	getClubRooms(37, "查询俱乐部房间列表"),
+//	getClubRooms(37, "查询俱乐部房间列表"),
 	getAllPlayerDistance(38, "获取所有玩家相互之间的距离"),
 	getJoinedClubs(39, "获取加入的俱乐部列表"),
 	
@@ -52,6 +52,9 @@ public enum MsgTypeEnum {
 	delClub(46, "创始人删除俱乐部"),
 	getClubs(47, "获取创建的和加入的俱乐部列表"),
 	replaceCreateRoom(48, "代开房间"),
+	entryClubTable(49, "加入俱乐部牌桌"),
+	createClubTable(50, "创建俱乐部牌桌"),
+	getClubTables(51, "查询俱乐部牌桌列表"),
 	
 	/**斗牛特有100-199*/
 	readyRobBanker(100, "准备抢庄"),

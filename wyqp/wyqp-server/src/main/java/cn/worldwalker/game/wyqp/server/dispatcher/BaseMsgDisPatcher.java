@@ -144,7 +144,6 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.entryClub.msgType, MsgTypeEnum.entryClub);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.exitClub.msgType, MsgTypeEnum.exitClub);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.getClubMembers.msgType, MsgTypeEnum.getClubMembers);
-		notNeedLockMsgTypeMap.put(MsgTypeEnum.getClubRooms.msgType, MsgTypeEnum.getClubRooms);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.getAllPlayerDistance.msgType, MsgTypeEnum.getAllPlayerDistance);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.offlineNotice.msgType, MsgTypeEnum.offlineNotice);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.onlineNotice.msgType, MsgTypeEnum.onlineNotice);
@@ -158,6 +157,11 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.auditClubMember.msgType, MsgTypeEnum.auditClubMember);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.delClub.msgType, MsgTypeEnum.delClub);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.getClubs.msgType, MsgTypeEnum.getClubs);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.entryClubTable.msgType, MsgTypeEnum.entryClubTable);
+		
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.entryClubTable.msgType, MsgTypeEnum.entryClubTable);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.createClubTable.msgType, MsgTypeEnum.createClubTable);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.getClubTables.msgType, MsgTypeEnum.getClubTables);
 		
 	}
 }
