@@ -33,7 +33,14 @@ public class BaseMsg {
 	private String clubOwnerWord;
 	private String clubName;
 	private Integer tableNum;
+	private Integer timeFlag;
 	
+	public Integer getTimeFlag() {
+		return timeFlag;
+	}
+	public void setTimeFlag(Integer timeFlag) {
+		this.timeFlag = timeFlag;
+	}
 	public Integer getTableNum() {
 		return tableNum;
 	}

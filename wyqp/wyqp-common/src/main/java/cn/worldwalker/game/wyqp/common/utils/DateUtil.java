@@ -267,6 +267,10 @@ public class DateUtil {
 	         gregorianCalendar.set(Calendar.DATE, day - n);
 	         return gregorianCalendar.getTime();
 	     }
+	     
+	     public static void main(String[] args) {
+			System.out.println(getDateFormat(getNDayBefore(new Date(), 0)));
+		}
 	 
 	     /**
 	      * 获取日期后一天
@@ -346,6 +350,17 @@ public class DateUtil {
 	         Calendar c = Calendar.getInstance();
 	         c.add(Calendar.MONTH, -monty);
 	         return c.getTime();
+	     }
+	     
+	     public static Date getNDaysBeforeStartTime(Date date, int n){
+	    	 String start = DateUtil.getDateFormat(DateUtil.getNDayBefore(date, n)) + " 00:00:00";
+			 Date startTime = DateUtil.formatDate(start, DateUtil.DATETIME_DEFAULT_FORMAT);
+	    	 return startTime;
+	     }
+	     public static Date getNDaysBeforeEndTime(Date date, int n){
+			 String end = DateUtil.getDateFormat(DateUtil.getNDayBefore(date, n)) + " 23:59:59";
+			 Date endTime = DateUtil.formatDate(end, DateUtil.DATETIME_DEFAULT_FORMAT);
+	    	 return endTime;
 	     }
 
 }

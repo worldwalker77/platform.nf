@@ -70,11 +70,19 @@
     </insert>  
      
     <select id="getUserRecord"  parameterType = "cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel" resultMap="userRecordResultMap">
-	    SELECT record_uuid,game_type,detail_type,room_id,player_id,score,record_info,remark,create_time
+	    SELECT club_id,room_id,record_uuid,game_type,detail_type,player_id,score,record_info,remark,create_time
 		from t_user_record
-		where player_id = #{playerId}
+		where 1=1
+		<if test="playerId != null ">  
+	       and player_id = #{playerId}
+	    </if>
+	    <if test="clubId != null ">  
+	       and club_id = #{clubId}
+	       and <![CDATA[ create_time >= #{startTime} and create_time <= #{endTime} ]]>
+	       GROUP BY club_id,room_id
+	    </if>
 		order by create_time DESC
-		limit 20
+		limit 50
 	</select>
 	
 	<select id="getRoomRemarkByUuid"  parameterType = "cn.worldwalker.game.wyqp.common.domain.base.UserRecordModel" resultMap="userRecordResultMap">

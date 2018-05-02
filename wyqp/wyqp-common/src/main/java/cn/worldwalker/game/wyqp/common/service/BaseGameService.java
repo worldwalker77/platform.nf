@@ -51,6 +51,7 @@ import cn.worldwalker.game.wyqp.common.manager.CommonManager;
 import cn.worldwalker.game.wyqp.common.result.Result;
 import cn.worldwalker.game.wyqp.common.roomlocks.RoomLockContainer;
 import cn.worldwalker.game.wyqp.common.rpc.WeiXinRpc;
+import cn.worldwalker.game.wyqp.common.utils.DateUtil;
 import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.IPUtil;
 import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
@@ -993,9 +994,18 @@ public abstract class BaseGameService {
 		result.setData(data);
 		result.setGameType(request.getGameType());
 		BaseMsg msg = request.getMsg();
+		Integer clubId = msg.getClubId();
+		Integer timeFlag = msg.getTimeFlag();
 		UserRecordModel qmodel = new UserRecordModel();
 		qmodel.setGameType(request.getGameType());
-		qmodel.setPlayerId(userInfo.getPlayerId());
+		if (clubId != null) {
+			qmodel.setClubId(clubId);
+			Date date = new Date();
+			qmodel.setStartTime(DateUtil.getNDaysBeforeStartTime(date, timeFlag));
+			qmodel.setEndTime(DateUtil.getNDaysBeforeEndTime(date, timeFlag));
+		}else{
+			qmodel.setPlayerId(userInfo.getPlayerId());
+		}
 		List<UserRecordModel> list = commonManager.getUserRecord(qmodel);
 		result.setMsgType(MsgTypeEnum.userRecord.msgType);
 		result.setData(list);
