@@ -629,7 +629,8 @@ public abstract class BaseGameService {
 			/**解散房间*/
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
 			if (roomInfo.getClubId() != null) {
-				redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomId);
+				redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
+				
 			}
 			/**将用户缓存信息里面的roomId设置为null*/
 			userInfo.setRoomId(null);
@@ -745,7 +746,7 @@ public abstract class BaseGameService {
 			/**解散房间*/
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
 			if (roomInfo.getClubId() != null) {
-				redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomId);
+				redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
 			}
 			/**删除解散标志位*/
 			redisOperationService.delDissolveIpRoomIdTime(roomId);
@@ -858,7 +859,8 @@ public abstract class BaseGameService {
 			/**解散房间*/
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
 			if (roomInfo.getClubId() != null) {
-				redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomId);
+				redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
+				
 			}
 			noticeAllClubPlayerTablePlayerNum(null, roomInfo.getClubId());
 		}else{/**如果只有部分人确认，则只删除当前玩家的标记*/

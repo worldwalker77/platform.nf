@@ -61,7 +61,7 @@ public class RoomInfoCleanJob /**extends SingleServerJobByRedis*/ {
 					log.info("定时任务销毁房间,roomId=" + model.getRoomId());
 					redisOperationService.cleanPlayerAndRoomInfo(model.getRoomId(), GameUtil.getPlayerIdStrArr(playerList));
 					if (roomInfo.getClubId() != null) {
-						redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomInfo.getRoomId());
+						redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
 					}
 					redisOperationService.delDissolveIpRoomIdTime(model.getRoomId());
 					try {
