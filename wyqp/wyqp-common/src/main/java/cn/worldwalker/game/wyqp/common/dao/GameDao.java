@@ -54,6 +54,9 @@ public interface GameDao {
 	public List<GameModel> getClubTables(GameQuery gameQuery);
 	
 	public Integer getMaxClubTableNum(GameQuery gameQuery);
+	public Integer delClubTable(GameQuery gameQuery);
+	
+	public Integer updateClubTable(GameQuery gameQuery);
 	
 	
 	

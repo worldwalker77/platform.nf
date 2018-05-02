@@ -163,5 +163,9 @@ public abstract class BaseMsgDisPatcher {
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.createClubTable.msgType, MsgTypeEnum.createClubTable);
 		notNeedLockMsgTypeMap.put(MsgTypeEnum.getClubTables.msgType, MsgTypeEnum.getClubTables);
 		
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.delClubTable.msgType, MsgTypeEnum.delClubTable);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.updateClubTable.msgType, MsgTypeEnum.updateClubTable);
+		notNeedLockMsgTypeMap.put(MsgTypeEnum.updateClubNotice.msgType, MsgTypeEnum.updateClubNotice);
+		
 	}
 }

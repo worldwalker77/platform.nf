@@ -110,6 +110,7 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 				break;
 			case getClubs:
 				commonGameService.getClubs(ctx, request, userInfo);
+				break;
 			case createClubTable:
 				commonGameService.createClubTable(ctx, request, userInfo);
 				break;
@@ -118,6 +119,16 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 				break;
 			case entryClubTable:
 				commonGameService.entryClubTable(ctx, request, userInfo);
+				break;
+				
+			case delClubTable:
+				commonGameService.delClubTable(ctx, request, userInfo);
+				break;
+			case updateClubTable:
+				commonGameService.updateClubTable(ctx, request, userInfo);
+				break;
+			case updateClubNotice:
+				commonGameService.updateClubNotice(ctx, request, userInfo);
 				break;
 			default:
 				break;
