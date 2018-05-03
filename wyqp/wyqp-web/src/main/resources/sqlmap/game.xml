@@ -349,6 +349,7 @@
 	<update id="updateProxyClub"  parameterType = "gameQuery">
 	    update t_proxy_club
 	    set 
+	    update_time = now()
 	    <if test="status !=null ">  
 	       and status = #{status}
 	    </if>

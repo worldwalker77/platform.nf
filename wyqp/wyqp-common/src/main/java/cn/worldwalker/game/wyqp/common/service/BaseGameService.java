@@ -2051,13 +2051,13 @@ public abstract class BaseGameService {
 		if (CollectionUtils.isEmpty(list)) {
 			throw new BusinessException(ExceptionEnum.NO_AUTHORITY);
 		}
+		gameQuery = doCreateGameQuery(ctx, request, userInfo);
+		gameQuery.setClubId(clubId);
 		gameQuery.setTableNum(msg.getTableNum());
-		
-		gameQuery.setGameType(msg.getGameType());
-		gameQuery.setDetailType(msg.getDetailType());
+		gameQuery.setGameType(request.getGameType());
+		gameQuery.setDetailType(request.getDetailType());
 		gameQuery.setPayType(msg.getPayType());
 		gameQuery.setTotalGames(msg.getTotalGames());
-		gameQuery.setRemark(String.valueOf(msg.getRemark()));
 		gameDao.updateClubTable(gameQuery);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}

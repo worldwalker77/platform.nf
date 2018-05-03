@@ -35,28 +35,7 @@ public class BaseMsg {
 	private String clubName;
 	private Integer tableNum;
 	private Integer timeFlag;
-	private Integer gameType;
-	private Integer detailType;
-	private Map<String, Object> remark;
 	
-	public Map<String, Object> getRemark() {
-		return remark;
-	}
-	public void setRemark(Map<String, Object> remark) {
-		this.remark = remark;
-	}
-	public Integer getGameType() {
-		return gameType;
-	}
-	public void setGameType(Integer gameType) {
-		this.gameType = gameType;
-	}
-	public Integer getDetailType() {
-		return detailType;
-	}
-	public void setDetailType(Integer detailType) {
-		this.detailType = detailType;
-	}
 	public Integer getTimeFlag() {
 		return timeFlag;
 	}

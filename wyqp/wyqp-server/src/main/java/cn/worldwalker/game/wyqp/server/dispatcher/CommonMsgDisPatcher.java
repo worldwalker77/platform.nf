@@ -124,9 +124,6 @@ public class CommonMsgDisPatcher extends BaseMsgDisPatcher{
 			case delClubTable:
 				commonGameService.delClubTable(ctx, request, userInfo);
 				break;
-			case updateClubTable:
-				commonGameService.updateClubTable(ctx, request, userInfo);
-				break;
 			case updateClubNotice:
 				commonGameService.updateClubNotice(ctx, request, userInfo);
 				break;
