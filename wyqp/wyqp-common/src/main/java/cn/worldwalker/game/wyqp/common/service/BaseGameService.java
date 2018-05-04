@@ -1012,6 +1012,7 @@ public abstract class BaseGameService {
 		}else{
 			qmodel.setPlayerId(userInfo.getPlayerId());
 		}
+		log.info("=====战绩参数：" + JsonUtil.toJson(qmodel));
 		List<UserRecordModel> list = commonManager.getUserRecord(qmodel);
 		result.setMsgType(MsgTypeEnum.userRecord.msgType);
 		result.setData(list);
@@ -1470,6 +1471,8 @@ public abstract class BaseGameService {
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		/**设置玩家id与俱乐部id的关系，记忆下次直接进入俱乐部*/
 		redisOperationService.setPlayerIdClubId(playerId, clubId);
+		/**设置当前这个俱乐部玩家列表*/
+		redisOperationService.setClubIdPlayerId(clubId, playerId);
 	}
 	
 	/**
@@ -1515,6 +1518,8 @@ public abstract class BaseGameService {
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		/**设置玩家id与俱乐部id的关系，记忆下次直接进入俱乐部*/
 		redisOperationService.setPlayerIdClubId(playerId, clubId);
+		/**设置当前这个俱乐部玩家列表*/
+		redisOperationService.setClubIdPlayerId(clubId, playerId);
 		/**设置俱乐部锁，只要俱乐部不解散，这个锁一直存在*/
 		RoomLockContainer.setLockByClubId(clubId, new ReentrantLock());
 	}
@@ -1597,6 +1602,8 @@ public abstract class BaseGameService {
 			data.put("clubOwnerWord", gameModel.getClubOwnerWord());
 			channelContainer.sendTextMsgByPlayerIds(result, playerId);
 			redisOperationService.setPlayerIdClubId(playerId, clubId);
+			/**设置当前这个俱乐部玩家列表*/
+			redisOperationService.setClubIdPlayerId(clubId, playerId);
 		}
 	}
 	
@@ -1616,6 +1623,8 @@ public abstract class BaseGameService {
 		Integer playerId = msg.getPlayerId();
 		/**退出俱乐部需要删除playerId与俱乐部id的对应关系，去掉记忆*/
 		redisOperationService.hdelPlayerIdClubId(playerId);
+		/**设置当前这个俱乐部玩家列表*/
+		redisOperationService.delClubIdPlayerId(redisOperationService.getClubIdByPlayerId(playerId), playerId);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	
