@@ -710,27 +710,27 @@ public class RedisOperationService {
 	/**clubId+tableNum->roomId 映射*/
 	public void setClubIdTableNumRoomId(Integer clubId, Integer tableNum, Integer roomId){
 		if (gameInfoStorageType == 0 ) {
-			jedisTemplate.hset(Constant.clubIdTableNumRoomIdMap, clubId + "" + tableNum, String.valueOf(roomId));
+			jedisTemplate.hset(Constant.clubIdTableNumRoomIdMap, clubId + "_" + tableNum, String.valueOf(roomId));
 		}else{
-			GameInfoMemoryContainer.clubIdTableNumRoomIdMap.put(clubId + "" + tableNum, String.valueOf(roomId));
+			GameInfoMemoryContainer.clubIdTableNumRoomIdMap.put(clubId + "_" + tableNum, String.valueOf(roomId));
 		}
 		
 	}
 	
 	public void delRoomIdByClubIdTableNum(Integer clubId, Integer tableNum){
 		if (gameInfoStorageType == 0 ) {
-			jedisTemplate.hdel(Constant.clubIdTableNumRoomIdMap, clubId + "" + tableNum);
+			jedisTemplate.hdel(Constant.clubIdTableNumRoomIdMap, clubId + "_" + tableNum);
 		}else{
-			GameInfoMemoryContainer.clubIdTableNumRoomIdMap.remove(clubId + "" + tableNum);
+			GameInfoMemoryContainer.clubIdTableNumRoomIdMap.remove(clubId + "_" + tableNum);
 		}
 	}
 	
 	public Integer getRoomIdByClubIdTableNum(Integer clubId, Integer tableNum){
 		String roomIdStr = null;
 		if (gameInfoStorageType == 0 ) {
-			roomIdStr = jedisTemplate.hget(Constant.clubIdTableNumRoomIdMap, clubId + "" + tableNum);
+			roomIdStr = jedisTemplate.hget(Constant.clubIdTableNumRoomIdMap, clubId + "_" + tableNum);
 		}else{
-			roomIdStr = GameInfoMemoryContainer.clubIdTableNumRoomIdMap.get(clubId + "" + tableNum);
+			roomIdStr = GameInfoMemoryContainer.clubIdTableNumRoomIdMap.get(clubId + "_" + tableNum);
 		}
 		if (StringUtils.isNotBlank(roomIdStr)) {
 			return Integer.valueOf(roomIdStr);

@@ -327,6 +327,7 @@ public abstract class BaseGameService {
 		}
 		for(GameModel model : tableList){
 			Integer roomId = redisOperationService.getRoomIdByClubIdTableNum(clubId, model.getTableNum());
+			log.info("clubId:" + clubId + ",tableNum:" + model.getTableNum() + ",roomId:" + roomId);
 			if (roomId != null) {
 				UserInfo userInfo = new UserInfo();
 				userInfo.setRoomId(roomId);
@@ -630,6 +631,7 @@ public abstract class BaseGameService {
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
 			if (roomInfo.getClubId() != null) {
 				redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
+				log.info("解散俱乐部房间后，删除映射关系clubId:" + roomInfo.getClubId() + ",tableNum:" + roomInfo.getTableNum());
 				
 			}
 			/**将用户缓存信息里面的roomId设置为null*/
@@ -747,6 +749,7 @@ public abstract class BaseGameService {
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
 			if (roomInfo.getClubId() != null) {
 				redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
+				log.info("解散俱乐部房间后，删除映射关系clubId:" + roomInfo.getClubId() + ",tableNum:" + roomInfo.getTableNum());
 			}
 			/**删除解散标志位*/
 			redisOperationService.delDissolveIpRoomIdTime(roomId);
@@ -860,6 +863,7 @@ public abstract class BaseGameService {
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
 			if (roomInfo.getClubId() != null) {
 				redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
+				log.info("解散俱乐部房间后，删除映射关系clubId:" + roomInfo.getClubId() + ",tableNum:" + roomInfo.getTableNum());
 				
 			}
 			noticeAllClubPlayerTablePlayerNum(null, roomInfo.getClubId());
@@ -1796,9 +1800,10 @@ public abstract class BaseGameService {
 		int onlineNum = 0;
 		for(GameModel modle : list){
 			tempModel = new GameModel();
-			tempModel.setPlayerId(playerId);
+			tempModel.setPlayerId(modle.getPlayerId());
 			tempModel.setNickName(modle.getNickName());
 			tempModel.setHeadImgUrl(modle.getHeadImgUrl());
+			tempModel.setCreateTime(modle.getCreateTime());
 			if (channelContainer.isPlayIdActive(modle.getPlayerId())) {
 				tempModel.setOnlineStatus(1);
 				onlineList.add(tempModel);
@@ -1984,6 +1989,7 @@ public abstract class BaseGameService {
 		List<GameModel> tableList = gameDao.getClubTables(gameQuery);
 		for(GameModel model : tableList){
 			Integer roomId = redisOperationService.getRoomIdByClubIdTableNum(clubId, model.getTableNum());
+			log.info("clubId:" + clubId + ",tableNum:" + model.getTableNum() + ",roomId:" + roomId);
 			if (roomId != null) {
 				userInfo.setRoomId(roomId);
 				BaseRoomInfo roomInfo = getRoomInfo(null, null, userInfo);
