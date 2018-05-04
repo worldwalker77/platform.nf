@@ -1,5 +1,7 @@
 package cn.worldwalker.game.wyqp.common.backend;
 
+import java.util.Date;
+
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
@@ -33,7 +35,15 @@ public class GameQuery {
 	private Integer totalGames;
 	private String remark;
 	private Integer tableNum;
+	private Date updateTime;
 	
+	
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
 	public Integer getTableNum() {
 		return tableNum;
 	}

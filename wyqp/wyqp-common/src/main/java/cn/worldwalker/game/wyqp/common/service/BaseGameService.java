@@ -2086,6 +2086,7 @@ public abstract class BaseGameService {
 		gameQuery.setStatus(msg.getStatus());
 		gameQuery.setClubName(msg.getClubName());
 		gameQuery.setClubOwnerWord(msg.getClubOwnerWord());
+		gameQuery.setUpdateTime(new Date());
 		gameDao.updateProxyClub(gameQuery);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}

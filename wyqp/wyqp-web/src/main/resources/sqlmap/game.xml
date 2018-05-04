@@ -349,15 +349,15 @@
 	<update id="updateProxyClub"  parameterType = "gameQuery">
 	    update t_proxy_club
 	    set 
-	    update_time = now()
+	    update_time = #{status}
 	    <if test="status !=null ">  
-	       and status = #{status}
+	       , status = #{status}
 	    </if>
 	    <if test="clubName !=null ">  
-	       and club_name = #{clubName}
+	       , club_name = #{clubName}
 	    </if>
 	    <if test="clubOwnerWord !=null ">  
-	       and club_owner_word = #{clubOwnerWord}
+	       , club_owner_word = #{clubOwnerWord}
 	    </if>
 	    where 
 	    club_id = #{clubId} 

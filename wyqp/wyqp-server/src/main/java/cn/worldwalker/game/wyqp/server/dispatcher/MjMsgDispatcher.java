@@ -80,8 +80,10 @@ public class MjMsgDispatcher extends BaseMsgDisPatcher {
 			break;
 		case createClubTable:
 			mjGameService.createClubTable(ctx, request, userInfo);
+			break;
 		case updateClubTable:
 			mjGameService.updateClubTable(ctx, request, userInfo);
+			break;
 		default:
 			break;
 		}
