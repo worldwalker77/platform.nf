@@ -1,6 +1,7 @@
 package cn.worldwalker.game.wyqp.common.domain.base;
 
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)

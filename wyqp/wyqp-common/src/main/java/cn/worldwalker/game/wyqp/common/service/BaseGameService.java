@@ -629,7 +629,8 @@ public abstract class BaseGameService {
 			/**解散房间*/
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
 			if (roomInfo.getClubId() != null) {
-				redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomId);
+				redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
+				
 			}
 			/**将用户缓存信息里面的roomId设置为null*/
 			userInfo.setRoomId(null);
@@ -745,7 +746,7 @@ public abstract class BaseGameService {
 			/**解散房间*/
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
 			if (roomInfo.getClubId() != null) {
-				redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomId);
+				redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
 			}
 			/**删除解散标志位*/
 			redisOperationService.delDissolveIpRoomIdTime(roomId);
@@ -858,7 +859,8 @@ public abstract class BaseGameService {
 			/**解散房间*/
 			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
 			if (roomInfo.getClubId() != null) {
-				redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomId);
+				redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
+				
 			}
 			noticeAllClubPlayerTablePlayerNum(null, roomInfo.getClubId());
 		}else{/**如果只有部分人确认，则只删除当前玩家的标记*/
@@ -1930,7 +1932,12 @@ public abstract class BaseGameService {
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
 		Integer clubId = redisOperationService.getClubIdByPlayerId(playerId);
-		
+		if (clubId == null) {
+			log.warn("玩家没有进入俱乐部");
+			result.setMsgType(MsgTypeEnum.exitClub.msgType);
+			channelContainer.sendTextMsgByPlayerIds(result, playerId);
+			return;
+		}
 		GameQuery gameQuery = new GameQuery();
 		gameQuery.setClubId(clubId);
 		
@@ -1965,6 +1972,12 @@ public abstract class BaseGameService {
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
 		Integer clubId = redisOperationService.getClubIdByPlayerId(playerId);
+		if (clubId == null) {
+			log.warn("玩家没有进入俱乐部");
+			result.setMsgType(MsgTypeEnum.exitClub.msgType);
+			channelContainer.sendTextMsgByPlayerIds(result, playerId);
+			return;
+		}
 		GameQuery gameQuery = new GameQuery();
 		gameQuery.setClubId(clubId);
 		List<GameModel> tableList = gameDao.getClubTables(gameQuery);
@@ -1988,6 +2001,92 @@ public abstract class BaseGameService {
 			}
 		}
 		result.setData(tableList);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void delClubTable(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.delClubTable.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		Integer clubId = redisOperationService.getClubIdByPlayerId(playerId);
+		if (clubId == null) {
+			log.warn("玩家没有进入俱乐部");
+			result.setMsgType(MsgTypeEnum.exitClub.msgType);
+			channelContainer.sendTextMsgByPlayerIds(result, playerId);
+			return;
+		}
+		/**校验clubId是否属于这个玩家，否则无权限*/
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setClubId(clubId);
+		gameQuery.setPlayerId(playerId);
+		List<GameModel> list = gameDao.getProxyClubs(gameQuery);
+		if (CollectionUtils.isEmpty(list)) {
+			throw new BusinessException(ExceptionEnum.NO_AUTHORITY);
+		}
+		gameQuery.setTableNum(msg.getTableNum());
+		gameDao.delClubTable(gameQuery);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void updateClubTable(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.updateClubTable.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		Integer clubId = redisOperationService.getClubIdByPlayerId(playerId);
+		if (clubId == null) {
+			log.warn("玩家没有进入俱乐部");
+			result.setMsgType(MsgTypeEnum.exitClub.msgType);
+			channelContainer.sendTextMsgByPlayerIds(result, playerId);
+			return;
+		}
+		/**校验clubId是否属于这个玩家，否则无权限*/
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setClubId(clubId);
+		gameQuery.setPlayerId(playerId);
+		List<GameModel> list = gameDao.getProxyClubs(gameQuery);
+		if (CollectionUtils.isEmpty(list)) {
+			throw new BusinessException(ExceptionEnum.NO_AUTHORITY);
+		}
+		gameQuery = doCreateGameQuery(ctx, request, userInfo);
+		gameQuery.setClubId(clubId);
+		gameQuery.setTableNum(msg.getTableNum());
+		gameQuery.setGameType(request.getGameType());
+		gameQuery.setDetailType(request.getDetailType());
+		gameQuery.setPayType(msg.getPayType());
+		gameQuery.setTotalGames(msg.getTotalGames());
+		gameDao.updateClubTable(gameQuery);
+		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+	}
+	
+	public void updateClubNotice(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo){
+		Result result = new Result();
+		result.setGameType(request.getGameType());
+		result.setMsgType(MsgTypeEnum.updateClubNotice.msgType);
+		BaseMsg msg = request.getMsg();
+		Integer playerId = msg.getPlayerId();
+		Integer clubId = redisOperationService.getClubIdByPlayerId(playerId);
+		if (clubId == null) {
+			log.warn("玩家没有进入俱乐部");
+			result.setMsgType(MsgTypeEnum.exitClub.msgType);
+			channelContainer.sendTextMsgByPlayerIds(result, playerId);
+			return;
+		}
+		/**校验clubId是否属于这个玩家，否则无权限*/
+		GameQuery gameQuery = new GameQuery();
+		gameQuery.setClubId(clubId);
+		gameQuery.setPlayerId(playerId);
+		List<GameModel> list = gameDao.getProxyClubs(gameQuery);
+		if (CollectionUtils.isEmpty(list)) {
+			throw new BusinessException(ExceptionEnum.NO_AUTHORITY);
+		}
+		gameQuery.setStatus(msg.getStatus());
+		gameQuery.setClubName(msg.getClubName());
+		gameQuery.setClubOwnerWord(msg.getClubOwnerWord());
+		gameDao.updateProxyClub(gameQuery);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	

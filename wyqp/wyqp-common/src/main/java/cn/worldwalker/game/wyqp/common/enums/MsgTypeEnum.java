@@ -56,6 +56,10 @@ public enum MsgTypeEnum {
 	createClubTable(50, "创建俱乐部牌桌"),
 	getClubTables(51, "查询俱乐部牌桌列表"),
 	
+	delClubTable(52, "删除俱乐部牌桌"),
+	updateClubTable(53, "编辑俱乐部牌桌"),
+	updateClubNotice(54, "更新俱乐部公告"),
+	
 	/**斗牛特有100-199*/
 	readyRobBanker(100, "准备抢庄"),
 	robBanker(101, "抢庄"),

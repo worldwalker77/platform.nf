@@ -29,6 +29,13 @@
 		<result column="club_owner_word" property="clubOwnerWord"/>
 		<result column="is_admin" property="isAdmin"/>
 		<result column="head_img_url" property="headImgUrl"/>
+		
+		<result column="table_num" property="tableNum"/>
+		<result column="game_type" property="gameType"/>
+		<result column="detail_type" property="detailType"/>
+		<result column="pay_type" property="payType"/>
+		<result column="remark" property="remark"/>
+		<result column="total_games" property="totalGames"/>
 	</resultMap>
 	
 	
@@ -341,8 +348,25 @@
 	</select>
 	<update id="updateProxyClub"  parameterType = "gameQuery">
 	    update t_proxy_club
-	    set status = #{status},club_name=#{clubName},club_owner_word=#{clubOwnerWord}
-	    where club_id = #{clubId} and proxy_id = #{proxyId}
+	    set 
+	    update_time = now()
+	    <if test="status !=null ">  
+	       and status = #{status}
+	    </if>
+	    <if test="clubName !=null ">  
+	       and club_name = #{clubName}
+	    </if>
+	    <if test="clubOwnerWord !=null ">  
+	       and club_owner_word = #{clubOwnerWord}
+	    </if>
+	    where 
+	    club_id = #{clubId} 
+	    <if test="proxyId !=null ">  
+	       and proxy_id = #{proxyId}
+	    </if> 
+	    <if test="playerId !=null ">  
+	       and player_id = #{playerId}
+	    </if> 
 	</update>
 	
 	<delete id="delProxyClub"  parameterType = "gameQuery">
@@ -483,7 +507,36 @@
 	    from t_club_table 
 	    where  club_id = #{clubId}
 	</select>
+	<delete id="delClubTable"  parameterType = "gameQuery">
+	    delete from  t_club_table
+	    where club_id = #{clubId} 
+	    <if test="tableNum != null ">  
+	       and table_num = #{tableNum}
+	    </if> 
+	</delete>
 	
+	<update id="updateClubTable"  parameterType = "gameQuery">
+	    update t_club_table
+	    set 
+	    <if test="gameType !=null ">  
+	       and game_type = #{gameType}
+	    </if>
+	    <if test="detailType !=null ">  
+	       and detail_type = #{detailType}
+	    </if>
+	    <if test="payType !=null ">  
+	       and pay_type = #{payType}
+	    </if>
+	    <if test="totalGames !=null ">  
+	       and total_games = #{totalGames}
+	    </if>
+	    <if test="remark !=null ">  
+	       and remark = #{remark}
+	    </if>
+	    where 
+	    club_id = #{clubId} 
+        and table_num = #{tableNum}
+	</update>
 </mapper>
 
 
