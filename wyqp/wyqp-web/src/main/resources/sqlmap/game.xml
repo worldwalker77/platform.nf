@@ -131,7 +131,8 @@
 		     					pay_type,
 		     					total_games,
 		     					remark,
-		     					create_time
+		     					create_time,
+		     					update_time
 	     					) 
 	     			values(  
 		     					#{clubId},
@@ -141,6 +142,7 @@
 		     					#{payType},
 		     					#{totalGames},
 		     					#{remark},
+		     					now(),
 		     					now()
 		     				)    
     </insert>
@@ -349,7 +351,7 @@
 	<update id="updateProxyClub"  parameterType = "gameQuery">
 	    update t_proxy_club
 	    set 
-	    update_time = #{status}
+	    update_time = #{updateTime}
 	    <if test="status !=null ">  
 	       , status = #{status}
 	    </if>
@@ -375,7 +377,7 @@
 	</delete>
 	
 	<select id="getClubUsers"  parameterType = "gameQuery" resultMap="gameModelResultMap">
-	    select a.proxy_id,a.club_id,a.player_id,a.nick_name,a.status,a.create_time,a.head_img_url
+	    select a.proxy_id,a.club_id,a.player_id,a.nick_name,a.status,a.create_time,a.head_img_url,a.create_time
 	    from t_club_user a
 	    where  1=1
 	    <if test="proxyId !=null ">  
@@ -518,20 +520,21 @@
 	<update id="updateClubTable"  parameterType = "gameQuery">
 	    update t_club_table
 	    set 
+	    update_time = #{updateTime}
 	    <if test="gameType !=null ">  
-	       and game_type = #{gameType}
+	       , game_type = #{gameType}
 	    </if>
 	    <if test="detailType !=null ">  
-	       and detail_type = #{detailType}
+	       , detail_type = #{detailType}
 	    </if>
 	    <if test="payType !=null ">  
-	       and pay_type = #{payType}
+	       , pay_type = #{payType}
 	    </if>
 	    <if test="totalGames !=null ">  
-	       and total_games = #{totalGames}
+	       , total_games = #{totalGames}
 	    </if>
 	    <if test="remark !=null ">  
-	       and remark = #{remark}
+	       , remark = #{remark}
 	    </if>
 	    where 
 	    club_id = #{clubId} 

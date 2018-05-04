@@ -1453,6 +1453,7 @@ public abstract class BaseGameService {
 		}
 		Integer clubId = commonManager.createClub(msg.getClubName(), msg.getClubOwnerWord(), msg.getStatus(), 
 				playerId, userInfo.getNickName(), userInfo.getHeadImgUrl());
+		
 		Map<String, Object> data = new HashMap<String, Object>();
 		result.setData(data);
 		data.put("roomCardNum", 0);

@@ -463,14 +463,14 @@ public class CommonManagerImpl implements CommonManager{
 		gameQuery.setRoomCardNum(0);
 		/**创建俱乐部*/
 		gameDao.insertProxyClub(gameQuery);
-//		GameQuery gameQuery1 = new GameQuery();
-//		gameQuery1.setClubId(gameQuery.getClubId());
-//		gameQuery1.setPlayerId(playerId);
-//		gameQuery1.setNickName(nickName);
-//		gameQuery1.setHeadImgUrl(headImgUrl);
-//		gameQuery1.setStatus(1);
-//		/**默认创始人也加入俱乐部，并且不需要审核*/
-//		gameDao.insertClubUser(gameQuery1);
+		GameQuery gameQuery1 = new GameQuery();
+		gameQuery1.setClubId(gameQuery.getClubId());
+		gameQuery1.setPlayerId(playerId);
+		gameQuery1.setNickName(nickName);
+		gameQuery1.setHeadImgUrl(headImgUrl);
+		gameQuery1.setStatus(1);
+		/**默认创始人也加入俱乐部，并且不需要审核*/
+		gameDao.insertClubUser(gameQuery1);
 		return gameQuery.getClubId();
 	}
 	@Override
@@ -481,5 +481,6 @@ public class CommonManagerImpl implements CommonManager{
 		gameQuery.setPlayerId(null);
 		gameDao.delClubUser(gameQuery);
 		gameDao.delProxyClub(gameQuery);
+		gameDao.delClubTable(gameQuery);
 	}
 }
