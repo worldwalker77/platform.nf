@@ -266,7 +266,6 @@ public abstract class BaseGameService {
 		
 		/**如果玩家是从俱乐部创建的房间，则设置俱乐部id与房间id列表对应关系*/
 		if (clubId != null) {
-			redisOperationService.setClubIdRoomId(clubId, roomId);
 			roomInfo.setClubId(clubId);
 			roomInfo.setTableNum(msg.getTableNum());
 		}

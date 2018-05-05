@@ -756,7 +756,9 @@ public class RedisOperationService {
 					lock1.unlock();
 				}
 			}
-			ve.add(playerId);
+			if (!ve.contains(playerId)) {
+				ve.add(playerId);
+			}
 		}
 	}
 	
