@@ -1423,6 +1423,8 @@ public class MjCardRule {
 		        List<Integer> typeList = MjScoreService.getInstance().calHuPlayer(player,cardIndex);
 		        //黎川不要平胡和十三烂哦
 		        if (typeList != null && typeList.size() == 1 && type == 2 &&
+                        //地胡还是可以胡P胡哦
+                        player.getDiscardCardList().size() > 0 &&
                         (typeList.contains(PING_HU.type) || typeList.contains(SHI_SHI_SAN_LAN.type) )){
 		            isHu = false;
                 }

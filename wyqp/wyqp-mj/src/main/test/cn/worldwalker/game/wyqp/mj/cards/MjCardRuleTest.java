@@ -7,6 +7,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class MjCardRuleTest {
 
@@ -53,15 +54,20 @@ public class MjCardRuleTest {
         mjRoomInfo.setDetailType(6);
         isHu = MjCardRule.checkHu(mjRoomInfo, mjPlayerInfo,0,0);
         Assert.assertTrue(isHu);
+        mjPlayerInfo.setDiscardCardList(Arrays.asList(1,2));
         isHu = MjCardRule.checkHu(mjRoomInfo, mjPlayerInfo,0,2);
         Assert.assertTrue(!isHu);
+        //地胡
+        mjPlayerInfo.setDiscardCardList(Collections.<Integer>emptyList());
+        isHu = MjCardRule.checkHu(mjRoomInfo, mjPlayerInfo,0,2);
+        Assert.assertTrue(isHu);
     }
 
 
     @Test
     public void testCalculateAllPlayerOperations() throws Exception{
-        MjRoomInfo mjRoomInfo = new MjRoomInfo();
-        mjRoomInfo.setLastPlayerId(1);
-        MjCardRule.calculateAllPlayerOperations(mjRoomInfo, 1, 1001,1);
+//        MjRoomInfo mjRoomInfo = new MjRoomInfo();
+//        mjRoomInfo.setLastPlayerId(1);
+//        MjCardRule.calculateAllPlayerOperations(mjRoomInfo, 1, 1001,1);
     }
 }
