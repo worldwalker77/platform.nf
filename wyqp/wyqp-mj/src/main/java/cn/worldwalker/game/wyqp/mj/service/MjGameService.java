@@ -1365,6 +1365,7 @@ public class MjGameService extends BaseGameService {
         } else {/**如果当前局数等于总局数，则设置为一圈结束*/
             roomInfo.setStatus(MjRoomStatusEnum.totalGameOver.status);
             try {
+            	log.info("记录一圈总战绩===============");
                 commonManager.addUserRecord(roomInfo);
             } catch (Exception e) {
                 e.printStackTrace();

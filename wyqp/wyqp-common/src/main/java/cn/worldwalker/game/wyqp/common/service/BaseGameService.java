@@ -674,7 +674,7 @@ public abstract class BaseGameService {
 				/**解散房间*/
 				redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
 				if (roomInfo.getClubId() != null) {
-					redisOperationService.delClubIdRoomId(roomInfo.getClubId(), roomId);
+					redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
 				}
 				/**将用户缓存信息里面的roomId设置为null*/
 				userInfo.setRoomId(null);
@@ -1621,10 +1621,11 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.exitClub.msgType);
 		BaseMsg msg = request.getMsg();
 		Integer playerId = msg.getPlayerId();
+		Integer clubId = redisOperationService.getClubIdByPlayerId(playerId);
 		/**退出俱乐部需要删除playerId与俱乐部id的对应关系，去掉记忆*/
 		redisOperationService.hdelPlayerIdClubId(playerId);
 		/**设置当前这个俱乐部玩家列表*/
-		redisOperationService.delClubIdPlayerId(redisOperationService.getClubIdByPlayerId(playerId), playerId);
+		redisOperationService.delClubIdPlayerId(clubId, playerId);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
 	
@@ -1953,6 +1954,15 @@ public abstract class BaseGameService {
 			channelContainer.sendTextMsgByPlayerIds(result, playerId);
 			return;
 		}
+		
+		GameQuery gameQuery1 = new GameQuery();
+		gameQuery1.setClubId(clubId);
+		gameQuery1.setPlayerId(playerId);
+		List<GameModel> list = gameDao.getProxyClubs(gameQuery1);
+		if (CollectionUtils.isEmpty(list)) {
+			throw new BusinessException(ExceptionEnum.NO_PERMISSION);
+		}
+		
 		GameQuery gameQuery = new GameQuery();
 		gameQuery.setClubId(clubId);
 		
@@ -1971,6 +1981,7 @@ public abstract class BaseGameService {
 		gameQuery.setTotalGames(msg.getTotalGames());
 		gameDao.insertClubTable(gameQuery);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+		noticeAllClubPlayerTablePlayerNum(null, clubId);
 	}
 	
 	public abstract GameQuery doCreateGameQuery(ChannelHandlerContext ctx, BaseRequest request, UserInfo userInfo);
