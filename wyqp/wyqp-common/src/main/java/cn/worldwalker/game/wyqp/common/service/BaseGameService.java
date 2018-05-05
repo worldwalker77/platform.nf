@@ -1515,6 +1515,7 @@ public abstract class BaseGameService {
 		data.put("clubOwnerWord", gameModel.getClubOwnerWord());
 		data.put("nickName", gameModel.getNickName());
 		data.put("wechatNum", gameModel.getNickName());
+		data.put("playerId", gameModel.getPlayerId());
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		/**设置玩家id与俱乐部id的关系，记忆下次直接进入俱乐部*/
 		redisOperationService.setPlayerIdClubId(playerId, clubId);
@@ -1562,6 +1563,7 @@ public abstract class BaseGameService {
 			data.put("clubId", clubId);
 			data.put("clubName", gameModel.getClubName());
 			data.put("clubOwnerWord", gameModel.getClubOwnerWord());
+			data.put("playerId", gameModel.getPlayerId());
 			channelContainer.sendTextMsgByPlayerIds(result, playerId);
 			redisOperationService.setPlayerIdClubId(playerId, clubId);
 			return;
@@ -1578,6 +1580,7 @@ public abstract class BaseGameService {
 				data.put("clubId", clubId);
 				data.put("clubName", gameModel.getClubName());
 				data.put("clubOwnerWord", gameModel.getClubOwnerWord());
+				data.put("playerId", gameModel.getPlayerId());
 				channelContainer.sendTextMsgByPlayerIds(result, playerId);
 				redisOperationService.setPlayerIdClubId(playerId, clubId);
 				return;
@@ -1600,6 +1603,7 @@ public abstract class BaseGameService {
 			data.put("clubId", clubId);
 			data.put("clubName", gameModel.getClubName());
 			data.put("clubOwnerWord", gameModel.getClubOwnerWord());
+			data.put("playerId", gameModel.getPlayerId());
 			channelContainer.sendTextMsgByPlayerIds(result, playerId);
 			redisOperationService.setPlayerIdClubId(playerId, clubId);
 			/**设置当前这个俱乐部玩家列表*/
