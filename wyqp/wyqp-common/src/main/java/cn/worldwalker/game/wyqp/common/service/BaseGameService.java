@@ -1936,19 +1936,23 @@ public abstract class BaseGameService {
 		List<GameModel> joinedList = gameDao.getJoinedClubs(gameQuery);
 		List<GameModel> clubList = new ArrayList<GameModel>();
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		int createdNum = 0;
+		int joinedNum = 0;
 		for(GameModel md : createdList){
 			clubList.add(md);
+			createdNum++;
 			map.put(md.getClubId(), md.getClubId());
 		}
 		for(GameModel md : joinedList){
 			if (!map.containsKey(md.getClubId())) {
 				clubList.add(md);
+				joinedNum++;
 			}
 		}
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("clubList", clubList);
-		data.put("createdNum", createdList.size());
-		data.put("joinedNum", joinedList.size());
+		data.put("createdNum", createdNum);
+		data.put("joinedNum", joinedNum);
 		result.setData(data);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 	}
