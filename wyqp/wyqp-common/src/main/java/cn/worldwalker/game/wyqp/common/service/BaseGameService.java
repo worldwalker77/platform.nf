@@ -1935,8 +1935,16 @@ public abstract class BaseGameService {
 		gameQuery.setStatus(1);
 		List<GameModel> joinedList = gameDao.getJoinedClubs(gameQuery);
 		List<GameModel> clubList = new ArrayList<GameModel>();
-		clubList.addAll(joinedList);
-		clubList.addAll(createdList);
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		for(GameModel md : createdList){
+			clubList.add(md);
+			map.put(md.getClubId(), md.getClubId());
+		}
+		for(GameModel md : joinedList){
+			if (!map.containsKey(md.getClubId())) {
+				clubList.add(md);
+			}
+		}
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("clubList", clubList);
 		data.put("createdNum", createdList.size());
