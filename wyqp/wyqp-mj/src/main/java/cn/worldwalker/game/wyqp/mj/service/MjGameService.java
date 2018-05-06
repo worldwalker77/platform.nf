@@ -578,7 +578,7 @@ public class MjGameService extends BaseGameService {
             data.put("cardIndex", gangCardIndex);
             data.put("mingGangCardList", mingGangCardList);
             result.setMsgType(MsgTypeEnum.mingGang.msgType);
-            channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArrWithOutSelf(playerList, curPlayerId));
+//            channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArrWithOutSelf(playerList, curPlayerId));
             /***给抢杠的玩家返回可操作权限*/
             data.put("operations", MjCardRule.getPlayerHighestPriority(roomInfo, curPlayerId));
             channelContainer.sendTextMsgByPlayerIds(result, curPlayerId);
