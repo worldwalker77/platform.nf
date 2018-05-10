@@ -1,6 +1,10 @@
 package cn.worldwalker.game.wyqp.common.backend;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.util.StringUtils;
@@ -71,7 +75,14 @@ public class GameModel {
 	
 	private Integer playerNum;
 	
+	private List<Map<String, Object>> playerList = new ArrayList<Map<String,Object>>();
 	
+	public List<Map<String, Object>> getPlayerList() {
+		return playerList;
+	}
+	public void setPlayerList(List<Map<String, Object>> playerList) {
+		this.playerList = playerList;
+	}
 	public Integer getPlayerNum() {
 		return playerNum;
 	}

@@ -41,6 +41,7 @@ public enum ExceptionEnum {
     CREATE_CLUB_LIMIT_ERROR(35, "每个玩家只能创建5个俱乐部"),
     JOIN_CLUB_LIMIT_ERROR(36, "每个玩家只能加入10个俱乐部"),
     HAS_APPLY(37, "你已经申请加入此俱乐部，等待俱乐部创始人审核"),
+    NOT_ENOUGH_CARD_FOR_CREATE_ROOM(38, "创建俱乐部最少需要200张房卡"),
     /**斗牛100-199*/
     
     /**麻将200-299*/

@@ -337,7 +337,10 @@ public abstract class BaseGameService {
 				for(int i = 0; i < size; i++){
 					BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(i);
 					if (redisOperationService.getRoomIdGameTypeByPlayerId(playerInfo.getPlayerId()) != null) {
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put("nickName", playerInfo.getNickName());
 						num++;
+						model.getPlayerList().add(map);
 					}
 				}
 				model.setPlayerNum(num);
@@ -1452,8 +1455,16 @@ public abstract class BaseGameService {
 		GameQuery gameQuery = new GameQuery();
 		gameQuery.setPlayerId(playerId);
 		Long clubCount = gameDao.getProxyClubsCount(gameQuery);
+		/**每个创建不超过5个俱乐部*/
 		if (clubCount >= 5) {
 			throw new BusinessException(ExceptionEnum.CREATE_CLUB_LIMIT_ERROR);
+		}
+		/**房卡数必须最少有200张*/
+		if (redisOperationService.isLoginFuseOpen()) {
+			List<GameModel> list = gameDao.getUserByCondition(gameQuery);
+			if (list.get(0).getRoomCardNum() < 200) {
+				throw new BusinessException(ExceptionEnum.NOT_ENOUGH_CARD_FOR_CREATE_ROOM);
+			}
 		}
 		Integer clubId = commonManager.createClub(msg.getClubName(), msg.getClubOwnerWord(), msg.getStatus(), 
 				playerId, userInfo.getNickName(), userInfo.getHeadImgUrl());
@@ -1466,6 +1477,7 @@ public abstract class BaseGameService {
 		data.put("clubOwnerWord", msg.getClubOwnerWord());
 		data.put("nickName", userInfo.getNickName());
 		data.put("wechatNum", userInfo.getNickName());
+		data.put("playerId", playerId);
 		result.setMsgType(MsgTypeEnum.entryClub.msgType);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
 		/**设置玩家id与俱乐部id的关系，记忆下次直接进入俱乐部*/
@@ -2034,8 +2046,12 @@ public abstract class BaseGameService {
 				for(int i = 0; i < size; i++){
 					BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(i);
 					if (redisOperationService.getRoomIdGameTypeByPlayerId(playerInfo.getPlayerId()) != null) {
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put("nickName", playerInfo.getNickName());
 						num++;
+						model.getPlayerList().add(map);
 					}
+					
 				}
 				model.setPlayerNum(num);
 			}else{
