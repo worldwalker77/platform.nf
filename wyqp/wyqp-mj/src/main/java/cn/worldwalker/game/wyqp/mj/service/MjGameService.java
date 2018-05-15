@@ -918,7 +918,11 @@ public class MjGameService extends BaseGameService {
                 	/**放弃胡，则一圈内此玩家不能胡牌*/
                 	player.setCheckHuflag(false);
                 	/**设置当时放弃的胡的分数*/
-                	player.setCheckHuScore(mjScoreService.getHuScore(player, roomInfo.getLastCardIndex()));
+                	Integer opType = 0;
+                	if (huStr.startsWith("3")) {
+                		opType = 3;
+					}
+                	player.setCheckHuScore(mjScoreService.getHuScore(player, roomInfo.getLastCardIndex(),opType));
                 	/**如果pass的胡是抢杠，则需要让杠的玩家走完剩余流程*/
                 	if (huStr.startsWith("3")) {
                 		/**走上个玩家杠没走完的逻辑*/

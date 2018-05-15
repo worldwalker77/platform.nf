@@ -49,6 +49,7 @@ public class MjHuServiceTest {
         caseMap.put(Arrays.asList(0,1,1,1,8,8,9,9,11,11,18,18,33,33), false);
         caseMap.put(Arrays.asList(0,0,1,3,8,8,9,9,11,11,18,18,33,33), false);
         caseMap.put(Arrays.asList(0,0,1,3,8,8,9,9,11,11,18,18,33), false);
+        caseMap.put(Arrays.asList(0,4,8,12,17,22,27,28,29,30,31,32,33,19), true);
         //清一色
 //        caseMap.put(Arrays.asList(0,0,1,1,2,3,4,5,7,7,8,8), true);
 
