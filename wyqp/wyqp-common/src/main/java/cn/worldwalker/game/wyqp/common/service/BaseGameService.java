@@ -1013,6 +1013,7 @@ public abstract class BaseGameService {
 			qmodel.setEndTime(DateUtil.getNDaysBeforeEndTime(date, timeFlag));
 		}else{
 			qmodel.setPlayerId(userInfo.getPlayerId());
+			qmodel.setClubId(null);
 		}
 		log.info("=====战绩参数：" + JsonUtil.toJson(qmodel));
 		List<UserRecordModel> list = commonManager.getUserRecord(qmodel);
