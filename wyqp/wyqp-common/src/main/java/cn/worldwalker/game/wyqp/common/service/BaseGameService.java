@@ -56,7 +56,6 @@ import cn.worldwalker.game.wyqp.common.utils.GameUtil;
 import cn.worldwalker.game.wyqp.common.utils.IPUtil;
 import cn.worldwalker.game.wyqp.common.utils.JsonUtil;
 import cn.worldwalker.game.wyqp.common.utils.SnowflakeIdGenerator;
-import cn.worldwalker.game.wyqp.common.utils.UrlImgDownLoadUtil;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.DateUtils;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.HttpUtil;
 import cn.worldwalker.game.wyqp.common.utils.wxpay.MapUtils;
@@ -214,6 +213,7 @@ public abstract class BaseGameService {
 		if (redisRelaModel != null) {
 			throw new BusinessException(ExceptionEnum.ALREADY_IN_ROOM.index, ExceptionEnum.ALREADY_IN_ROOM.description + ",房间号：" + redisRelaModel.getRoomId());
 		}
+		Integer clubOwnerId = null;
 		/**校验房卡数量是否足够*/
 		Integer clubId = redisOperationService.getClubIdByPlayerId(msg.getPlayerId());
 		if (redisOperationService.isLoginFuseOpen()) {
@@ -224,6 +224,7 @@ public abstract class BaseGameService {
 				gameQuery.setClubId(clubId);
 				List<GameModel> gmList = gameDao.getProxyClubs(gameQuery);
 				roomCardCheckPlayerId = gmList.get(0).getPlayerId();
+				clubOwnerId = roomCardCheckPlayerId;
 			}
 			commonManager.roomCardCheck(roomCardCheckPlayerId, request.getGameType(), msg.getPayType(), msg.getTotalGames());
 		}
@@ -268,6 +269,7 @@ public abstract class BaseGameService {
 		if (clubId != null) {
 			roomInfo.setClubId(clubId);
 			roomInfo.setTableNum(msg.getTableNum());
+			roomInfo.setClubOwnerId(clubOwnerId);
 		}
 		List playerList = roomInfo.getPlayerList();
 		BasePlayerInfo playerInfo = (BasePlayerInfo)playerList.get(0);
@@ -1460,9 +1462,10 @@ public abstract class BaseGameService {
 		if (clubCount >= 5) {
 			throw new BusinessException(ExceptionEnum.CREATE_CLUB_LIMIT_ERROR);
 		}
+		List<GameModel> list = null;
 		/**房卡数必须最少有200张*/
 		if (redisOperationService.isLoginFuseOpen()) {
-			List<GameModel> list = gameDao.getUserByCondition(gameQuery);
+			list = gameDao.getUserByCondition(gameQuery);
 			if (list.get(0).getRoomCardNum() < 200) {
 				throw new BusinessException(ExceptionEnum.NOT_ENOUGH_CARD_FOR_CREATE_ROOM);
 			}
@@ -1472,7 +1475,7 @@ public abstract class BaseGameService {
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		result.setData(data);
-		data.put("roomCardNum", 0);
+		data.put("roomCardNum", list.get(0).getRoomCardNum());
 		data.put("clubId", clubId);
 		data.put("clubName", msg.getClubName());
 		data.put("clubOwnerWord", msg.getClubOwnerWord());
@@ -1521,7 +1524,10 @@ public abstract class BaseGameService {
 		result.setMsgType(MsgTypeEnum.entryClub.msgType);
 		Map<String, Object> data = new HashMap<String, Object>();
 		result.setData(data);
-		data.put("roomCardNum", gameModel.getRoomCardNum());
+		/**查询俱乐部房卡*/
+		gameQuery.setPlayerId(gameModel.getPlayerId());
+		list = gameDao.getUserByCondition(gameQuery);
+		data.put("roomCardNum", list.get(0).getRoomCardNum());
 		data.put("clubId", clubId);
 		data.put("clubName", gameModel.getClubName());
 		data.put("clubOwnerWord", gameModel.getClubOwnerWord());
@@ -1566,7 +1572,9 @@ public abstract class BaseGameService {
 		}
 		
 		GameModel gameModel = list.get(0);
-		data.put("roomCardNum", gameModel.getRoomCardNum());
+		gameQuery.setPlayerId(gameModel.getPlayerId());
+		List<GameModel> list1 = gameDao.getUserByCondition(gameQuery);
+		data.put("roomCardNum", list1.get(0).getRoomCardNum());
 		data.put("nickName", gameModel.getNickName());
 		data.put("wechatNum", gameModel.getNickName());
 		/**如果进入俱乐部的是主人本人，则直接进入*/

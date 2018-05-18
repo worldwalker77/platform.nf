@@ -226,6 +226,9 @@ public class MjCardRule {
 		}
 		int allSize = allPlayerOperations.size();
 		TreeMap<Integer, String> curPlayerOperations = allPlayerOperations.get(playerId);
+		if (curPlayerOperations == null || curPlayerOperations.isEmpty()) {
+			return null;
+		}
 		/**当前玩家的可操作权限*/
 		TreeMap<Integer, String> resultMap = new TreeMap<Integer, String>();
 		resultMap.putAll(curPlayerOperations);
