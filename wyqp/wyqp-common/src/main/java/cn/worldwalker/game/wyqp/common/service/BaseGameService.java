@@ -1475,7 +1475,12 @@ public abstract class BaseGameService {
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		result.setData(data);
-		data.put("roomCardNum", list.get(0).getRoomCardNum());
+		if (redisOperationService.isLoginFuseOpen()) {
+			data.put("roomCardNum", list.get(0).getRoomCardNum());
+		}else{
+			data.put("roomCardNum", 0);
+		}
+		
 		data.put("clubId", clubId);
 		data.put("clubName", msg.getClubName());
 		data.put("clubOwnerWord", msg.getClubOwnerWord());
@@ -1527,7 +1532,12 @@ public abstract class BaseGameService {
 		/**查询俱乐部房卡*/
 		gameQuery.setPlayerId(gameModel.getPlayerId());
 		list = gameDao.getUserByCondition(gameQuery);
-		data.put("roomCardNum", list.get(0).getRoomCardNum());
+		if (redisOperationService.isLoginFuseOpen()) {
+			data.put("roomCardNum", list.get(0).getRoomCardNum());
+		}else{
+			data.put("roomCardNum", 0);
+		}
+		
 		data.put("clubId", clubId);
 		data.put("clubName", gameModel.getClubName());
 		data.put("clubOwnerWord", gameModel.getClubOwnerWord());
@@ -1574,7 +1584,11 @@ public abstract class BaseGameService {
 		GameModel gameModel = list.get(0);
 		gameQuery.setPlayerId(gameModel.getPlayerId());
 		List<GameModel> list1 = gameDao.getUserByCondition(gameQuery);
-		data.put("roomCardNum", list1.get(0).getRoomCardNum());
+		if (redisOperationService.isLoginFuseOpen()) {
+			data.put("roomCardNum", list1.get(0).getRoomCardNum());
+		}else{
+			data.put("roomCardNum", 0);
+		}
 		data.put("nickName", gameModel.getNickName());
 		data.put("wechatNum", gameModel.getNickName());
 		/**如果进入俱乐部的是主人本人，则直接进入*/
