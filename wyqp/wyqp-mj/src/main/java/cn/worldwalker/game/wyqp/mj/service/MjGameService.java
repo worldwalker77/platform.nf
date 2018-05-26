@@ -1524,6 +1524,9 @@ public class MjGameService extends BaseGameService {
         Integer playerId = userInfo.getPlayerId();
         Integer roomId = userInfo.getRoomId();
         MjRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, MjRoomInfo.class);
+        if (roomInfo == null) {
+			return roomInfoList;
+		}
         MjRoomInfo newRoomInfo = new MjRoomInfo();
         roomInfoList.add(roomInfo);
         roomInfoList.add(newRoomInfo);

@@ -455,6 +455,10 @@ public abstract class BaseGameService {
 		/**先获取房间信息，判断此玩家是否在房间里面，如果在房间里面就走刷新接口*/
 		userInfo.setRoomId(roomId);
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
+		if (roomInfo == null) {
+			redisOperationService.delGameTypeUpdateTimeByRoomId(roomId);
+			throw new BusinessException(ExceptionEnum.ROOM_ID_NOT_EXIST);
+		}
 		List playerList = roomInfo.getPlayerList();
 		boolean isExist = false;
 		for(int i = 0; i < playerList.size(); i++ ){
@@ -620,7 +624,11 @@ public abstract class BaseGameService {
 		Integer playerId = userInfo.getPlayerId();
 		Integer roomId = userInfo.getRoomId();
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
-		
+		if (roomInfo == null) {
+			log.warn("房间信息不存在");
+			channelContainer.sendTextMsgByPlayerIds(new Result(0, MsgTypeEnum.entryHall.msgType), playerId);
+			return;
+		}
 		List playerList = roomInfo.getPlayerList();
 		if (!GameUtil.isExistPlayerInRoom(playerId, playerList)) {
 			throw new BusinessException(ExceptionEnum.PLAYER_NOT_IN_ROOM);
@@ -841,7 +849,9 @@ public abstract class BaseGameService {
 		Integer roomId = msg.getRoomId();
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
 		if (null == roomInfo) {
-			throw new BusinessException(ExceptionEnum.ROOM_ID_NOT_EXIST);
+			log.warn("房间信息不存在");
+			channelContainer.sendTextMsgByPlayerIds(new Result(0, MsgTypeEnum.entryHall.msgType), msg.getPlayerId());
+			return;
 		}
 		List playerList = roomInfo.getPlayerList();
 		if (!GameUtil.isExistPlayerInRoom(msg.getPlayerId(), playerList)) {
@@ -893,7 +903,9 @@ public abstract class BaseGameService {
 		Integer roomId = msg.getRoomId();
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
 		if (null == roomInfo) {
-			throw new BusinessException(ExceptionEnum.ROOM_ID_NOT_EXIST);
+			log.warn("房间信息不存在");
+			channelContainer.sendTextMsgByPlayerIds(new Result(0, MsgTypeEnum.entryHall.msgType), msg.getPlayerId());
+			return;
 		}
 		List playerList = roomInfo.getPlayerList();
 		if (!GameUtil.isExistPlayerInRoom(msg.getPlayerId(), playerList)) {
@@ -946,7 +958,9 @@ public abstract class BaseGameService {
 		Integer roomId = msg.getRoomId();
 		BaseRoomInfo roomInfo = getRoomInfo(ctx, request, userInfo);
 		if (null == roomInfo) {
-			throw new BusinessException(ExceptionEnum.ROOM_ID_NOT_EXIST);
+			log.warn("房间信息不存在");
+			channelContainer.sendTextMsgByPlayerIds(new Result(0, MsgTypeEnum.entryHall.msgType), msg.getPlayerId());
+			return;
 		}
 		List playerList = roomInfo.getPlayerList();
 		if (!GameUtil.isExistPlayerInRoom(msg.getPlayerId(), playerList)) {
@@ -1120,6 +1134,13 @@ public abstract class BaseGameService {
 		Integer roomId = msg.getRoomId();
 		Integer playerId = msg.getPlayerId();
 		List<BaseRoomInfo> roomInfoList = doRefreshRoom(ctx, request, userInfo);
+		if (CollectionUtils.isEmpty(roomInfoList)) {
+			log.warn("房间信息不存在");
+			/**房间不存在，则需要删除离线用户与房间的关系标记，防止循环刷新，但是房间不存在*/
+			redisOperationService.hdelOfflinePlayerIdRoomIdGameTypeTime(playerId);
+			channelContainer.sendTextMsgByPlayerIds(new Result(0, MsgTypeEnum.entryHall.msgType), playerId);
+			return;
+		}
 		BaseRoomInfo roomInfo = roomInfoList.get(0);
 		BaseRoomInfo returnRoomInfo = roomInfoList.get(1);
 		if (null == roomInfo) {
