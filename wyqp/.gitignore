@@ -7,5 +7,6 @@
 */.plugins/*
 *.iml*
 *.idea
+*/test-output*
 
 
