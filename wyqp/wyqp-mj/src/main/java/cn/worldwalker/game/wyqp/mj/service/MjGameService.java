@@ -1,12 +1,37 @@
 package cn.worldwalker.game.wyqp.mj.service;
 
+import io.netty.channel.ChannelHandlerContext;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeMap;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Service;
+
 import cn.worldwalker.game.wyqp.common.backend.GameQuery;
 import cn.worldwalker.game.wyqp.common.constant.Constant;
-import cn.worldwalker.game.wyqp.common.domain.base.*;
+import cn.worldwalker.game.wyqp.common.domain.base.BaseMsg;
+import cn.worldwalker.game.wyqp.common.domain.base.BaseRequest;
+import cn.worldwalker.game.wyqp.common.domain.base.BaseRoomInfo;
+import cn.worldwalker.game.wyqp.common.domain.base.UserInfo;
+import cn.worldwalker.game.wyqp.common.domain.base.UserModel;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjMsg;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjPlayerInfo;
 import cn.worldwalker.game.wyqp.common.domain.mj.MjRoomInfo;
-import cn.worldwalker.game.wyqp.common.enums.*;
+import cn.worldwalker.game.wyqp.common.enums.GameTypeEnum;
+import cn.worldwalker.game.wyqp.common.enums.MsgTypeEnum;
+import cn.worldwalker.game.wyqp.common.enums.OnlineStatusEnum;
+import cn.worldwalker.game.wyqp.common.enums.RoomCardOperationEnum;
+import cn.worldwalker.game.wyqp.common.enums.RoomStatusEnum;
 import cn.worldwalker.game.wyqp.common.exception.BusinessException;
 import cn.worldwalker.game.wyqp.common.exception.ExceptionEnum;
 import cn.worldwalker.game.wyqp.common.result.Result;
@@ -17,14 +42,11 @@ import cn.worldwalker.game.wyqp.common.utils.SnowflakeIdGenerator;
 import cn.worldwalker.game.wyqp.common.utils.log.ThreadPoolMgr;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardResource;
 import cn.worldwalker.game.wyqp.mj.cards.MjCardRule;
-import cn.worldwalker.game.wyqp.mj.enums.*;
-import io.netty.channel.ChannelHandlerContext;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
+import cn.worldwalker.game.wyqp.mj.enums.MjHuTypeEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjOperationEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjPlayerStatusEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjRoomStatusEnum;
+import cn.worldwalker.game.wyqp.mj.enums.MjTypeEnum;
 @Service(value="mjGameService")
 public class MjGameService extends BaseGameService {
 
@@ -1113,6 +1135,15 @@ public class MjGameService extends BaseGameService {
             data.put("playerList", newPlayerList);
             data.put("opMap", roomInfo.getOpMap());
             channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+            /**如果是大结算的话要把房间销毁掉,并且*/
+            if (MsgTypeEnum.totalSettlement.msgType == result.getMsgType()) {
+				redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
+				if (roomInfo.getClubId() != null) {
+					redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
+					log.info("解散俱乐部房间后，删除映射关系clubId:" + roomInfo.getClubId() + ",tableNum:" + roomInfo.getTableNum());
+				}
+				noticeAllClubPlayerTablePlayerNum(null, roomInfo.getClubId());
+			}
             /**记录回放操作日志*/
             addOperationLog(result.getMsgType(), null, roomInfo, player, null, null, null);
         } else {
@@ -1194,6 +1225,15 @@ public class MjGameService extends BaseGameService {
                 data.put("playerList", newPlayerList);
                 data.put("opMap", roomInfo.getOpMap());
                 channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+                /**如果是大结算的话要把房间销毁掉,并且*/
+                if (MsgTypeEnum.totalSettlement.msgType == result.getMsgType()) {
+    				redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
+    				if (roomInfo.getClubId() != null) {
+    					redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
+    					log.info("解散俱乐部房间后，删除映射关系clubId:" + roomInfo.getClubId() + ",tableNum:" + roomInfo.getTableNum());
+    				}
+    				noticeAllClubPlayerTablePlayerNum(null, roomInfo.getClubId());
+    			}
                 /**记录回放操作日志*/
                 addOperationLog(result.getMsgType(), null, roomInfo, player, null, null, null);
             } else {/**如果有其他玩家可以胡牌，则需要通知其他玩家胡牌*/
@@ -1310,6 +1350,17 @@ public class MjGameService extends BaseGameService {
         }
         data.put("playerList", newPlayerList);
         channelContainer.sendTextMsgByPlayerIds(result, GameUtil.getPlayerIdArr(playerList));
+        
+        /**如果是大结算的话要把房间销毁掉,并且*/
+        if (MsgTypeEnum.totalSettlement.msgType == result.getMsgType()) {
+			redisOperationService.cleanPlayerAndRoomInfo(roomId, GameUtil.getPlayerIdStrArr(playerList));
+			if (roomInfo.getClubId() != null) {
+				redisOperationService.delRoomIdByClubIdTableNum(roomInfo.getClubId(), roomInfo.getTableNum());
+				log.info("解散俱乐部房间后，删除映射关系clubId:" + roomInfo.getClubId() + ",tableNum:" + roomInfo.getTableNum());
+				
+			}
+			noticeAllClubPlayerTablePlayerNum(null, roomInfo.getClubId());
+		}
         /**记录回放操作日志*/
         addOperationLog(result.getMsgType(), null, roomInfo, MjCardRule.getPlayerInfoByPlayerId(playerList, roomInfo.getCurPlayerId()), null, null, null);
 
@@ -1651,6 +1702,9 @@ public class MjGameService extends BaseGameService {
     public BaseRoomInfo getRoomInfo(ChannelHandlerContext ctx,
                                     BaseRequest request, UserInfo userInfo) {
         Integer roomId = userInfo.getRoomId();
+        if (roomId ==  null) {
+        	return null;
+		}
         MjRoomInfo roomInfo = redisOperationService.getRoomInfoByRoomId(roomId, MjRoomInfo.class);
         return roomInfo;
     }

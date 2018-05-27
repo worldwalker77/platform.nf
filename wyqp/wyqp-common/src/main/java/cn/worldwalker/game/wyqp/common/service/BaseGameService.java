@@ -313,7 +313,7 @@ public abstract class BaseGameService {
 		
 	}
 	
-	private void noticeAllClubPlayerTablePlayerNum(Integer playerId, Integer clubId){
+	public void noticeAllClubPlayerTablePlayerNum(Integer playerId, Integer clubId){
 		if (clubId == null) {
 			return;
 		}
@@ -1534,7 +1534,10 @@ public abstract class BaseGameService {
 		gameQuery.setClubId(clubId);
 		List<GameModel> list = gameDao.getProxyClubs(gameQuery);
 		if (CollectionUtils.isEmpty(list)) {
-			throw new BusinessException(ExceptionEnum.CLUB_ID_NOT_EXIST);
+			log.error("俱乐部不存在");
+			redisOperationService.hdelPlayerIdClubId(playerId);
+			channelContainer.sendTextMsgByPlayerIds(new Result(0, MsgTypeEnum.entryHall.msgType), playerId);
+			return;
 		}
 		GameModel gameModel = list.get(0);
 		/**如果不是俱乐部创始人进入，则需要校验玩家是否在俱乐部中*/
@@ -1725,6 +1728,10 @@ public abstract class BaseGameService {
 		/**删除playerId与俱乐部id的对应关系，去掉记忆*/
 		redisOperationService.hdelPlayerIdClubId(otherPlayerId);
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
+		
+		/**给被删除的玩家返回进入大厅协议以便退出俱乐部*/
+		result.setMsgType(MsgTypeEnum.exitClub.msgType);
+		channelContainer.sendTextMsgByPlayerIds(result, otherPlayerId);
 	}
 	
 	/**
@@ -1833,6 +1840,9 @@ public abstract class BaseGameService {
 		for(GameModel model : list){
 			/**删除playerId与俱乐部id的对应关系，去掉记忆*/
 			redisOperationService.hdelPlayerIdClubId(model.getPlayerId());
+			/**给被删除的玩家返回进入大厅协议以便退出俱乐部*/
+			result.setMsgType(MsgTypeEnum.exitClub.msgType);
+			channelContainer.sendTextMsgByPlayerIds(result, model.getPlayerId());
 		}
 		/**删除俱乐部*/
 		channelContainer.sendTextMsgByPlayerIds(result, playerId);
