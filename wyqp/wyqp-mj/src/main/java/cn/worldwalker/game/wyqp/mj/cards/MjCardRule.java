@@ -226,6 +226,9 @@ public class MjCardRule {
 		}
 		int allSize = allPlayerOperations.size();
 		TreeMap<Integer, String> curPlayerOperations = allPlayerOperations.get(playerId);
+		if (curPlayerOperations == null || curPlayerOperations.isEmpty()) {
+			return null;
+		}
 		/**当前玩家的可操作权限*/
 		TreeMap<Integer, String> resultMap = new TreeMap<Integer, String>();
 		resultMap.putAll(curPlayerOperations);
@@ -1443,7 +1446,7 @@ public class MjCardRule {
             	/**可胡牌标志为false，则不能胡牌*/
     			if (!player.getCheckHuflag()) {
     				/**再判断下此时胡的分数是否大于当时放弃胡时的分数，如果大于则可以胡，如果小于或者等于则不能胡*/
-    				Integer huScore = MjScoreService.getInstance().getHuScore(player, cardIndex);
+    				Integer huScore = MjScoreService.getInstance().getHuScore(player, cardIndex, type);
     				if (huScore > player.getCheckHuScore()) {
     					isHu = true;
 					}else{

@@ -252,13 +252,16 @@ public class MjScoreService {
      */
 
     @SuppressWarnings("ConstantConditions")
-    public int getHuScore(MjPlayerInfo mjPlayerInfo, Integer card){
+    public int getHuScore(MjPlayerInfo mjPlayerInfo, Integer card, Integer opType){
         List<Integer> typeList = MjScoreService.getInstance().calHuPlayer(mjPlayerInfo,card);
         int score = 0;
         for (Integer type : typeList){
             score = score + MjScoreEnum.getByType(type).score;
         }
         score = score > 8 ? 8 : score;
+        if (opType == 3) {
+        	score = 3*score;
+		}
         return score;
     }
 

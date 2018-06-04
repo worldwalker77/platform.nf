@@ -87,14 +87,18 @@ public class CommonManagerImpl implements CommonManager{
 	@Override
 	public List<Integer> deductRoomCard(BaseRoomInfo roomInfo, RoomCardOperationEnum operationEnum){
 		List<Integer> playerIList = new ArrayList<Integer>();
-		if (roomInfo.getPayType() == 1) {/**房主付费*/
-			playerIList.add(roomInfo.getRoomOwnerId());
-		}else{/**AA付费*/
-			List playerList = roomInfo.getPlayerList();
-			int size = playerList.size();
-			for(int i = 0; i < size; i++){
-				BasePlayerInfo player = (BasePlayerInfo)playerList.get(i);
-				playerIList.add(player.getPlayerId());
+		if (roomInfo.getClubId() != null) {
+			playerIList.add(roomInfo.getClubOwnerId());
+		}else{
+			if (roomInfo.getPayType() == 1) {/**房主付费*/
+				playerIList.add(roomInfo.getRoomOwnerId());
+			}else{/**AA付费*/
+				List playerList = roomInfo.getPlayerList();
+				int size = playerList.size();
+				for(int i = 0; i < size; i++){
+					BasePlayerInfo player = (BasePlayerInfo)playerList.get(i);
+					playerIList.add(player.getPlayerId());
+				}
 			}
 		}
 		for(Integer playerId : playerIList){

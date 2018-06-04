@@ -92,7 +92,11 @@ public class CommonGameService extends BaseGameService{
 				List<GameModel> gmList = gameDao.getClubTables(gameQuery);
 				
 				if (CollectionUtils.isEmpty(gmList)) {
-					throw new BusinessException(ExceptionEnum.PARAMS_ERROR);
+					log.error("数据库查询不到俱乐部牌桌,gameQuery:" + JsonUtil.toJson(gameQuery));
+					Result result = new Result();
+					result.setMsgType(MsgTypeEnum.entryHall.msgType);
+					channelContainer.sendTextMsgByPlayerIds(result, msg.getPlayerId());
+					return;
 				}
 				GameModel gm = gmList.get(0);
 				Map<String, Object> remark = JsonUtil.toMap(gm.getRemark());
@@ -226,6 +230,10 @@ public class CommonGameService extends BaseGameService{
 	public BaseRoomInfo getRoomInfo(ChannelHandlerContext ctx,
 			BaseRequest request, UserInfo userInfo) {
 		Integer roomId = userInfo.getRoomId();
+		if (roomId == null) {
+			return null;
+			
+		}
 		RedisRelaModel model = redisOperationService.getGameTypeUpdateTimeByRoomId(roomId);
 		if (model == null) {
 			return null;

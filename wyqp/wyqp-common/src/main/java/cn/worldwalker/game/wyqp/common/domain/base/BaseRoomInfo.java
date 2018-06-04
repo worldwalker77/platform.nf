@@ -51,6 +51,8 @@ public class BaseRoomInfo {
 	
 	private Integer clubId;
 	
+	private Integer clubOwnerId;
+	
 	private Integer tableNum;
 	/**玩家相互之间的距离*/
 	private Map<String, String> distanceMap = new HashMap<String, String>();
@@ -59,6 +61,14 @@ public class BaseRoomInfo {
 	/**房间信息备注*/
 	private Map<String, Object> remark = new HashMap<String, Object>();
 	
+	public Integer getClubOwnerId() {
+		return clubOwnerId;
+	}
+
+	public void setClubOwnerId(Integer clubOwnerId) {
+		this.clubOwnerId = clubOwnerId;
+	}
+
 	public Integer getTableNum() {
 		return tableNum;
 	}
