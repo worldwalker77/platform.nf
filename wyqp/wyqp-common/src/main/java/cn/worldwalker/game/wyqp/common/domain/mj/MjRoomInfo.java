@@ -32,6 +32,12 @@ public class MjRoomInfo extends BaseRoomInfo{
 	
 	/**是否可以吃牌 0：不可以 1：可以*/
 	private Integer isChiPai = 1;
+	/**是否可以假胡，一圈之内如果不糊，则是否可以胡*/
+	private Integer isJiaHu = 1;
+	/**大转弯： A打的牌 B碰了 然后B又自摸杠了  那A给2分  就跟放杠一样;小转弯：跟正常情况一样*/
+	private Integer isDaZhuanWan = 0;
+	/**庄家坐马： 庄家翻倍;庄家不做马：跟正常情况一样*/
+	private Integer isBankerMultiple = 0;
 	/**胡牌底分*/
 	private Integer huButtomScore = 0;
 	/**每个花的分数*/
@@ -246,5 +252,24 @@ public class MjRoomInfo extends BaseRoomInfo{
     public void setControlPlayer(Set<Integer> controlPlayer) {
         this.controlPlayer = controlPlayer;
     }
+	public Integer getIsJiaHu() {
+		return isJiaHu;
+	}
+	public void setIsJiaHu(Integer isJiaHu) {
+		this.isJiaHu = isJiaHu;
+	}
+	public Integer getIsDaZhuanWan() {
+		return isDaZhuanWan;
+	}
+	public void setIsDaZhuanWan(Integer isDaZhuanWan) {
+		this.isDaZhuanWan = isDaZhuanWan;
+	}
+	public Integer getIsBankerMultiple() {
+		return isBankerMultiple;
+	}
+	public void setIsBankerMultiple(Integer isBankerMultiple) {
+		this.isBankerMultiple = isBankerMultiple;
+	}
+    
 }
 
