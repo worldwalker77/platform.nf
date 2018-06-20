@@ -1028,7 +1028,19 @@ public class MjGameService extends BaseGameService {
     					return;
     				}
 				}
-            	MjCardRule.getPlayerHighestPriority(roomInfo, curPlayerId);
+            	/**如果当前玩家pass的是胡，则需要设置假胡标记*/
+            	String huStr = delOperation.get(MjOperationEnum.hu.type);
+                /**如果放弃的是胡*/
+                if (StringUtils.isNotBlank(huStr)) {
+                	/**放弃胡，则一圈内此玩家不能胡牌*/
+                	player.setCheckHuflag(false);
+                	/**设置当时放弃的胡的分数*/
+                	Integer opType = 0;
+                	if (huStr.startsWith("3")) {
+                		opType = 3;
+					}
+                	player.setCheckHuScore(mjScoreService.getHuScore(player, roomInfo.getLastCardIndex(),opType));
+                }
                 roomInfo.setCurPlayerId(curPlayerId);
                 roomInfo.setUpdateTime(new Date());
                 redisOperationService.setRoomIdRoomInfo(roomId, roomInfo);
